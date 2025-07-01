@@ -16,7 +16,7 @@ xdg-open index.html        # Linux
 
 `index.html` supports several query parameters so you can customize the reveal text and appearance. Parameters are optional and can be combined:
 
-- `main` – main headline (default: "We're Expecting!")
+- `main` – main headline (default: "We are expecting!")
 - `sub` – secondary line of text
 - `date` – additional date or detail line
 - `photo` – URL to an image shown as a circular avatar
