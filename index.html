@@ -206,7 +206,10 @@
     function getParams() {
       const url = new URL(window.location.href);
       const params = {};
-      for (const [k, v] of url.searchParams.entries()) params[k] = v;
+      for (const [k, v] of url.searchParams.entries()) {
+        // Replace + with spaces to handle form submissions correctly
+        params[k] = v.replace(/\+/g, ' ');
+      }
       return params;
     }
 
