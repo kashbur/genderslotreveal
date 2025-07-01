@@ -230,8 +230,8 @@
       // Defaults
       const lines = [];
       let photo = params.photo ? decodeURIComponent(params.photo) : '';
-      // Only allow http:, https: or data: URLs for images
-      if (photo && !/^https?:|^data:/i.test(photo)) {
+      // Only allow http:, https: or data:image/ URLs for images
+      if (photo && !/^(https?:|data:image\/)/i.test(photo)) {
         photo = '';
       }
       const main = params.main || "We're Expecting!";
