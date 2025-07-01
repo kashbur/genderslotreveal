@@ -43,14 +43,15 @@
       pointer-events: none;
     }
     .blur-background { filter: blur(8px);}
-    .reel {
-      position: absolute;
-      width: 19.2%; height: 14.4%;
-      top: 34.2%;
-      background: transparent;
-      display: flex; justify-content: center; align-items: center;
-      z-index: 2;
-    }
+      .reel {
+        position: absolute;
+        width: 19.2%; height: 14.4%;
+        top: 34.2%;
+        background: transparent;
+        display: flex; justify-content: center; align-items: center;
+        z-index: 2;
+        transition: filter 0.5s ease;
+      }
     #reel1 { left: 20.4%; }
     #reel2 { left: 42.7%; }
     #reel3 { left: 65.1%; }
@@ -63,16 +64,16 @@
       transition: transform 0.05s;
       box-shadow: none;
     }
-    .spin-button {
-      position: absolute;
-      width: 34%; max-width: 170px;
-      left: 50%; top: 62.5%;
-      transform: translateX(-50%);
-      cursor: pointer;
-      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
-      z-index: 3;
-      transition: all 0.08s;
-    }
+      .spin-button {
+        position: absolute;
+        width: 34%; max-width: 170px;
+        left: 50%; top: 62.5%;
+        transform: translateX(-50%);
+        cursor: pointer;
+        filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
+        z-index: 3;
+        transition: all 0.08s, filter 0.5s ease;
+      }
     .spin-button img {
       width: 100%; height: auto; display: block;
       border-radius: 0;
@@ -186,25 +187,16 @@
       /* box-shadow: none; */
       /* border: none; */
     }
-    .tap-to-continue {
-      position: absolute; bottom: -40px; left: 0; width: 100%; text-align: center;
-      color: white; font-size: 1.8rem; animation: pulse 1.4s infinite;
-      font-family: 'Poppins', sans-serif;
-      font-weight: 700;
-      text-shadow: 0 3px 9px #0009, 0 2px 4px #0008;
-      letter-spacing: 1px;
-    }
-    @keyframes pulse { 0% {opacity:0.5;} 50% {opacity:1;} 100% {opacity:0.5;}}
   </style>
 </head>
 <body>
   <div class="aspect-container">
     <div class="slot-machine-container">
       <div class="slot-machine blur-background" id="slotMachine"></div>
-      <div id="reel1" class="reel"><img src="img/ring.png" alt="Ring"></div>
-      <div id="reel2" class="reel"><img src="img/graduation cap.png" alt="Graduation"></div>
-      <div id="reel3" class="reel"><img src="img/briefcase.png" alt="Briefcase"></div>
-      <div class="spin-button" id="spinButton">
+      <div id="reel1" class="reel blur-background"><img src="img/ring.png" alt="Ring"></div>
+      <div id="reel2" class="reel blur-background"><img src="img/graduation cap.png" alt="Graduation"></div>
+      <div id="reel3" class="reel blur-background"><img src="img/briefcase.png" alt="Briefcase"></div>
+      <div class="spin-button blur-background" id="spinButton">
         <img src="img/tap to spin.png" alt="Spin"/>
       </div>
       <div class="reveal-overlay" id="revealOverlay">
@@ -216,7 +208,6 @@
       <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
         <div class="instructions-container">
           <img src="img/directions.png" alt="Instructions" class="instructions-image"/>
-          <div class="tap-to-continue">Tap to continue</div>
         </div>
       </div>
     </div>
@@ -294,6 +285,10 @@
       function hideInstructionsOverlay() {
         instructionsOverlay.style.opacity = '0';
         slotMachine.classList.remove('blur-background');
+        reel1.classList.remove('blur-background');
+        reel2.classList.remove('blur-background');
+        reel3.classList.remove('blur-background');
+        spinButton.classList.remove('blur-background');
         instructionsOverlay.style.pointerEvents = 'none';
         setTimeout(() => {
           if (instructionsOverlay.parentNode) instructionsOverlay.parentNode.removeChild(instructionsOverlay);
