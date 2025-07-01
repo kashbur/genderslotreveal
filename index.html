@@ -34,7 +34,7 @@
     }
     .slot-machine {
       position: absolute; width: 100%; height: 100%;
-      background-image: url('img/background.png'); /* your slot machine background */
+      background-image: url('img/background.png');
       background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
@@ -82,11 +82,21 @@
     .spin-button.pressed, .spin-button:active {
       transform: translateX(-50%) scale(0.95);
     }
+    /* Overlay colors */
+    .reveal-overlay.default { background-color: rgba(238, 222, 197, 0.93); }
+    .reveal-overlay.pink    { background-color: rgba(255, 189, 227, 0.93); }
+    .reveal-overlay.blue    { background-color: rgba(161, 208, 255, 0.93);}
+    .reveal-overlay.gold    { background-color: rgba(255, 221, 137, 0.93);}
+    .reveal-overlay.purple  { background-color: rgba(199, 158, 255, 0.93);}
+    .reveal-overlay.green   { background-color: rgba(189, 244, 197, 0.93);}
+    .reveal-overlay.teal    { background-color: rgba(140, 233, 220, 0.93);}
+    .reveal-overlay.peach   { background-color: rgba(255, 208, 176, 0.93);}
+    .reveal-overlay.yellow  { background-color: rgba(255, 244, 150, 0.93);}
     .reveal-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(238, 222, 197, 0.93);
       display: flex; justify-content: center; align-items: center;
       z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      flex-direction: column;
     }
     .reveal-text {
       font-family: 'Poppins', sans-serif;
@@ -96,10 +106,19 @@
       line-height: 1.14; width: 90%;
       display: flex; flex-direction: column; align-items: center;
     }
-    .headline { font-size: 1.18em; margin-bottom: 0.2em; text-transform: none;}
-    .baby-name { font-size: 1em; margin: 0.13em 0 0.12em 0;}
-    .baby-date { font-size: 0.86em; margin-bottom: 0.22em;}
-    .parents { font-size: 0.8em; margin-top: 0.18em; text-transform: none;}
+    .reveal-text .photo {
+      display: none;
+      max-width: 180px;
+      max-height: 180px;
+      border-radius: 16px;
+      margin-bottom: 0.6em;
+      object-fit: cover;
+      box-shadow: 0 3px 14px #0003;
+    }
+    .reveal-text .msg-main { font-size: 1.05em; margin-bottom: 0.23em; }
+    .reveal-text .msg-sub { font-size: 0.95em; margin-bottom: 0.17em; }
+    .reveal-text .msg-due { font-size: 0.88em; margin-bottom: 0.12em;}
+    .reveal-text .msg-sign { font-size: 0.82em; margin-top: 0.25em; font-weight: 400; text-shadow: none; color: #fae9de; letter-spacing: 1px; text-transform: none;}
     .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
     .confetti-square { width: 10px; height: 10px;}
     .confetti-rectangle { width: 8px; height: 16px;}
@@ -144,12 +163,13 @@
       <div class="spin-button" id="spinButton">
         <img src="img/tap to spin.png" alt="Spin"/>
       </div>
-      <div class="reveal-overlay" id="revealOverlay">
+      <div class="reveal-overlay default" id="revealOverlay">
         <div class="reveal-text">
-          <span class="headline"></span>
-          <span class="baby-name"></span>
-          <span class="baby-date"></span>
-          <span class="parents"></span>
+          <img class="photo" src="" alt="Baby Reveal Photo"/>
+          <span class="msg-main">We're Expecting!</span>
+          <span class="msg-sub"></span>
+          <span class="msg-due"></span>
+          <span class="msg-sign"></span>
         </div>
       </div>
       <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
@@ -161,29 +181,53 @@
     </div>
   </div>
   <script>
-    // --- URL Parameter Logic ---
-    function getUrlParam(name, fallback = "") {
-      try {
-        const url = new URL(window.location.href);
-        return url.searchParams.get(name) || fallback;
-      } catch { return fallback; }
+    // --- Helper to parse URL params ---
+    function getParam(name, def='') {
+      const url = new URL(window.location.href);
+      let v = url.searchParams.get(name);
+      return (v !== null && v !== undefined && v !== "") ? v : def;
     }
-    function updateRevealTextFromParams() {
-      // Grab params, allow defaults if missing
-      const headline = getUrlParam('headline', "It's a Surprise!");
-      const name = getUrlParam('name', '');
-      const date = getUrlParam('date', '');
-      const parents = getUrlParam('parents', '');
 
-      document.querySelector('.headline').textContent = headline || "";
-      document.querySelector('.baby-name').textContent = name ? name : "";
-      document.querySelector('.baby-date').textContent = date ? ("Coming " + date + "!") : "";
-      document.querySelector('.parents').textContent = parents ? parents : "";
+    // --- Update reveal text and overlay color based on params ---
+    function applyRevealParams() {
+      // Params: message, sub, due, photo, color, signoff
+      const mainMsg = getParam('message', "We're Expecting!");
+      const subMsg = getParam('sub', '');
+      const dueMsg = getParam('due', '');
+      const signMsg = getParam('signoff', '');
+      const photo = getParam('photo', '');
+      let color = getParam('color', 'default').toLowerCase();
+
+      // Reveal text
+      document.querySelector('.msg-main').textContent = mainMsg;
+      document.querySelector('.msg-sub').textContent = subMsg;
+      document.querySelector('.msg-due').textContent = dueMsg;
+      document.querySelector('.msg-sign').textContent = signMsg;
+
+      // Hide lines if empty
+      document.querySelector('.msg-sub').style.display = subMsg ? "" : "none";
+      document.querySelector('.msg-due').style.display = dueMsg ? "" : "none";
+      document.querySelector('.msg-sign').style.display = signMsg ? "" : "none";
+
+      // Photo
+      const img = document.querySelector('.photo');
+      if (photo) {
+        img.src = decodeURIComponent(photo);
+        img.alt = subMsg || mainMsg || "Baby Reveal";
+        img.style.display = '';
+      } else {
+        img.style.display = 'none';
+      }
+
+      // Overlay color
+      const overlay = document.getElementById('revealOverlay');
+      overlay.className = "reveal-overlay " + (
+        ["pink","blue","gold","purple","green","teal","peach","yellow"].includes(color) ? color : "default"
+      );
     }
-    document.addEventListener('DOMContentLoaded', updateRevealTextFromParams);
 
-    // --- Slot machine script (same as before, untouched) ---
     document.addEventListener('DOMContentLoaded', function () {
+      // --- Slot logic unchanged below ---
       const icons = [
         "img/ring.png",
         "img/graduation cap.png",
@@ -202,6 +246,9 @@
       const reel3 = document.getElementById('reel3');
       const revealOverlay = document.getElementById('revealOverlay');
       const instructionsOverlay = document.getElementById('instructionsOverlay');
+
+      // --- URL param reveal setup
+      applyRevealParams();
 
       function hideInstructionsOverlay() {
         instructionsOverlay.style.opacity = '0';
@@ -309,7 +356,8 @@
         }, delay);
       }
       function showReveal() {
-        updateRevealTextFromParams(); // update with params when shown
+        // re-apply overlay for color & param in case user changed url and reload
+        applyRevealParams();
         revealOverlay.style.opacity = '1';
         revealOverlay.style.pointerEvents = 'auto';
         createConfetti();
