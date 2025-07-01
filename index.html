@@ -84,47 +84,76 @@
     }
     .reveal-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(238, 222, 197, 0.93); /* default */
+      background-color: rgba(238, 222, 197, 0.93);
       display: flex; justify-content: center; align-items: center;
       z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.2s;
       flex-direction: column;
     }
-    /* Overlay color classes */
-    .overlay-pink   { background-color: rgba(255, 192, 220, 0.92)!important; }
-    .overlay-blue   { background-color: rgba(173, 206, 255, 0.92)!important; }
-    .overlay-gold   { background-color: rgba(247, 220, 135, 0.94)!important; }
-    .overlay-green  { background-color: rgba(186, 245, 196, 0.92)!important; }
-    .overlay-purple { background-color: rgba(220, 195, 255, 0.92)!important; }
-    .overlay-gray   { background-color: rgba(210, 210, 220, 0.91)!important; }
-    .reveal-text {
+    .reveal-overlay .color-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      opacity: 0.53;
+      background: transparent;
+      transition: background 0.3s;
+    }
+    .reveal-content {
+      position: relative;
+      z-index: 2;
+      width: 95%;
+      max-width: 95vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .reveal-lines {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+    .reveal-line {
+      width: 100%;
+      text-align: center;
       font-family: 'Poppins', sans-serif;
       color: #fff;
-      text-align: center;
-      text-shadow: -2px -2px 0 #A59079, 2px -2px 0 #A59079, -2px 2px 0 #A59079, 2px 2px 0 #A59079, 0px 3px 5px rgba(0,0,0,0.18);
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      line-height: 1.18; width: 95%;
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center;
-    }
-    .reveal-text > div, .reveal-text > img {
+      text-shadow: -2px -2px 0 #A59079, 2px -2px 0 #A59079, -2px 2px 0 #A59079, 2px 2px 0 #A59079, 0px 3px 5px rgba(0,0,0,0.2);
+      margin-bottom: 0.32em;
       opacity: 0;
-      transition: opacity 0.55s;
-      margin-bottom: 0.56em;
-      width: 100%;
-      max-width: 90%;
-      margin-left: auto;
-      margin-right: auto;
+      transform: translateY(16px);
+      transition: opacity 0.7s, transform 0.7s;
     }
-    .reveal-main { font-size: 2.1rem; font-weight: 700; }
-    .reveal-sub { font-size: 1.3rem; font-weight: 600; margin-bottom: 0.36em;}
-    .reveal-date { font-size: 1.1rem; font-weight: 500; margin-bottom: 0.22em;}
-    .reveal-from { font-size: 1.04rem; margin-top: 0.7em; font-style: italic; }
-    .reveal-photo { display: block; margin: 0.55em auto 0.4em auto; max-width: 160px; border-radius: 13px; box-shadow: 0 4px 16px #0002; }
+    .reveal-line.shown {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-line.photo img {
+      width: 108px;
+      height: 108px;
+      border-radius: 12px;
+      object-fit: cover;
+      margin-bottom: 1em;
+      border: 4px solid #fff5;
+      background: #f6f6f6;
+      box-shadow: 0 2px 16px #0002;
+    }
+    .reveal-line.main { font-size: 2.15rem; font-weight: 900; margin-top: 0.16em;}
+    .reveal-line.sub { font-size: 1.35rem; font-weight: 700; }
+    .reveal-line.date { font-size: 1.14rem; font-weight: 700; }
+    .reveal-line.from { font-size: 1.13rem; font-weight: 700; font-style: italic; margin-top: 1.3em;}
+    @media (max-width:500px) {
+      .aspect-container { max-width: 100vw; }
+      .reveal-line.main { font-size: 1.25rem;}
+      .reveal-line.sub { font-size: 1.09rem;}
+      .reveal-line.date { font-size: 1rem;}
+      .reveal-line.from { font-size: 0.95rem;}
+      .reveal-content { max-width: 99vw; }
+    }
     .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
     .confetti-square { width: 10px; height: 10px;}
     .confetti-rectangle { width: 8px; height: 16px;}
     .confetti-circle { width: 10px; height: 10px; border-radius: 50%;}
+    /* Instructions Overlay */
     .instructions-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.68);
@@ -136,8 +165,6 @@
     }
     .instructions-image {
       width: 100%; height: auto; border-radius: 12px; box-shadow: 0 2px 20px #0004;
-      background: transparent;
-      display: block;
     }
     .tap-to-continue {
       position: absolute; bottom: -40px; left: 0; width: 100%; text-align: center;
@@ -148,15 +175,6 @@
       letter-spacing: 1px;
     }
     @keyframes pulse { 0% {opacity:0.5;} 50% {opacity:1;} 100% {opacity:0.5;}}
-    @media (max-width:500px) {
-      .aspect-container { max-width: 100vw; }
-      .instructions-container { max-width: 96vw;}
-      .reveal-main { font-size: 1.26rem;}
-      .reveal-sub { font-size: 1.08rem;}
-      .reveal-date { font-size: 0.98rem;}
-      .spin-button { width: 41%; }
-      .tap-to-continue { font-size: 1.33rem; }
-    }
   </style>
 </head>
 <body>
@@ -170,7 +188,10 @@
         <img src="img/tap to spin.png" alt="Spin"/>
       </div>
       <div class="reveal-overlay" id="revealOverlay">
-        <div class="reveal-text" id="revealText"></div>
+        <div class="color-overlay" id="colorOverlay"></div>
+        <div class="reveal-content">
+          <div class="reveal-lines" id="revealLines"></div>
+        </div>
       </div>
       <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
         <div class="instructions-container">
@@ -181,30 +202,45 @@
     </div>
   </div>
   <script>
-    // --------- PARAM HELPERS ---------
-    function getParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name) ? decodeURIComponent(params.get(name)) : "";
-    }
-    // --------- PARAM LOGIC ---------
-    const msg  = getParam("msg")  || "We're Expecting!";
-    const sub  = getParam("sub")  || "";
-    const date = getParam("date") || "";
-    const photo = getParam("photo") || "";
-    const from = getParam("from") || "";
-    const color = (getParam("color") || "").toLowerCase();
-
-    // Overlay color logic (add class to overlay)
-    function setRevealOverlayColor() {
-      const overlay = document.getElementById("revealOverlay");
-      overlay.classList.remove("overlay-pink", "overlay-blue", "overlay-gold", "overlay-green", "overlay-purple", "overlay-gray");
-      if (["pink","blue","gold","green","purple","gray"].includes(color)) {
-        overlay.classList.add("overlay-"+color);
-      }
+    // -------------- URL Params Logic -------------
+    function getParams() {
+      const url = new URL(window.location.href);
+      const params = {};
+      for (const [k, v] of url.searchParams.entries()) params[k] = v;
+      return params;
     }
 
+    function getRevealLinesFromParams(params) {
+      // Defaults
+      const lines = [];
+      const photo = params.photo ? decodeURIComponent(params.photo) : '';
+      const main = params.main || "We're Expecting!";
+      const sub = params.sub || "";
+      const date = params.date || "";
+      const from = params.from || "";
+      if (photo) lines.push({type: 'photo', content: photo});
+      if (main) lines.push({type: 'main', content: main});
+      if (sub) lines.push({type: 'sub', content: sub});
+      if (date) lines.push({type: 'date', content: date});
+      if (from) lines.push({type: 'from', content: from});
+      return lines;
+    }
+    function getColorOverlay(params) {
+      // Pink, blue, yellow, green, purple, gold, none
+      let color = (params.color || 'pink').toLowerCase();
+      const overlays = {
+        pink: 'rgba(249, 185, 215, 0.93)',
+        blue: 'rgba(173, 212, 253, 0.93)',
+        yellow: 'rgba(254, 243, 199, 0.93)',
+        green: 'rgba(203, 247, 208, 0.93)',
+        purple: 'rgba(210, 197, 252, 0.93)',
+        gold: 'rgba(255, 223, 154, 0.93)',
+        none: 'transparent',
+      };
+      return overlays[color] || overlays.pink;
+    }
+    // ----------- Slot Machine Game Logic ----------
     document.addEventListener('DOMContentLoaded', function () {
-      // --- Slot machine images (update paths if needed) ---
       const icons = [
         "img/ring.png",
         "img/graduation cap.png",
@@ -222,11 +258,15 @@
       const reel2 = document.getElementById('reel2');
       const reel3 = document.getElementById('reel3');
       const revealOverlay = document.getElementById('revealOverlay');
-      const revealText = document.getElementById('revealText');
+      const revealLinesDiv = document.getElementById('revealLines');
+      const colorOverlay = document.getElementById('colorOverlay');
       const instructionsOverlay = document.getElementById('instructionsOverlay');
-      // Color overlay
-      setRevealOverlayColor();
+      const params = getParams();
 
+      // Set overlay color on reveal
+      colorOverlay.style.background = getColorOverlay(params);
+
+      // Hide instructions overlay
       function hideInstructionsOverlay() {
         instructionsOverlay.style.opacity = '0';
         slotMachine.classList.remove('blur-background');
@@ -241,6 +281,7 @@
         hideInstructionsOverlay();
       }, {passive:false});
 
+      // Spin button interactions
       function playClickSound() {
         try {
           const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -333,41 +374,45 @@
         }, delay);
       }
 
+      // ------------- REVEAL LOGIC -----------------
       function showReveal() {
-        // Compose staggered lines based on present params
-        const revealLines = [];
-        if (msg) revealLines.push(`<div class="reveal-main">${msg}</div>`);
-        if (sub) revealLines.push(`<div class="reveal-sub">${sub}</div>`);
-        if (date) revealLines.push(`<div class="reveal-date">${date}</div>`);
-        if (photo) revealLines.push(`<img src="${photo}" class="reveal-photo" alt="" />`);
-        if (from) revealLines.push(`<div class="reveal-from">Love, ${from}</div>`);
+        // 1. Clear any previous reveal lines!
+        revealLinesDiv.innerHTML = '';
 
-        revealText.innerHTML = '';
-        revealText.style.opacity = '1';
+        // 2. Get all lines to reveal
+        const revealLines = getRevealLinesFromParams(params);
 
-        let i = 0;
-        function staggeredReveal() {
-          if (i < revealLines.length) {
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = revealLines[i];
-            const el = tempDiv.firstChild;
-            el.style.opacity = 0;
-            revealText.appendChild(el);
-            setTimeout(() => { el.style.opacity = 1; }, 30);
-            i++;
-            setTimeout(staggeredReveal, 950); // Adjust timing as needed
-          }
-        }
-        staggeredReveal();
+        // 3. Stagger and animate
+        let delay = 0;
+        revealLines.forEach((line, i) => {
+          setTimeout(() => {
+            const div = document.createElement('div');
+            div.className = 'reveal-line ' + line.type;
+            if (line.type === 'photo') {
+              const img = document.createElement('img');
+              img.src = line.content;
+              img.alt = "photo";
+              img.onerror = () => { div.style.display = 'none'; }; // Hide if broken link
+              div.appendChild(img);
+            } else {
+              div.textContent = line.content;
+            }
+            revealLinesDiv.appendChild(div);
+            setTimeout(() => div.classList.add('shown'), 70);
+          }, delay);
+          delay += 720; // milliseconds between each line
+        });
+
+        // 4. Show overlay and confetti
         revealOverlay.style.opacity = '1';
         revealOverlay.style.pointerEvents = 'auto';
         createConfetti();
         setTimeout(() => {
           revealOverlay.style.opacity = '0';
           revealOverlay.style.pointerEvents = 'none';
-        }, Math.max(5500, 1200 * (revealLines.length + 2)));
+        }, delay + 2600);
       }
-
+      // -------- Confetti logic (unchanged) ----------
       function createConfetti() {
         document.querySelectorAll('.confetti').forEach(el => { if (el.parentNode) el.parentNode.removeChild(el); });
         const colors = [
