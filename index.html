@@ -230,8 +230,9 @@
     }
     function getColorOverlay(params) {
       // Pink, blue, yellow, green, purple, gold, none
-      let color = (params.color || 'pink').toLowerCase();
+      let color = (params.color || 'beige').toLowerCase();
       const overlays = {
+        beige: 'rgba(238, 222, 197, 0.93)',
         pink: 'rgba(249, 185, 215, 0.93)',
         blue: 'rgba(173, 212, 253, 0.93)',
         yellow: 'rgba(254, 243, 199, 0.93)',
@@ -240,7 +241,7 @@
         gold: 'rgba(255, 223, 154, 0.93)',
         none: 'transparent',
       };
-      return overlays[color] || overlays.pink;
+      return overlays[color] || overlays.beige;
     }
     // ----------- Slot Machine Game Logic ----------
     document.addEventListener('DOMContentLoaded', function () {
