@@ -261,8 +261,8 @@
       return overlays[color] || overlays.beige;
     }
     // ----------- Slot Machine Game Logic ----------
-    document.addEventListener('DOMContentLoaded', function () {
-      const icons = [
+      document.addEventListener('DOMContentLoaded', function () {
+        const icons = [
         "img/ring.png",
         "img/graduation cap.png",
         "img/briefcase.png",
@@ -281,8 +281,9 @@
       const revealOverlay = document.getElementById('revealOverlay');
       const revealLinesDiv = document.getElementById('revealLines');
       const colorOverlay = document.getElementById('colorOverlay');
-      const instructionsOverlay = document.getElementById('instructionsOverlay');
-      const params = getParams();
+        const instructionsOverlay = document.getElementById('instructionsOverlay');
+        const params = getParams();
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
       // Set overlay color on reveal
       colorOverlay.style.background = getColorOverlay(params);
@@ -307,11 +308,13 @@
       }, {passive:false});
 
       // Spin button interactions
-      function playClickSound() {
-        try {
-          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-          const oscillator = audioContext.createOscillator();
-          const gainNode = audioContext.createGain();
+        function playClickSound() {
+          try {
+            if (audioContext.state === 'suspended') {
+              audioContext.resume();
+            }
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
           oscillator.type = 'sine';
           oscillator.frequency.setValueAtTime(210, audioContext.currentTime);
           gainNode.gain.setValueAtTime(0.14, audioContext.currentTime);
