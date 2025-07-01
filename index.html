@@ -1,466 +1,475 @@
-<div class="aspect-container">
-  <div class="slot-machine-container">
-    <div class="slot-machine blur-background" id="slotMachine"></div>
-    <div id="reel1" class="reel"><img src="https://i.postimg.cc/s26Ryf7W/2.png" alt="Ring"></div>
-    <div id="reel2" class="reel"><img src="https://i.postimg.cc/qRWVhmmM/3.png" alt="Graduation"></div>
-    <div id="reel3" class="reel"><img src="https://i.postimg.cc/cCYqQQj7/4.png" alt="Briefcase"></div>
-    <div class="spin-button" id="spinButton">
-      <img src="https://i.postimg.cc/7hkzxGn5/Blue-Phone-Text-Message-Instagram-Reel-Video.png" alt="Spin"/>
-    </div>
-    <div class="reveal-overlay" id="revealOverlay">
-      <div class="reveal-text">
-        <span class="reveal-line1">We are expecting!</span>
-        <span class="reveal-line2">
-          <span class="baby-label">Baby</span>
-          <span class="baby-name"></span>
-          coming <span class="baby-month"></span>
-        </span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Baby Gender Reveal Slot Machine</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html, body {
+      margin: 0; padding: 0;
+      height: 100%; width: 100%;
+      background: #f0f0f0;
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      display: flex; justify-content: center; align-items: center;
+      overflow: hidden;
+    }
+
+    .aspect-container {
+      position: relative;
+      width: 98vw;
+      max-width: 430px;
+      aspect-ratio: 9/16;
+      background: #ddd;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.13);
+      overflow: hidden;
+      border-radius: 18px;
+      display: flex; justify-content: center; align-items: center;
+    }
+
+    .slot-machine-container {
+      position: absolute; width: 100%; height: 100%;
+      top: 0; left: 0;
+      display: flex; justify-content: center; align-items: center;
+      overflow: visible;
+    }
+
+    .slot-machine {
+      position: absolute; width: 100%; height: 100%;
+      background-image: url('https://i.postimg.cc/zXmcfd6L/Blue-Phone-Text-Message-Instagram-Reel-Video.png');
+      background-size: 100% 100%;
+      background-position: center;
+      background-repeat: no-repeat;
+      transition: filter 0.5s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .blur-background { filter: blur(8px); }
+
+    .reel {
+      position: absolute;
+      background: transparent;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 2;
+    }
+    #reel1 { top: 34.2%; left: 20.4%; width: 19.2%; height: 14.4%; }
+    #reel2 { top: 34.2%; left: 42.7%; width: 19.2%; height: 14.4%; }
+    #reel3 { top: 34.2%; left: 65.1%; width: 19.2%; height: 14.4%; }
+
+    .reel img {
+      width: 85%; height: 85%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+      transition: transform 0.05s;
+    }
+
+    @media (max-width: 768px) {
+      #reel1, #reel2, #reel3 { top: 34.7%; }
+      .spin-button { width: 31.25%; }
+    }
+    @media (max-width: 480px) {
+      #reel1, #reel2, #reel3 { top: 34.7%; }
+      .spin-button { width: 27.5%; top: 62.5%; }
+    }
+    @media (max-width: 375px) {
+      #reel1, #reel2, #reel3 { top: 35.2%; }
+    }
+    @media (max-width: 320px) {
+      #reel1, #reel2, #reel3 { top: 35.7%; }
+    }
+    @media (max-width:500px) {
+      .aspect-container { max-width: 100vw; }
+      .instructions-container { max-width: 200px;}
+      .reveal-text { font-size: 1.22rem;}
+      .tap-to-continue { font-size: 0.97rem; }
+    }
+
+    .spin-button {
+      position: absolute;
+      top: 62.5%;
+      left: 50%;
+      width: 34%;
+      padding: 0;
+      background: transparent;
+      transform: translateX(-50%);
+      cursor: pointer;
+      transition: all 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+      z-index: 3;
+    }
+    .spin-button img {
+      width: 100%; height: auto; display: block;
+      border-radius: 0;
+    }
+    .spin-button.pressed, .spin-button:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    .reveal-overlay {
+      position: absolute; 
+      top: 0; left: 0; 
+      width: 100%; height: 100%;
+      background-color: rgba(238, 222, 197, 0.93);
+      display: flex; 
+      justify-content: center; 
+      align-items: center;
+      z-index: 10; 
+      opacity: 0; 
+      pointer-events: none; 
+      transition: opacity 0.2s;
+    }
+    .reveal-text {
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      font-size: 2.1rem;
+      font-weight: 700;
+      color: #fff;
+      text-shadow:
+        -2px -2px 0 #A59079,
+         2px -2px 0 #A59079,
+        -2px  2px 0 #A59079,
+         2px  2px 0 #A59079,
+         0px  2.5px 0 #A59079,
+         2.5px 0px 0 #A59079,
+        -2.5px 0px 0 #A59079,
+         0px -2.5px 0 #A59079,
+         0px  3.5px 7px rgba(0,0,0,0.14);
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      line-height: 1.18;
+      width: 88%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .reveal-text .reveal-line1 {
+      font-size: 1em;
+      margin-bottom: 0.5em;
+      display: block;
+      font-weight: 700;
+      text-transform: none;
+    }
+    .reveal-text .reveal-line2 {
+      font-size: 1em;
+      font-weight: 500;
+      display: block;
+      text-transform: none;
+    }
+    .reveal-text .baby-label {
+      font-size: 1em;
+      font-weight: 700;
+    }
+    .reveal-text .baby-name {
+      font-size: 1em;
+      font-weight: 700;
+    }
+    .reveal-text .baby-month {
+      font-size: 1em;
+      font-weight: 700;
+    }
+
+    .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
+    .confetti-square { width: 10px; height: 10px;}
+    .confetti-rectangle { width: 8px; height: 16px;}
+    .confetti-circle { width: 10px; height: 10px; border-radius: 50%;}
+
+    .instructions-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.68);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 20; cursor: pointer; transition: opacity 0.4s;
+    }
+    .instructions-container { width: 90%; max-width: 270px; position: relative;}
+    .instructions-image { width: 100%; height: auto; border-radius: 12px;}
+    .tap-to-continue {
+      position: absolute; bottom: -32px; left: 0; width: 100%; text-align: center;
+      color: white; font-size: 1.15rem; animation: pulse 1.4s infinite;
+      font-family: 'Poppins', Arial, Helvetica, sans-serif;
+      text-shadow: 0 2px 5px #0007;
+    }
+    @keyframes pulse { 0% {opacity:0.5;} 50% {opacity:1;} 100% {opacity:0.5;} }
+  </style>
+</head>
+<body>
+  <div class="aspect-container">
+    <div class="slot-machine-container">
+      <div class="slot-machine blur-background" id="slotMachine"></div>
+      <div id="reel1" class="reel"><img src="https://i.postimg.cc/s26Ryf7W/2.png" alt="Ring"></div>
+      <div id="reel2" class="reel"><img src="https://i.postimg.cc/qRWVhmmM/3.png" alt="Graduation"></div>
+      <div id="reel3" class="reel"><img src="https://i.postimg.cc/cCYqQQj7/4.png" alt="Briefcase"></div>
+      <div class="spin-button" id="spinButton">
+        <img src="https://i.postimg.cc/7hkzxGn5/Blue-Phone-Text-Message-Instagram-Reel-Video.png" alt="Spin"/>
       </div>
-    </div>
-    <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
-      <div class="instructions-container">
-        <img src="https://i.postimg.cc/GpQmD1Y3/Untitled-design.png" alt="Instructions" class="instructions-image"/>
-        <div class="tap-to-continue">Tap to continue</div>
+      <div class="reveal-overlay" id="revealOverlay">
+        <div class="reveal-text">
+          <span class="reveal-line1">We are expecting!</span>
+          <span class="reveal-line2">
+            <span class="baby-label">Baby</span>
+            <span class="baby-name"></span>
+            coming <span class="baby-month"></span>
+          </span>
+        </div>
+      </div>
+      <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
+        <div class="instructions-container">
+          <img src="https://i.postimg.cc/GpQmD1Y3/Untitled-design.png" alt="Instructions" class="instructions-image"/>
+          <div class="tap-to-continue">Tap to continue</div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-/* Universal box-sizing for easier sizing */
-*, *::before, *::after { box-sizing: border-box; }
-
-html, body {
-  margin: 0; padding: 0;
-  height: 100%; width: 100%;
-  background: #f0f0f0;
-  font-family: 'Poppins', Arial, Helvetica, sans-serif;
-  display: flex; justify-content: center; align-items: center;
-  overflow: hidden;
-}
-
-.aspect-container {
-  position: relative;
-  width: 98vw;
-  max-width: 430px;
-  aspect-ratio: 9/16;
-  background: #ddd;
-  box-shadow: 0 6px 24px rgba(0,0,0,0.13);
-  overflow: hidden;
-  border-radius: 18px;
-  display: flex; justify-content: center; align-items: center;
-}
-
-.slot-machine-container {
-  position: absolute; width: 100%; height: 100%;
-  top: 0; left: 0;
-  display: flex; justify-content: center; align-items: center;
-  overflow: visible;
-}
-
-.slot-machine {
-  position: absolute; width: 100%; height: 100%;
-  background-image: url('https://i.postimg.cc/zXmcfd6L/Blue-Phone-Text-Message-Instagram-Reel-Video.png');
-  background-size: 100% 100%;
-  background-position: center;
-  background-repeat: no-repeat;
-  transition: filter 0.5s ease;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.blur-background { filter: blur(8px); }
-
-.reel {
-  position: absolute;
-  background: transparent;
-  display: flex; justify-content: center; align-items: center;
-  z-index: 2;
-}
-#reel1 { top: 34.2%; left: 20.4%; width: 19.2%; height: 14.4%; }
-#reel2 { top: 34.2%; left: 42.7%; width: 19.2%; height: 14.4%; }
-#reel3 { top: 34.2%; left: 65.1%; width: 19.2%; height: 14.4%; }
-
-.reel img {
-  width: 85%; height: 85%;
-  object-fit: contain;
-  display: block;
-  margin: auto;
-  transition: transform 0.05s;
-}
-
-/* --- Responsive Adjustments --- */
-@media (max-width: 768px) {
-  #reel1, #reel2, #reel3 { top: 34.7%; }
-  .spin-button { width: 31.25%; }
-}
-@media (max-width: 480px) {
-  #reel1, #reel2, #reel3 { top: 34.7%; }
-  .spin-button { width: 27.5%; top: 62.5%; }
-}
-@media (max-width: 375px) {
-  #reel1, #reel2, #reel3 { top: 35.2%; }
-}
-@media (max-width: 320px) {
-  #reel1, #reel2, #reel3 { top: 35.7%; }
-}
-@media (max-width:500px) {
-  .aspect-container { max-width: 100vw; }
-  .instructions-container { max-width: 200px;}
-  .reveal-text { font-size: 1.22rem;}
-  .tap-to-continue { font-size: 0.97rem; }
-}
-
-.spin-button {
-  position: absolute;
-  top: 62.5%;
-  left: 50%;
-  width: 34%;
-  padding: 0;
-  background: transparent;
-  transform: translateX(-50%);
-  cursor: pointer;
-  transition: all 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
-  z-index: 3;
-}
-.spin-button img {
-  width: 100%; height: auto; display: block;
-  border-radius: 0;
-}
-.spin-button.pressed, .spin-button:active {
-  transform: translateX(-50%) scale(0.95);
-}
-
-/* --- Reveal Overlay & Text (improved outline) --- */
-.reveal-overlay {
-  position: absolute; 
-  top: 0; left: 0; 
-  width: 100%; height: 100%;
-  background-color: rgba(238, 222, 197, 0.93);
-  display: flex; 
-  justify-content: center; 
-  align-items: center;
-  z-index: 10; 
-  opacity: 0; 
-  pointer-events: none; 
-  transition: opacity 0.2s;
-}
-.reveal-text {
-  font-family: 'Poppins', Arial, Helvetica, sans-serif;
-  font-size: 2.1rem;
-  font-weight: 700;
-  color: #fff;
-  text-shadow:
-    -2px -2px 0 #A59079,
-     2px -2px 0 #A59079,
-    -2px  2px 0 #A59079,
-     2px  2px 0 #A59079,
-     0px  2.5px 0 #A59079,
-     2.5px 0px 0 #A59079,
-    -2.5px 0px 0 #A59079,
-     0px -2.5px 0 #A59079,
-     0px  3.5px 7px rgba(0,0,0,0.14);
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1.2px;
-  line-height: 1.18;
-  width: 88%;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-.reveal-text .reveal-line1 {
-  font-size: 1em;
-  margin-bottom: 0.5em;
-  display: block;
-  font-weight: 700;
-  text-transform: none;
-}
-.reveal-text .reveal-line2 {
-  font-size: 1em;
-  font-weight: 500;
-  display: block;
-  text-transform: none;
-}
-.reveal-text .baby-label {
-  font-size: 1em;
-  font-weight: 700;
-}
-.reveal-text .baby-name {
-  font-size: 1em;
-  font-weight: 700;
-}
-.reveal-text .baby-month {
-  font-size: 1em;
-  font-weight: 700;
-}
-
-/* --- Confetti --- */
-.confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
-.confetti-square { width: 10px; height: 10px;}
-.confetti-rectangle { width: 8px; height: 16px;}
-.confetti-circle { width: 10px; height: 10px; border-radius: 50%;}
-
-/* --- Instructions Overlay --- */
-.instructions-overlay {
-  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.68);
-  display: flex; justify-content: center; align-items: center;
-  z-index: 20; cursor: pointer; transition: opacity 0.4s;
-}
-.instructions-container { width: 90%; max-width: 270px; position: relative;}
-.instructions-image { width: 100%; height: auto; border-radius: 12px;}
-.tap-to-continue {
-  position: absolute; bottom: -32px; left: 0; width: 100%; text-align: center;
-  color: white; font-size: 1.15rem; animation: pulse 1.4s infinite;
-  font-family: 'Poppins', Arial, Helvetica, sans-serif;
-  text-shadow: 0 2px 5px #0007;
-}
-@keyframes pulse { 0% {opacity:0.5;} 50% {opacity:1;} 100% {opacity:0.5;}
-}
-// --- Reveal param text logic ---
-function getUrlParam(name, fallback = "") {
-  try {
-    const url = new URL(window.location.href);
-    return url.searchParams.get(name) || fallback;
-  } catch {
-    return fallback;
-  }
-}
-function updateRevealTextFromParams() {
-  const name = getUrlParam('name', '');
-  const month = getUrlParam('month', 'soon!');
-  const nameDisplay = name ? name : '';
-  const babyLabel = 'Baby';
-  const monthDisplay = month;
-  document.querySelector('.baby-label').textContent = babyLabel;
-  document.querySelector('.baby-name').textContent = nameDisplay;
-  document.querySelector('.baby-month').textContent = monthDisplay;
-}
-updateRevealTextFromParams();
-
-// --- Main slot machine JS ---
-document.addEventListener('DOMContentLoaded', function () {
-  const icons = [
-    "https://i.postimg.cc/s26Ryf7W/2.png",
-    "https://i.postimg.cc/qRWVhmmM/3.png",
-    "https://i.postimg.cc/cCYqQQj7/4.png",
-    "https://i.postimg.cc/v86dFsB1/5.png",
-    "https://i.postimg.cc/WbLcsHF5/baby-bottle.png",
-    "https://i.postimg.cc/HLKPBrb6/6.png",
-    "https://i.postimg.cc/FF0nVszx/7.png"
-  ];
-  let spinCount = 0;
-  let currentSymbols = [icons[0], icons[1], icons[2]];
-  const slotMachine = document.getElementById('slotMachine');
-  const spinButton = document.getElementById('spinButton');
-  const reel1 = document.getElementById('reel1');
-  const reel2 = document.getElementById('reel2');
-  const reel3 = document.getElementById('reel3');
-  const revealOverlay = document.getElementById('revealOverlay');
-  const instructionsOverlay = document.getElementById('instructionsOverlay');
-
-  // Overlay fix for mobile: support both click and touch
-  function hideInstructionsOverlay() {
-    instructionsOverlay.style.opacity = '0';
-    slotMachine.classList.remove('blur-background');
-    instructionsOverlay.style.pointerEvents = 'none';
-    setTimeout(() => {
-      if (instructionsOverlay.parentNode) instructionsOverlay.parentNode.removeChild(instructionsOverlay);
-    }, 400);
-  }
-  instructionsOverlay.addEventListener('click', hideInstructionsOverlay);
-  instructionsOverlay.addEventListener('touchstart', function (e) {
-    e.preventDefault();
-    hideInstructionsOverlay();
-  }, {passive:false});
-
-  function playClickSound() {
-    try {
-      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const oscillator = audioContext.createOscillator();
-      const gainNode = audioContext.createGain();
-      oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(210, audioContext.currentTime);
-      gainNode.gain.setValueAtTime(0.14, audioContext.currentTime);
-      gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.14);
-      oscillator.connect(gainNode); gainNode.connect(audioContext.destination);
-      oscillator.start(); oscillator.stop(audioContext.currentTime + 0.14);
-    } catch (e) {}
-  }
-  spinButton.addEventListener('mousedown', function () {
-    this.classList.add('pressed');
-    if (navigator.vibrate) navigator.vibrate(24);
-    playClickSound();
-  });
-  spinButton.addEventListener('mouseup', function () {
-    this.classList.remove('pressed');
-  });
-  spinButton.addEventListener('mouseleave', function () { this.classList.remove('pressed'); });
-  spinButton.addEventListener('touchstart', function (e) {
-    e.preventDefault();
-    this.classList.add('pressed');
-    if (navigator.vibrate) navigator.vibrate(24);
-    playClickSound();
-  }, {passive:false});
-  spinButton.addEventListener('touchend', function (e) {
-    e.preventDefault();
-    this.classList.remove('pressed');
-    handleSpin();
-  }, {passive:false});
-  spinButton.addEventListener('click', handleSpin);
-
-  function handleSpin() {
-    spinCount++;
-    spinButton.style.pointerEvents = 'none';
-    const reel1Delay = 0, reel2Delay = 600, reel3Delay = 1200;
-    if (spinCount === 4) {
-      const babyBottle = icons[4];
-      spinReelWithResult(reel1, babyBottle, reel1Delay);
-      spinReelWithResult(reel2, babyBottle, reel2Delay);
-      spinReelWithResult(reel3, babyBottle, reel3Delay, showReveal);
-      currentSymbols = [babyBottle, babyBottle, babyBottle];
-    } else {
-      generateRandomNonMatchingSymbols();
-      spinReelWithResult(reel1, currentSymbols[0], reel1Delay);
-      spinReelWithResult(reel2, currentSymbols[1], reel2Delay);
-      spinReelWithResult(reel3, currentSymbols[2], reel3Delay);
+  <script>
+    // --- Reveal param text logic ---
+    function getUrlParam(name, fallback = "") {
+      try {
+        const url = new URL(window.location.href);
+        return url.searchParams.get(name) || fallback;
+      } catch {
+        return fallback;
+      }
     }
-    setTimeout(() => { spinButton.style.pointerEvents = 'auto'; }, reel3Delay + 900);
-  }
-  function generateRandomNonMatchingSymbols() {
-    let idx = [];
-    while (idx.length < 3) {
-      let r = Math.floor(Math.random()*icons.length);
-      if (!idx.includes(r)) idx.push(r);
+    function updateRevealTextFromParams() {
+      const name = getUrlParam('name', '');
+      const month = getUrlParam('month', 'soon!');
+      const nameDisplay = name ? name : '';
+      const babyLabel = 'Baby';
+      const monthDisplay = month;
+      document.querySelector('.baby-label').textContent = babyLabel;
+      document.querySelector('.baby-name').textContent = nameDisplay;
+      document.querySelector('.baby-month').textContent = monthDisplay;
     }
-    currentSymbols = [icons[idx[0]], icons[idx[1]], icons[idx[2]]];
-  }
-  function spinReelWithResult(reel, finalIcon, delay, callback) {
-    setTimeout(() => {
-      const maxSpins = 26, spinInterval = 34, totalDuration = maxSpins * spinInterval;
-      let startTime = null;
-      function animate(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = elapsed / totalDuration;
-        const img = reel.querySelector('img');
-        if (progress < 1) {
-          const frameIndex = Math.floor(progress * maxSpins);
-          if (frameIndex < maxSpins - 1) {
-            img.src = icons[Math.floor(Math.random() * icons.length)];
-            const scaleEffect = 1 + Math.sin(progress * Math.PI * 8) * 0.04;
-            img.style.transform = `scale(${scaleEffect})`;
-          } else {
-            img.src = finalIcon;
-            img.style.transform = 'scale(1)';
-            if (callback && reel === reel3) setTimeout(callback, 300);
+    updateRevealTextFromParams();
+
+    // --- Main slot machine JS ---
+    document.addEventListener('DOMContentLoaded', function () {
+      const icons = [
+        "https://i.postimg.cc/s26Ryf7W/2.png",
+        "https://i.postimg.cc/qRWVhmmM/3.png",
+        "https://i.postimg.cc/cCYqQQj7/4.png",
+        "https://i.postimg.cc/v86dFsB1/5.png",
+        "https://i.postimg.cc/WbLcsHF5/baby-bottle.png",
+        "https://i.postimg.cc/HLKPBrb6/6.png",
+        "https://i.postimg.cc/FF0nVszx/7.png"
+      ];
+      let spinCount = 0;
+      let currentSymbols = [icons[0], icons[1], icons[2]];
+      const slotMachine = document.getElementById('slotMachine');
+      const spinButton = document.getElementById('spinButton');
+      const reel1 = document.getElementById('reel1');
+      const reel2 = document.getElementById('reel2');
+      const reel3 = document.getElementById('reel3');
+      const revealOverlay = document.getElementById('revealOverlay');
+      const instructionsOverlay = document.getElementById('instructionsOverlay');
+
+      // Overlay fix for mobile: support both click and touch
+      function hideInstructionsOverlay() {
+        instructionsOverlay.style.opacity = '0';
+        slotMachine.classList.remove('blur-background');
+        instructionsOverlay.style.pointerEvents = 'none';
+        setTimeout(() => {
+          if (instructionsOverlay.parentNode) instructionsOverlay.parentNode.removeChild(instructionsOverlay);
+        }, 400);
+      }
+      instructionsOverlay.addEventListener('click', hideInstructionsOverlay);
+      instructionsOverlay.addEventListener('touchstart', function (e) {
+        e.preventDefault();
+        hideInstructionsOverlay();
+      }, {passive:false});
+
+      function playClickSound() {
+        try {
+          const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+          oscillator.type = 'sine';
+          oscillator.frequency.setValueAtTime(210, audioContext.currentTime);
+          gainNode.gain.setValueAtTime(0.14, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.14);
+          oscillator.connect(gainNode); gainNode.connect(audioContext.destination);
+          oscillator.start(); oscillator.stop(audioContext.currentTime + 0.14);
+        } catch (e) {}
+      }
+      spinButton.addEventListener('mousedown', function () {
+        this.classList.add('pressed');
+        if (navigator.vibrate) navigator.vibrate(24);
+        playClickSound();
+      });
+      spinButton.addEventListener('mouseup', function () {
+        this.classList.remove('pressed');
+      });
+      spinButton.addEventListener('mouseleave', function () { this.classList.remove('pressed'); });
+      spinButton.addEventListener('touchstart', function (e) {
+        e.preventDefault();
+        this.classList.add('pressed');
+        if (navigator.vibrate) navigator.vibrate(24);
+        playClickSound();
+      }, {passive:false});
+      spinButton.addEventListener('touchend', function (e) {
+        e.preventDefault();
+        this.classList.remove('pressed');
+        handleSpin();
+      }, {passive:false});
+      spinButton.addEventListener('click', handleSpin);
+
+      function handleSpin() {
+        spinCount++;
+        spinButton.style.pointerEvents = 'none';
+        const reel1Delay = 0, reel2Delay = 600, reel3Delay = 1200;
+        if (spinCount === 4) {
+          const babyBottle = icons[4];
+          spinReelWithResult(reel1, babyBottle, reel1Delay);
+          spinReelWithResult(reel2, babyBottle, reel2Delay);
+          spinReelWithResult(reel3, babyBottle, reel3Delay, showReveal);
+          currentSymbols = [babyBottle, babyBottle, babyBottle];
+        } else {
+          generateRandomNonMatchingSymbols();
+          spinReelWithResult(reel1, currentSymbols[0], reel1Delay);
+          spinReelWithResult(reel2, currentSymbols[1], reel2Delay);
+          spinReelWithResult(reel3, currentSymbols[2], reel3Delay);
+        }
+        setTimeout(() => { spinButton.style.pointerEvents = 'auto'; }, reel3Delay + 900);
+      }
+      function generateRandomNonMatchingSymbols() {
+        let idx = [];
+        while (idx.length < 3) {
+          let r = Math.floor(Math.random()*icons.length);
+          if (!idx.includes(r)) idx.push(r);
+        }
+        currentSymbols = [icons[idx[0]], icons[idx[1]], icons[idx[2]]];
+      }
+      function spinReelWithResult(reel, finalIcon, delay, callback) {
+        setTimeout(() => {
+          const maxSpins = 26, spinInterval = 34, totalDuration = maxSpins * spinInterval;
+          let startTime = null;
+          function animate(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+            const progress = elapsed / totalDuration;
+            const img = reel.querySelector('img');
+            if (progress < 1) {
+              const frameIndex = Math.floor(progress * maxSpins);
+              if (frameIndex < maxSpins - 1) {
+                img.src = icons[Math.floor(Math.random() * icons.length)];
+                const scaleEffect = 1 + Math.sin(progress * Math.PI * 8) * 0.04;
+                img.style.transform = `scale(${scaleEffect})`;
+              } else {
+                img.src = finalIcon;
+                img.style.transform = 'scale(1)';
+                if (callback && reel === reel3) setTimeout(callback, 300);
+              }
+              requestAnimationFrame(animate);
+            } else {
+              img.src = finalIcon;
+              img.style.transform = 'scale(1)';
+              if (callback && reel === reel3 && progress >= 1) setTimeout(callback, 300);
+            }
           }
           requestAnimationFrame(animate);
-        } else {
-          img.src = finalIcon;
-          img.style.transform = 'scale(1)';
-          if (callback && reel === reel3 && progress >= 1) setTimeout(callback, 300);
-        }
+        }, delay);
       }
-      requestAnimationFrame(animate);
-    }, delay);
-  }
-  function showReveal() {
-    updateRevealTextFromParams(); // Just in case, re-reads params on reveal
-    revealOverlay.style.opacity = '1';
-    revealOverlay.style.pointerEvents = 'auto';
-    createConfetti();
-    setTimeout(() => {
-      revealOverlay.style.opacity = '0';
-      revealOverlay.style.pointerEvents = 'none';
-    }, 4200);
-  }
-  function createConfetti() {
-    document.querySelectorAll('.confetti').forEach(el => { if (el.parentNode) el.parentNode.removeChild(el); });
-    const colors = [
-      '#FFD700', '#FFC125', '#EEC900', '#CDAD00', '#8B7500',
-      '#DAA520', '#B8860B', '#A67C00', '#BDB76B', '#F0E68C',
-      '#C0C0C0', '#D3D3D3', '#DCDCDC', '#E8E8E8', '#A9A9A9',
-      '#B5B5B5', '#E0E0E0', '#F5F5F5', '#EBEBEB', '#CCCCCC'
-    ];
-    const container = document.querySelector('.slot-machine-container');
-    const confettiElements = [];
-    const viewportWidth = container.offsetWidth, viewportHeight = container.offsetHeight;
-    const confettiCount = 64;
-    for (let i = 0; i < confettiCount; i++) {
-      const confetti = document.createElement('div');
-      const shapeType = Math.floor(Math.random() * 3);
-      confetti.className = shapeType === 0 ? 'confetti confetti-square' :
-                           shapeType === 1 ? 'confetti confetti-rectangle' : 'confetti confetti-circle';
-      const left = (i / confettiCount) * viewportWidth + (Math.random() * 16 - 8);
-      const top = -18 - (Math.random() * 35);
-      const size = 6 + Math.random() * 6;
-      const scale = 0.7 + Math.random() * 0.6;
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const rotation = Math.random() * 360;
-      confetti.style.left = `${left}px`; confetti.style.top = `${top}px`;
-      if (shapeType === 0) { confetti.style.width = `${size}px`; confetti.style.height = `${size}px`; }
-      else if (shapeType === 1) { confetti.style.width = `${size * 0.5}px`; confetti.style.height = `${size * 1.5}px`; }
-      else { confetti.style.width = `${size}px`; confetti.style.height = `${size}px`; }
-      confetti.style.backgroundColor = color;
-      confetti.style.transform = `rotate(${rotation}deg) scale(${scale})`;
-      confetti.style.boxShadow = '0 0 4px rgba(255,255,255,0.7)';
-      container.appendChild(confetti);
-      confettiElements.push({
-        element: confetti,
-        speed: 1.3 + Math.random() * 1.1,
-        rotationSpeed: -0.5 + Math.random() * 1,
-        horizontalDrift: -2 + Math.random() * 4,
-        horizontalWobble: Math.random() * 2,
-        wobbleSpeed: 0.25 + Math.random() * 0.45,
-        floatFactor: 0.8 + Math.random() * 0.4,
-        x: left, y: top, rotation: rotation,
-        gravity: 0.05 + Math.random() * 0.04,
-        airResistance: 0.97 + Math.random() * 0.02
-      });
-    }
-    let lastTime = performance.now(), animationFrameId;
-    function animateAllConfetti(currentTime) {
-      const deltaTime = Math.min((currentTime - lastTime) / 16.67, 2);
-      lastTime = currentTime;
-      let activeConfetti = false;
-      confettiElements.forEach(confetti => {
-        if (confetti.y < viewportHeight + 44) {
-          activeConfetti = true;
-          confetti.speed += confetti.gravity * deltaTime;
-          confetti.horizontalDrift *= confetti.airResistance;
-          confetti.y += confetti.speed * deltaTime * confetti.floatFactor;
-          confetti.x += confetti.horizontalDrift * 0.06 * deltaTime;
-          const wobblePhase = confetti.y * 0.005 * confetti.wobbleSpeed;
-          const wobble = Math.sin(wobblePhase) * confetti.horizontalWobble;
-          confetti.rotation += confetti.rotationSpeed * 0.5 * deltaTime;
-          const el = confetti.element;
-          el.style.top = `${confetti.y}px`;
-          el.style.left = `${confetti.x + wobble}px`;
-          const scale = el.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1;
-          el.style.transform = `rotate(${confetti.rotation}deg) scale(${scale})`;
-          const shimmer = 0.8 + Math.sin(confetti.y * 0.006) * 0.18;
-          if (confetti.y > viewportHeight - 120) {
-            const fadeOut = 1 - Math.pow((confetti.y - (viewportHeight - 120)) / 120, 2);
-            el.style.opacity = Math.max(0, fadeOut * shimmer);
-          } else { el.style.opacity = shimmer; }
-        } else if (confetti.element.parentNode) {
-          confetti.element.parentNode.removeChild(confetti.element);
-        }
-      });
-      if (activeConfetti) animationFrameId = requestAnimationFrame(animateAllConfetti);
-      else confettiElements.forEach(confetti => { if (confetti.element.parentNode) confetti.element.parentNode.removeChild(confetti.element); });
-    }
-    animationFrameId = requestAnimationFrame(animateAllConfetti);
-    setTimeout(() => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
+      function showReveal() {
+        updateRevealTextFromParams(); // Just in case, re-reads params on reveal
+        revealOverlay.style.opacity = '1';
+        revealOverlay.style.pointerEvents = 'auto';
+        createConfetti();
+        setTimeout(() => {
+          revealOverlay.style.opacity = '0';
+          revealOverlay.style.pointerEvents = 'none';
+        }, 4200);
+      }
+      function createConfetti() {
         document.querySelectorAll('.confetti').forEach(el => { if (el.parentNode) el.parentNode.removeChild(el); });
+        const colors = [
+          '#FFD700', '#FFC125', '#EEC900', '#CDAD00', '#8B7500',
+          '#DAA520', '#B8860B', '#A67C00', '#BDB76B', '#F0E68C',
+          '#C0C0C0', '#D3D3D3', '#DCDCDC', '#E8E8E8', '#A9A9A9',
+          '#B5B5B5', '#E0E0E0', '#F5F5F5', '#EBEBEB', '#CCCCCC'
+        ];
+        const container = document.querySelector('.slot-machine-container');
+        const confettiElements = [];
+        const viewportWidth = container.offsetWidth, viewportHeight = container.offsetHeight;
+        const confettiCount = 64;
+        for (let i = 0; i < confettiCount; i++) {
+          const confetti = document.createElement('div');
+          const shapeType = Math.floor(Math.random() * 3);
+          confetti.className = shapeType === 0 ? 'confetti confetti-square' :
+                               shapeType === 1 ? 'confetti confetti-rectangle' : 'confetti confetti-circle';
+          const left = (i / confettiCount) * viewportWidth + (Math.random() * 16 - 8);
+          const top = -18 - (Math.random() * 35);
+          const size = 6 + Math.random() * 6;
+          const scale = 0.7 + Math.random() * 0.6;
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          const rotation = Math.random() * 360;
+          confetti.style.left = `${left}px`; confetti.style.top = `${top}px`;
+          if (shapeType === 0) { confetti.style.width = `${size}px`; confetti.style.height = `${size}px`; }
+          else if (shapeType === 1) { confetti.style.width = `${size * 0.5}px`; confetti.style.height = `${size * 1.5}px`; }
+          else { confetti.style.width = `${size}px`; confetti.style.height = `${size}px`; }
+          confetti.style.backgroundColor = color;
+          confetti.style.transform = `rotate(${rotation}deg) scale(${scale})`;
+          confetti.style.boxShadow = '0 0 4px rgba(255,255,255,0.7)';
+          container.appendChild(confetti);
+          confettiElements.push({
+            element: confetti,
+            speed: 1.3 + Math.random() * 1.1,
+            rotationSpeed: -0.5 + Math.random() * 1,
+            horizontalDrift: -2 + Math.random() * 4,
+            horizontalWobble: Math.random() * 2,
+            wobbleSpeed: 0.25 + Math.random() * 0.45,
+            floatFactor: 0.8 + Math.random() * 0.4,
+            x: left, y: top, rotation: rotation,
+            gravity: 0.05 + Math.random() * 0.04,
+            airResistance: 0.97 + Math.random() * 0.02
+          });
+        }
+        let lastTime = performance.now(), animationFrameId;
+        function animateAllConfetti(currentTime) {
+          const deltaTime = Math.min((currentTime - lastTime) / 16.67, 2);
+          lastTime = currentTime;
+          let activeConfetti = false;
+          confettiElements.forEach(confetti => {
+            if (confetti.y < viewportHeight + 44) {
+              activeConfetti = true;
+              confetti.speed += confetti.gravity * deltaTime;
+              confetti.horizontalDrift *= confetti.airResistance;
+              confetti.y += confetti.speed * deltaTime * confetti.floatFactor;
+              confetti.x += confetti.horizontalDrift * 0.06 * deltaTime;
+              const wobblePhase = confetti.y * 0.005 * confetti.wobbleSpeed;
+              const wobble = Math.sin(wobblePhase) * confetti.horizontalWobble;
+              confetti.rotation += confetti.rotationSpeed * 0.5 * deltaTime;
+              const el = confetti.element;
+              el.style.top = `${confetti.y}px`;
+              el.style.left = `${confetti.x + wobble}px`;
+              const scale = el.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1;
+              el.style.transform = `rotate(${confetti.rotation}deg) scale(${scale})`;
+              const shimmer = 0.8 + Math.sin(confetti.y * 0.006) * 0.18;
+              if (confetti.y > viewportHeight - 120) {
+                const fadeOut = 1 - Math.pow((confetti.y - (viewportHeight - 120)) / 120, 2);
+                el.style.opacity = Math.max(0, fadeOut * shimmer);
+              } else { el.style.opacity = shimmer; }
+            } else if (confetti.element.parentNode) {
+              confetti.element.parentNode.removeChild(confetti.element);
+            }
+          });
+          if (activeConfetti) animationFrameId = requestAnimationFrame(animateAllConfetti);
+          else confettiElements.forEach(confetti => { if (confetti.element.parentNode) confetti.element.parentNode.removeChild(confetti.element); });
+        }
+        animationFrameId = requestAnimationFrame(animateAllConfetti);
+        setTimeout(() => {
+          if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            document.querySelectorAll('.confetti').forEach(el => { if (el.parentNode) el.parentNode.removeChild(el); });
+          }
+        }, 8000);
       }
-    }, 8000);
-  }
-});
+    });
+  </script>
+</body>
+</html>
