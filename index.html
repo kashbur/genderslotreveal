@@ -153,10 +153,18 @@
     }
     @media (max-width:500px) {
       .aspect-container { max-width: 100vw; }
-      .reveal-line.main { font-size: 1.45rem; }
-      .reveal-line.sub { font-size: 1.2rem; }
-      .reveal-line.date { font-size: 1.1rem; }
-      .reveal-line.from { font-size: 1.05rem; }
+      .reveal-line {
+        -webkit-text-stroke: 0.5px #A59079;
+        text-shadow: 0 0 1px rgba(0,0,0,0.15);
+      }
+      .reveal-line.main { font-size: 1.75rem; }
+      .reveal-line.sub { font-size: 1.35rem; }
+      .reveal-line.date { font-size: 1.25rem; }
+      .reveal-line.from {
+        font-size: 1.2rem;
+        -webkit-text-stroke: 0.5px #A59079;
+        text-shadow: 0 0 1px rgba(0,0,0,0.15);
+      }
       .reveal-content { max-width: 99vw; }
     }
     .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
