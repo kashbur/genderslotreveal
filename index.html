@@ -5,16 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>The Big Reveal</title>
   <meta name="description" content="A fun, personalized surprise reveal experience. Play and discover your message!">
-  <meta property="og:title" content="The Big Reveal">
-  <meta property="og:description" content="A fun, personalized surprise reveal experience. Play and discover your message!">
-  <meta property="og:type" content="website">
-  <meta property="og:image" content="https://i.postimg.cc/66n3bbqK/Chat-GPT-Image-Jul-1-2025-01-18-33-PM.png">
-  <meta property="og:image:alt" content="Colorful confetti burst on a pastel background">
-  <meta property="og:url" content="https://YOUR_SITE_URL/">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="The Big Reveal">
-  <meta name="twitter:description" content="A fun, personalized surprise reveal experience.">
-  <meta name="twitter:image" content="https://i.postimg.cc/66n3bbqK/Chat-GPT-Image-Jul-1-2025-01-18-33-PM.png">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet"/>
   <style>
     html, body {
@@ -44,7 +34,7 @@
     }
     .slot-machine {
       position: absolute; width: 100%; height: 100%;
-      background-image: url('https://i.postimg.cc/zXmcfd6L/Blue-Phone-Text-Message-Instagram-Reel-Video.png');
+      background-image: url('img/box.png');
       background-size: 100% 100%;
       background-position: center;
       background-repeat: no-repeat;
@@ -146,11 +136,11 @@
   <div class="aspect-container">
     <div class="slot-machine-container">
       <div class="slot-machine blur-background" id="slotMachine"></div>
-      <div id="reel1" class="reel"><img src="https://i.postimg.cc/s26Ryf7W/2.png" alt="Ring"></div>
-      <div id="reel2" class="reel"><img src="https://i.postimg.cc/qRWVhmmM/3.png" alt="Graduation"></div>
-      <div id="reel3" class="reel"><img src="https://i.postimg.cc/cCYqQQj7/4.png" alt="Briefcase"></div>
+      <div id="reel1" class="reel"><img src="img/ring.png" alt="Ring"></div>
+      <div id="reel2" class="reel"><img src="img/graduation cap.png" alt="Graduation"></div>
+      <div id="reel3" class="reel"><img src="img/briefcase.png" alt="Briefcase"></div>
       <div class="spin-button" id="spinButton">
-        <img src="https://i.postimg.cc/7hkzxGn5/Blue-Phone-Text-Message-Instagram-Reel-Video.png" alt="Spin"/>
+        <img src="img/tap to spin.png" alt="Spin"/>
       </div>
       <div class="reveal-overlay" id="revealOverlay">
         <div class="reveal-text">
@@ -160,7 +150,7 @@
       </div>
       <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
         <div class="instructions-container">
-          <img src="https://i.postimg.cc/GpQmD1Y3/Untitled-design.png" alt="Instructions" class="instructions-image"/>
+          <img src="img/directions.png" alt="Instructions" class="instructions-image"/>
           <div class="tap-to-continue">Tap to continue</div>
         </div>
       </div>
@@ -168,15 +158,15 @@
   </div>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-     const icons = [
-  "img/ring.png",
-  "img/graduation cap.png",
-  "img/briefcase.png",
-  "img/house.png",
-  "img/scroll.png",
-  "img/baby-bottle.png",
-  "img/box.png"
-];
+      const icons = [
+        "img/ring.png",
+        "img/graduation cap.png",
+        "img/briefcase.png",
+        "img/house.png",
+        "img/scroll.png",
+        "img/baby-bottle.png",
+        "img/box.png"
+      ];
       let spinCount = 0;
       let currentSymbols = [icons[0], icons[1], icons[2]];
       const slotMachine = document.getElementById('slotMachine');
@@ -241,7 +231,7 @@
         spinButton.style.pointerEvents = 'none';
         const reel1Delay = 0, reel2Delay = 600, reel3Delay = 1200;
         if (spinCount === 4) {
-          const babyBottle = icons[4];
+          const babyBottle = icons[5];
           spinReelWithResult(reel1, babyBottle, reel1Delay);
           spinReelWithResult(reel2, babyBottle, reel2Delay);
           spinReelWithResult(reel3, babyBottle, reel3Delay, showReveal);
