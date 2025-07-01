@@ -421,12 +421,22 @@
         }
 
         let lastDelay = 0;
-        // Display photo and main line immediately
+        // Show main line immediately
         revealLines.forEach(line => {
-          if (line.type === 'photo' || line.type === 'main') {
+          if (line.type === 'main') {
             lastDelay = Math.max(lastDelay, revealLine(line, 0));
           }
         });
+
+        // If a photo is present, reveal it slightly after the main line
+        const hasPhoto = revealLines.some(l => l.type === 'photo');
+        if (hasPhoto) {
+          revealLines.forEach(line => {
+            if (line.type === 'photo') {
+              lastDelay = Math.max(lastDelay, revealLine(line, 800));
+            }
+          });
+        }
 
         // Sub and date lines together after ~900ms
         revealLines.forEach(line => {
