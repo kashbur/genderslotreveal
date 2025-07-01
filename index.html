@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=430, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Baby Gender Reveal Slot Machine</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet"/>
   <style>
@@ -80,61 +80,50 @@
       .tap-to-continue { font-size: 0.97rem; }
     }
     .spin-button {
-      position: absolute;
-      top: 62.5%;
-      left: 50%;
-      width: 34%;
-      padding: 0; background: transparent;
+      position: absolute; top: 62.5%; left: 50%; width: 34%; padding: 0; background: transparent;
       transform: translateX(-50%);
       cursor: pointer;
       transition: all 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
       filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
       z-index: 3;
     }
-    .spin-button img {
-      width: 100%; height: auto; display: block;
-      border-radius: 0;
-    }
+    .spin-button img { width: 100%; height: auto; display: block; border-radius: 0; }
     .spin-button.pressed, .spin-button:active { transform: translateX(-50%) scale(0.95); }
+
+    /* --- Reveal Overlay & Text (outline, transitions) --- */
     .reveal-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      background-color: rgba(238, 222, 197, 0.93);
+      background-color: var(--overlay-bg, rgba(238, 222, 197, 0.93)); /* will be updated by JS */
       display: flex; justify-content: center; align-items: center;
       z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+      flex-direction: column;
     }
     .reveal-text {
       font-family: 'Poppins', Arial, Helvetica, sans-serif;
       font-size: 2.1rem; font-weight: 700; color: #fff;
       text-shadow: -2px -2px 0 #A59079, 2px -2px 0 #A59079, -2px 2px 0 #A59079, 2px 2px 0 #A59079, 0px 2.5px 0 #A59079, 2.5px 0px 0 #A59079, -2.5px 0px 0 #A59079, 0px -2.5px 0 #A59079, 0px 3.5px 7px rgba(0,0,0,0.14);
-      text-align: center; text-transform: uppercase; letter-spacing: 1.2px;
-      line-height: 1.18; width: 88%; margin: 0 auto;
+      text-align: center; letter-spacing: 1.2px; line-height: 1.18; width: 88%; margin: 0 auto;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
-    .reveal-line1 { font-size: 1em; margin-bottom: 0.5em; font-weight: 700; text-transform: none; opacity: 0; transition: opacity 0.5s;}
-    .reveal-line2 { font-size: 1em; font-weight: 500; margin-top: 0.5em; text-transform: none; opacity: 0; transition: opacity 0.5s;}
-    .reveal-parents {
-      margin-top: 1em;
-      font-size: 1.08em;
-      font-weight: 500;
-      color: #f5f0e0;
-      text-shadow: 0 1.5px 5px #a5907996;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
+    .reveal-line1, .reveal-line2, .reveal-parents { opacity: 0; transition: opacity 0.7s; }
+    .reveal-line1 { font-size: 1em; margin-bottom: 0.5em; display: block; font-weight: 700; text-transform: none; }
+    .reveal-line2 { font-size: 1em; font-weight: 500; display: block; text-transform: none; }
+    .reveal-parents { font-size: 0.7em; margin-top: 1.1em; font-weight: 500; color: #ffe; text-shadow: 0 2px 8px #ba7997; }
     .reveal-photo {
-      margin-top: 0.9em;
-      max-width: 80%;
-      border-radius: 14px;
-      box-shadow: 0 4px 16px #9878441f;
-      opacity: 0;
-      transition: opacity 0.7s;
-      display: none;
+      max-width: 82%; max-height: 140px; border-radius: 14px;
+      margin: 1em 0 0.3em 0; box-shadow: 0 2px 16px rgba(80,24,54,0.14), 0 0.5px 2.5px #fff2 inset;
+      background: #fff; object-fit: contain; display: none;
+      opacity: 0; transition: opacity 0.9s;
     }
+
+    /* --- Confetti --- */
     .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
     .confetti-square { width: 10px; height: 10px;}
     .confetti-rectangle { width: 8px; height: 16px;}
     .confetti-circle { width: 10px; height: 10px; border-radius: 50%;}
+
+    /* --- Instructions Overlay --- */
     .instructions-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.68);
@@ -164,12 +153,10 @@
       </div>
       <div class="reveal-overlay" id="revealOverlay">
         <div class="reveal-text">
-          <div class="reveal-line1"></div>
-          <div class="reveal-line2">
-            Baby <span class="baby-name"></span> coming <span class="baby-month"></span>
-          </div>
-          <div class="reveal-parents"></div>
-          <img class="reveal-photo" style="display:none;"/>
+          <span class="reveal-line1"></span>
+          <span class="reveal-line2"></span>
+          <img class="reveal-photo" src="" alt="Ultrasound" />
+          <span class="reveal-parents"></span>
         </div>
       </div>
       <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
@@ -181,49 +168,87 @@
     </div>
   </div>
   <script>
-    // --- URL parameter logic & reveal text ---
+    // -------- Reveal Text, Overlay Color, Language, etc. ---------
     function getUrlParam(name, fallback = "") {
       try {
         const url = new URL(window.location.href);
         return url.searchParams.get(name) || fallback;
       } catch { return fallback; }
     }
+
+    // Language map for 'Baby' and default phrases
+    const langLabels = {
+      en: { baby: "Baby", coming: "coming", love: "Love" },
+      fr: { baby: "Bébé", coming: "arrive", love: "Avec amour" },
+      es: { baby: "Bebé", coming: "llega", love: "Con cariño" },
+      de: { baby: "Baby", coming: "kommt", love: "Mit Liebe" },
+      it: { baby: "Bambino", coming: "arriva", love: "Con affetto" },
+      pt: { baby: "Bebê", coming: "chega", love: "Com carinho" }
+    };
+
+    // Overlay color presets
+    const overlayColors = {
+      pink: "rgba(255,186,225,0.96)",
+      blue: "rgba(168,196,255,0.94)",
+      gold: "rgba(238, 222, 197, 0.97)",
+      lavender: "rgba(207,176,255,0.94)",
+      green: "rgba(193,255,224,0.94)"
+    };
+
+    // Main function for updating reveal text and colors
     function updateRevealTextFromParams() {
-      // Language labels
-      const lang = getUrlParam('lang', 'en');
-      const labels = {
-        en: { headline: "We are expecting!", baby: "Baby", coming: "coming", parents: "Love," },
-        es: { headline: "¡Estamos esperando!", baby: "Bebé", coming: "llega", parents: "Con cariño," },
-        fr: { headline: "Nous attendons un bébé!", baby: "Bébé", coming: "arrive", parents: "Avec amour," }
-      };
-      const L = labels[lang] || labels.en;
-      // Get params (defaults for opt-out)
-      const headline = getUrlParam('headline', L.headline);
-      const babyName = getUrlParam('name', '');
-      const dueDate = getUrlParam('duedate', getUrlParam('month', 'soon!'));
+      const urlLang = (getUrlParam('lang','en') || 'en').toLowerCase();
+      const lang = langLabels[urlLang] || langLabels['en'];
+      const overlay = document.getElementById('revealOverlay');
+      // Overlay color logic
+      let overlayParam = (getUrlParam('overlay','')).toLowerCase();
+      let overlayBg = overlayColors[overlayParam] || overlayColors['gold'];
+      overlay.style.setProperty('--overlay-bg', overlayBg);
+
+      // Headline & lines
+      const headline = getUrlParam('headline', '');
+      const name = getUrlParam('name', '');
+      const due = getUrlParam('duedate', getUrlParam('month','soon!'));
       const parents = getUrlParam('parents', '');
-      const photoUrl = getUrlParam('photo', '');
-      // Set reveal lines
-      document.querySelector('.reveal-line1').textContent = headline;
-      // Only show "Baby [name] coming [month]" if at least name or date
-      document.querySelector('.reveal-line2').innerHTML =
-        (babyName || dueDate)
-          ? `${L.baby} <span class="baby-name">${babyName}</span> ${L.coming} <span class="baby-month">${dueDate}</span>`
-          : "";
-      // Parent names
-      document.querySelector('.reveal-parents').textContent = parents ? `${L.parents} ${parents}` : "";
-      document.querySelector('.reveal-parents').style.display = parents ? "block" : "none";
-      // Photo
-      const photoEl = document.querySelector('.reveal-photo');
-      if (photoUrl) {
-        photoEl.src = photoUrl;
-        photoEl.style.display = "block";
+      const photo = getUrlParam('photo', '');
+      const custom1 = getUrlParam('line1', ''); // allow extra custom line1
+
+      const line1 = headline ? headline : (custom1 ? custom1 : "We are expecting!");
+      // Build second line in language
+      let line2 = "";
+      if(name && due)
+        line2 = `${lang.baby} ${name} ${lang.coming} ${due}`;
+      else if(name)
+        line2 = `${lang.baby} ${name} ${lang.coming}`;
+      else if(due)
+        line2 = `${lang.baby} ${lang.coming} ${due}`;
+      else
+        line2 = `${lang.baby} ${lang.coming}`;
+
+      // Parents line
+      let parentsLine = "";
+      if(parents) parentsLine = parents;
+      else if(urlLang === "fr" && getUrlParam('love','') && name) parentsLine = `Avec amour, ${getUrlParam('love','')}`;
+      else if(urlLang === "en" && getUrlParam('love','') && name) parentsLine = `Love, ${getUrlParam('love','')}`;
+
+      // Update HTML
+      document.querySelector('.reveal-line1').textContent = line1;
+      document.querySelector('.reveal-line2').textContent = line2;
+      document.querySelector('.reveal-parents').textContent = parentsLine;
+
+      // Ultrasound or photo
+      const photoImg = document.querySelector('.reveal-photo');
+      if(photo) {
+        photoImg.src = photo;
+        photoImg.style.display = "block";
       } else {
-        photoEl.style.display = "none";
+        photoImg.style.display = "none";
       }
     }
 
-    // --- Main Slot Machine JS ---
+    updateRevealTextFromParams();
+
+    // --- Slot Machine JS (same as before, but calls updateRevealTextFromParams in showReveal) ---
     document.addEventListener('DOMContentLoaded', function () {
       const icons = [
         "https://i.postimg.cc/s26Ryf7W/2.png",
@@ -244,7 +269,7 @@
       const revealOverlay = document.getElementById('revealOverlay');
       const instructionsOverlay = document.getElementById('instructionsOverlay');
 
-      // Overlay fix for mobile: support both click and touch
+      // Instructions overlay
       function hideInstructionsOverlay() {
         instructionsOverlay.style.opacity = '0';
         slotMachine.classList.remove('blur-background');
@@ -255,8 +280,7 @@
       }
       instructionsOverlay.addEventListener('click', hideInstructionsOverlay);
       instructionsOverlay.addEventListener('touchstart', function (e) {
-        e.preventDefault();
-        hideInstructionsOverlay();
+        e.preventDefault(); hideInstructionsOverlay();
       }, {passive:false});
 
       function playClickSound() {
@@ -277,7 +301,9 @@
         if (navigator.vibrate) navigator.vibrate(24);
         playClickSound();
       });
-      spinButton.addEventListener('mouseup', function () { this.classList.remove('pressed'); });
+      spinButton.addEventListener('mouseup', function () {
+        this.classList.remove('pressed');
+      });
       spinButton.addEventListener('mouseleave', function () { this.classList.remove('pressed'); });
       spinButton.addEventListener('touchstart', function (e) {
         e.preventDefault();
@@ -349,35 +375,32 @@
         }, delay);
       }
 
-      // --- Reveal Animation (pause between lines, show photo if exists) ---
+      // --- Staggered Reveal Animation ---
       function showReveal() {
         updateRevealTextFromParams();
-        // Start hidden
         const overlay = document.getElementById('revealOverlay');
         const line1 = overlay.querySelector('.reveal-line1');
         const line2 = overlay.querySelector('.reveal-line2');
-        const parents = overlay.querySelector('.reveal-parents');
         const photo = overlay.querySelector('.reveal-photo');
+        const parents = overlay.querySelector('.reveal-parents');
         overlay.style.opacity = '1';
         overlay.style.pointerEvents = 'auto';
-        line1.style.opacity = 0; line2.style.opacity = 0; parents.style.opacity = 0; photo.style.opacity = 0;
+        [line1, line2, photo, parents].forEach(el => { if(el) el.style.opacity=0; });
+
+        // Staggered appearance
+        setTimeout(()=>{if(line1)line1.style.opacity=1;},400);
+        setTimeout(()=>{if(line2)line2.style.opacity=1;},1200);
+        setTimeout(()=>{if(photo && photo.style.display!="none")photo.style.opacity=1;},2000);
+        setTimeout(()=>{if(parents && parents.textContent.trim())parents.style.opacity=1;},2500);
+
         createConfetti();
 
-        // Fade in headline, then line2, then optional parents, then optional photo
-        setTimeout(()=>{ line1.style.opacity = 1; }, 100);
-        setTimeout(()=>{ line2.style.opacity = 1; }, 1050);
-        if(parents.textContent.trim()) setTimeout(()=>{ parents.style.opacity = 1; }, 1800);
-        if(photo.src && photo.style.display !== "none") setTimeout(()=>{ photo.style.opacity = 1; }, 2000);
-
-        // Remove overlay ONLY when user taps/clicks (makes it "sticky" until dismissed)
-        function closeOverlay() {
-          overlay.style.opacity = '0';
-          overlay.style.pointerEvents = 'none';
-          overlay.removeEventListener('click', closeOverlay);
-          overlay.removeEventListener('touchstart', closeOverlay);
-        }
-        overlay.addEventListener('click', closeOverlay);
-        overlay.addEventListener('touchstart', closeOverlay);
+        // Stays until user taps/clicks overlay (to dismiss)
+        overlay.onclick = function() {
+          overlay.style.opacity='0';
+          overlay.style.pointerEvents='none';
+          overlay.onclick=null;
+        };
       }
 
       function createConfetti() {
