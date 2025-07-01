@@ -228,7 +228,11 @@
     function getRevealLinesFromParams(params) {
       // Defaults
       const lines = [];
-      const photo = params.photo ? decodeURIComponent(params.photo) : '';
+      let photo = params.photo ? decodeURIComponent(params.photo) : '';
+      // Only allow http:, https: or data: URLs for images
+      if (photo && !/^https?:|^data:/i.test(photo)) {
+        photo = '';
+      }
       const main = params.main || "We're Expecting!";
       const sub = params.sub || "";
       const date = params.date || "";
