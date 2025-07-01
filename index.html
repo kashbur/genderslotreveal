@@ -17,9 +17,10 @@
     }
     .aspect-container {
       position: relative;
-      width: 98vw;
+      width: min(98vw, calc(98vh * 9 / 16));
       max-width: 430px;
       aspect-ratio: 9/16;
+      height: auto;
       background: #ddd;
       box-shadow: 0 6px 24px rgba(0,0,0,0.13);
       overflow: hidden;
