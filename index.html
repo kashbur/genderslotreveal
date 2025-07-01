@@ -114,17 +114,18 @@
       width: 100%;
     }
     .reveal-line {
-      width: 100%;
-      text-align: center;
-      font-family: 'Poppins', sans-serif;
-      color: #fff;
-      -webkit-text-stroke: 1px #A59079;
-      text-shadow: 0 0 1px rgba(0,0,0,0.2);
-      margin-bottom: 1em;
-      opacity: 0;
-      transform: translateY(16px);
-      transition: opacity 0.7s, transform 0.7s;
-    }
+        width: 100%;
+        text-align: center;
+        font-family: 'Poppins', sans-serif;
+        color: #fff;
+        -webkit-text-stroke: 1px #A59079;
+        text-shadow: 0 0 1px rgba(0,0,0,0.2);
+        margin-bottom: 1em;
+        opacity: 0;
+        transform: translateY(16px);
+        will-change: opacity, transform;
+        transition: opacity 0.6s ease, transform 0.6s ease;
+      }
     .reveal-line.shown {
       opacity: 1;
       transform: translateY(0);
@@ -144,7 +145,7 @@
     .reveal-line.sub { font-size: 1.35rem; font-weight: 700; }
     .reveal-line.date { font-size: 1.14rem; font-weight: 700; }
     .reveal-line.from {
-      font-size: 1rem;
+      font-size: 1.3rem;
       font-weight: 700;
       font-style: italic;
       margin-top: 2.5em;
@@ -162,7 +163,7 @@
       .reveal-line.sub { font-size: 1.35rem; }
       .reveal-line.date { font-size: 1.25rem; }
       .reveal-line.from {
-        font-size: 1.2rem;
+        font-size: 1.35rem;
         -webkit-text-stroke: 0.5px #A59079;
         text-shadow: 0 0 1px rgba(0,0,0,0.15);
       }
@@ -415,41 +416,24 @@
               div.textContent = line.content;
             }
             revealLinesDiv.appendChild(div);
-            setTimeout(() => div.classList.add('shown'), 70);
+            requestAnimationFrame(() => div.classList.add('shown'));
           }, delay);
-          return delay;
         }
 
-        let lastDelay = 0;
-        // Display photo and main line immediately
-        revealLines.forEach(line => {
-          if (line.type === 'photo' || line.type === 'main') {
-            lastDelay = Math.max(lastDelay, revealLine(line, 0));
-          }
-        });
-
-        // Sub and date lines together after ~900ms
-        revealLines.forEach(line => {
-          if (line.type === 'sub' || line.type === 'date') {
-            lastDelay = Math.max(lastDelay, revealLine(line, 900));
-          }
-        });
-
-        // From line last, after another ~1700ms
-        revealLines.forEach(line => {
-          if (line.type === 'from') {
-            lastDelay = Math.max(lastDelay, revealLine(line, 2600));
-          }
+        const step = 700;
+        revealLines.forEach((line, idx) => {
+          revealLine(line, step * idx);
         });
 
         // 4. Show overlay and confetti
         revealOverlay.style.opacity = '1';
         revealOverlay.style.pointerEvents = 'auto';
         createConfetti();
+        const totalDelay = step * revealLines.length;
         setTimeout(() => {
           revealOverlay.style.opacity = '0';
           revealOverlay.style.pointerEvents = 'none';
-        }, lastDelay + 30000);
+        }, totalDelay + 30000);
       }
       // -------- Confetti logic (unchanged) ----------
       function createConfetti() {
