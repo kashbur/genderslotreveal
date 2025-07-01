@@ -117,7 +117,8 @@
       text-align: center;
       font-family: 'Poppins', sans-serif;
       color: #fff;
-      text-shadow: -2px -2px 0 #A59079, 2px -2px 0 #A59079, -2px 2px 0 #A59079, 2px 2px 0 #A59079, 0px 3px 5px rgba(0,0,0,0.2);
+      -webkit-text-stroke: 1px #A59079;
+      text-shadow: 0 0 1px rgba(0,0,0,0.2);
       margin-bottom: 1em;
       opacity: 0;
       transform: translateY(16px);
@@ -146,14 +147,15 @@
       font-style: italic;
       margin-top: 2.5em;
       color: #fff;
-      text-shadow: -1px -1px 0 #A59079, 1px 1px 0 #A59079;
+      -webkit-text-stroke: 1px #A59079;
+      text-shadow: 0 0 1px rgba(0,0,0,0.2);
     }
     @media (max-width:500px) {
       .aspect-container { max-width: 100vw; }
-      .reveal-line.main { font-size: 1.05rem; }
-      .reveal-line.sub { font-size: 0.99rem; }
-      .reveal-line.date { font-size: 0.9rem; }
-      .reveal-line.from { font-size: 0.85rem; }
+      .reveal-line.main { font-size: 1.45rem; }
+      .reveal-line.sub { font-size: 1.2rem; }
+      .reveal-line.date { font-size: 1.1rem; }
+      .reveal-line.from { font-size: 1.05rem; }
       .reveal-content { max-width: 99vw; }
     }
     .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
@@ -391,20 +393,19 @@
         // 1. Clear any previous reveal lines!
         revealLinesDiv.innerHTML = '';
 
-        // 2. Get all lines to reveal
+        // 2. Determine lines to reveal
         const revealLines = getRevealLinesFromParams(params);
 
-        // 3. Stagger and animate
-        let delay = 0;
-        revealLines.forEach((line, i) => {
+        // Helper to create and show a line
+        function revealLine(line, delay) {
           setTimeout(() => {
             const div = document.createElement('div');
             div.className = 'reveal-line ' + line.type;
             if (line.type === 'photo') {
               const img = document.createElement('img');
               img.src = line.content;
-              img.alt = "photo";
-              img.onerror = () => { div.style.display = 'none'; }; // Hide if broken link
+              img.alt = 'photo';
+              img.onerror = () => { div.style.display = 'none'; };
               div.appendChild(img);
             } else {
               div.textContent = line.content;
@@ -412,7 +413,29 @@
             revealLinesDiv.appendChild(div);
             setTimeout(() => div.classList.add('shown'), 70);
           }, delay);
-          delay += 1300; // milliseconds between each line
+          return delay;
+        }
+
+        let lastDelay = 0;
+        // Display photo and main line immediately
+        revealLines.forEach(line => {
+          if (line.type === 'photo' || line.type === 'main') {
+            lastDelay = Math.max(lastDelay, revealLine(line, 0));
+          }
+        });
+
+        // Sub and date lines together after ~900ms
+        revealLines.forEach(line => {
+          if (line.type === 'sub' || line.type === 'date') {
+            lastDelay = Math.max(lastDelay, revealLine(line, 900));
+          }
+        });
+
+        // From line last, after another ~1700ms
+        revealLines.forEach(line => {
+          if (line.type === 'from') {
+            lastDelay = Math.max(lastDelay, revealLine(line, 2600));
+          }
         });
 
         // 4. Show overlay and confetti
@@ -422,7 +445,7 @@
         setTimeout(() => {
           revealOverlay.style.opacity = '0';
           revealOverlay.style.pointerEvents = 'none';
-        }, delay + 2600);
+        }, lastDelay + 2600);
       }
       // -------- Confetti logic (unchanged) ----------
       function createConfetti() {
