@@ -49,16 +49,26 @@
       display: flex; justify-content: center; align-items: center;
       z-index: 2;
     }
-    #reel1 { top: 34.2%; left: 20.4%; width: 19.2%; height: 14.4%; }
-    #reel2 { top: 34.2%; left: 42.7%; width: 19.2%; height: 14.4%; }
-    #reel3 { top: 34.2%; left: 65.1%; width: 19.2%; height: 14.4%; }
-    .reel img {
-      width: 85%; height: 85%;
-      object-fit: contain;
-      display: block;
-      margin: auto;
-      transition: transform 0.05s;
+    /* --- Reel Positions --- */
+    #reel1 {
+      top: 34.2%;
+      left: 20.4%;
+      width: 19.2%;
+      height: 14.4%;
     }
+    #reel2 {
+      top: 34.2%;
+      left: 42.7%;
+      width: 19.2%;
+      height: 14.4%;
+    }
+    #reel3 {
+      top: 34.2%;
+      left: 65.1%;
+      width: 19.2%;
+      height: 14.4%;
+    }
+    /* --- Responsive Reel Top Adjustments --- */
     @media (max-width: 768px) {
       #reel1, #reel2, #reel3 { top: 34.7%; }
       .spin-button { width: 31.25%; }
@@ -79,6 +89,13 @@
       .reveal-text { font-size: 1.22rem;}
       .tap-to-continue { font-size: 0.97rem; }
     }
+    .reel img {
+      width: 85%; height: 85%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+      transition: transform 0.05s;
+    }
     .spin-button {
       position: absolute;
       top: 62.5%;
@@ -93,52 +110,32 @@
       z-index: 3;
     }
     .spin-button img {
-      width: 100%; height: auto; display: block;
-      border-radius: 0;
+      width: 100%; height: auto; display: block; border-radius: 0;
     }
     .spin-button.pressed, .spin-button:active {
       transform: translateX(-50%) scale(0.95);
     }
+    /* --- Reveal Overlay & Text (with dramatic pause) --- */
     .reveal-overlay {
-      position: absolute; 
-      top: 0; left: 0; 
-      width: 100%; height: 100%;
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background-color: rgba(238, 222, 197, 0.93);
-      display: flex; 
-      justify-content: center; 
-      align-items: center;
-      z-index: 10; 
-      opacity: 0; 
-      pointer-events: none; 
-      transition: opacity 0.2s;
+      display: flex; justify-content: center; align-items: center;
+      z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.2s;
     }
     .reveal-text {
       font-family: 'Poppins', Arial, Helvetica, sans-serif;
       font-size: 2.1rem;
       font-weight: 700;
       color: #fff;
-      text-shadow:
-        -2px -2px 0 #A59079,
-         2px -2px 0 #A59079,
-        -2px  2px 0 #A59079,
-         2px  2px 0 #A59079,
-         0px  2.5px 0 #A59079,
-         2.5px 0px 0 #A59079,
-        -2.5px 0px 0 #A59079,
-         0px -2.5px 0 #A59079,
-         0px  3.5px 7px rgba(0,0,0,0.14);
+      text-shadow: -2px -2px 0 #A59079, 2px -2px 0 #A59079, -2px 2px 0 #A59079, 2px 2px 0 #A59079, 0px 2.5px 0 #A59079, 2.5px 0px 0 #A59079, -2.5px 0px 0 #A59079, 0px -2.5px 0 #A59079, 0px 3.5px 7px rgba(0,0,0,0.14);
       text-align: center;
       text-transform: uppercase;
       letter-spacing: 1.2px;
       line-height: 1.18;
       width: 88%;
       margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
     .reveal-text .reveal-line1 {
       font-size: 1em;
@@ -152,17 +149,19 @@
       font-weight: 500;
       display: block;
       text-transform: none;
+      opacity: 0;
+      transition: opacity 0.7s cubic-bezier(0.51, 0.01, 0.3, 1.19);
     }
-    .reveal-text .baby-label,
-    .reveal-text .baby-name,
-    .reveal-text .baby-month {
+    .reveal-text .baby-name, .reveal-text .baby-month {
       font-size: 1em;
       font-weight: 700;
     }
+    /* --- Confetti --- */
     .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
     .confetti-square { width: 10px; height: 10px;}
     .confetti-rectangle { width: 8px; height: 16px;}
     .confetti-circle { width: 10px; height: 10px; border-radius: 50%;}
+    /* --- Instructions Overlay --- */
     .instructions-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.68);
@@ -184,22 +183,24 @@
   <div class="aspect-container">
     <div class="slot-machine-container">
       <div class="slot-machine blur-background" id="slotMachine"></div>
+      <!-- Slot icons/reels -->
       <div id="reel1" class="reel"><img src="https://i.postimg.cc/s26Ryf7W/2.png" alt="Ring"></div>
       <div id="reel2" class="reel"><img src="https://i.postimg.cc/qRWVhmmM/3.png" alt="Graduation"></div>
       <div id="reel3" class="reel"><img src="https://i.postimg.cc/cCYqQQj7/4.png" alt="Briefcase"></div>
+      <!-- Spin Button -->
       <div class="spin-button" id="spinButton">
         <img src="https://i.postimg.cc/7hkzxGn5/Blue-Phone-Text-Message-Instagram-Reel-Video.png" alt="Spin"/>
       </div>
+      <!-- Reveal -->
       <div class="reveal-overlay" id="revealOverlay">
         <div class="reveal-text">
-          <span class="reveal-line1">We are expecting!</span>
-          <span class="reveal-line2">
-            <span class="baby-label">Baby</span>
-            <span class="baby-name"></span>
-            coming <span class="baby-month"></span>
-          </span>
+          <div class="reveal-line1">We are expecting!</div>
+          <div class="reveal-line2">
+            Baby <span class="baby-name"></span> coming <span class="baby-month"></span>
+          </div>
         </div>
       </div>
+      <!-- Instructions -->
       <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
         <div class="instructions-container">
           <img src="https://i.postimg.cc/GpQmD1Y3/Untitled-design.png" alt="Instructions" class="instructions-image"/>
@@ -214,22 +215,16 @@
       try {
         const url = new URL(window.location.href);
         return url.searchParams.get(name) || fallback;
-      } catch {
-        return fallback;
-      }
+      } catch { return fallback; }
     }
     function updateRevealTextFromParams() {
       const name = getUrlParam('name', '');
       const month = getUrlParam('month', 'soon!');
       const nameDisplay = name ? name : '';
-      const babyLabel = 'Baby';
       const monthDisplay = month;
-      document.querySelector('.baby-label').textContent = babyLabel;
       document.querySelector('.baby-name').textContent = nameDisplay;
       document.querySelector('.baby-month').textContent = monthDisplay;
     }
-    updateRevealTextFromParams();
-
     // --- Main slot machine JS ---
     document.addEventListener('DOMContentLoaded', function () {
       const icons = [
@@ -358,14 +353,18 @@
         }, delay);
       }
       function showReveal() {
-        updateRevealTextFromParams(); // Just in case, re-reads params on reveal
+        updateRevealTextFromParams(); // Update name/month from params
         revealOverlay.style.opacity = '1';
         revealOverlay.style.pointerEvents = 'auto';
         createConfetti();
-        setTimeout(() => {
-          revealOverlay.style.opacity = '0';
-          revealOverlay.style.pointerEvents = 'none';
-        }, 4200);
+
+        // Dramatic reveal: fade in line 2 after a pause
+        const line2 = document.querySelector('.reveal-line2');
+        if (line2) {
+          line2.style.opacity = '0';
+          setTimeout(() => { line2.style.opacity = '1'; }, 1100); // adjust delay if desired
+        }
+        // The overlay will STICK (not auto-dismiss) until page refresh
       }
       function createConfetti() {
         document.querySelectorAll('.confetti').forEach(el => { if (el.parentNode) el.parentNode.removeChild(el); });
