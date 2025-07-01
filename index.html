@@ -424,16 +424,27 @@
           }, delay);
         }
 
-        const step = 700;
-        revealLines.forEach((line, idx) => {
-          revealLine(line, step * idx);
-        });
+        const delays = [];
+
+        function revealType(type, delay) {
+          const line = revealLines.find(l => l.type === type);
+          if (line) {
+            revealLine(line, delay);
+            delays.push(delay);
+          }
+        }
+
+        revealType('main', 0);
+        revealType('photo', 800);
+        ['sub', 'date'].forEach(t => revealType(t, 900));
+        revealType('from', 2600);
+
+        const totalDelay = delays.length ? Math.max(...delays) : 0;
 
         // 4. Show overlay and confetti
         revealOverlay.style.opacity = '1';
         revealOverlay.style.pointerEvents = 'auto';
         createConfetti();
-        const totalDelay = step * revealLines.length;
         setTimeout(() => {
           revealOverlay.style.opacity = '0';
           revealOverlay.style.pointerEvents = 'none';
