@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=430, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>Baby Gender Reveal Slot Machine</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap" rel="stylesheet"/>
   <style>
@@ -49,26 +49,16 @@
       display: flex; justify-content: center; align-items: center;
       z-index: 2;
     }
-    /* --- Reel Positions --- */
-    #reel1 {
-      top: 34.2%;
-      left: 20.4%;
-      width: 19.2%;
-      height: 14.4%;
+    #reel1 { top: 34.2%; left: 20.4%; width: 19.2%; height: 14.4%; }
+    #reel2 { top: 34.2%; left: 42.7%; width: 19.2%; height: 14.4%; }
+    #reel3 { top: 34.2%; left: 65.1%; width: 19.2%; height: 14.4%; }
+    .reel img {
+      width: 85%; height: 85%;
+      object-fit: contain;
+      display: block;
+      margin: auto;
+      transition: transform 0.05s;
     }
-    #reel2 {
-      top: 34.2%;
-      left: 42.7%;
-      width: 19.2%;
-      height: 14.4%;
-    }
-    #reel3 {
-      top: 34.2%;
-      left: 65.1%;
-      width: 19.2%;
-      height: 14.4%;
-    }
-    /* --- Responsive Reel Top Adjustments --- */
     @media (max-width: 768px) {
       #reel1, #reel2, #reel3 { top: 34.7%; }
       .spin-button { width: 31.25%; }
@@ -89,20 +79,12 @@
       .reveal-text { font-size: 1.22rem;}
       .tap-to-continue { font-size: 0.97rem; }
     }
-    .reel img {
-      width: 85%; height: 85%;
-      object-fit: contain;
-      display: block;
-      margin: auto;
-      transition: transform 0.05s;
-    }
     .spin-button {
       position: absolute;
       top: 62.5%;
       left: 50%;
       width: 34%;
-      padding: 0;
-      background: transparent;
+      padding: 0; background: transparent;
       transform: translateX(-50%);
       cursor: pointer;
       transition: all 0.08s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -110,12 +92,10 @@
       z-index: 3;
     }
     .spin-button img {
-      width: 100%; height: auto; display: block; border-radius: 0;
+      width: 100%; height: auto; display: block;
+      border-radius: 0;
     }
-    .spin-button.pressed, .spin-button:active {
-      transform: translateX(-50%) scale(0.95);
-    }
-    /* --- Reveal Overlay & Text (with dramatic pause) --- */
+    .spin-button.pressed, .spin-button:active { transform: translateX(-50%) scale(0.95); }
     .reveal-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background-color: rgba(238, 222, 197, 0.93);
@@ -124,44 +104,37 @@
     }
     .reveal-text {
       font-family: 'Poppins', Arial, Helvetica, sans-serif;
-      font-size: 2.1rem;
-      font-weight: 700;
-      color: #fff;
+      font-size: 2.1rem; font-weight: 700; color: #fff;
       text-shadow: -2px -2px 0 #A59079, 2px -2px 0 #A59079, -2px 2px 0 #A59079, 2px 2px 0 #A59079, 0px 2.5px 0 #A59079, 2.5px 0px 0 #A59079, -2.5px 0px 0 #A59079, 0px -2.5px 0 #A59079, 0px 3.5px 7px rgba(0,0,0,0.14);
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      line-height: 1.18;
-      width: 88%;
-      margin: 0 auto;
+      text-align: center; text-transform: uppercase; letter-spacing: 1.2px;
+      line-height: 1.18; width: 88%; margin: 0 auto;
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
     }
-    .reveal-text .reveal-line1 {
-      font-size: 1em;
-      margin-bottom: 0.5em;
-      display: block;
-      font-weight: 700;
-      text-transform: none;
-    }
-    .reveal-text .reveal-line2 {
-      font-size: 1em;
+    .reveal-line1 { font-size: 1em; margin-bottom: 0.5em; font-weight: 700; text-transform: none; opacity: 0; transition: opacity 0.5s;}
+    .reveal-line2 { font-size: 1em; font-weight: 500; margin-top: 0.5em; text-transform: none; opacity: 0; transition: opacity 0.5s;}
+    .reveal-parents {
+      margin-top: 1em;
+      font-size: 1.08em;
       font-weight: 500;
-      display: block;
-      text-transform: none;
+      color: #f5f0e0;
+      text-shadow: 0 1.5px 5px #a5907996;
       opacity: 0;
-      transition: opacity 0.7s cubic-bezier(0.51, 0.01, 0.3, 1.19);
+      transition: opacity 0.5s;
     }
-    .reveal-text .baby-name, .reveal-text .baby-month {
-      font-size: 1em;
-      font-weight: 700;
+    .reveal-photo {
+      margin-top: 0.9em;
+      max-width: 80%;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px #9878441f;
+      opacity: 0;
+      transition: opacity 0.7s;
+      display: none;
     }
-    /* --- Confetti --- */
     .confetti { position: absolute; z-index: 101; will-change: transform, opacity; pointer-events: none; }
     .confetti-square { width: 10px; height: 10px;}
     .confetti-rectangle { width: 8px; height: 16px;}
     .confetti-circle { width: 10px; height: 10px; border-radius: 50%;}
-    /* --- Instructions Overlay --- */
     .instructions-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(0,0,0,0.68);
@@ -183,24 +156,22 @@
   <div class="aspect-container">
     <div class="slot-machine-container">
       <div class="slot-machine blur-background" id="slotMachine"></div>
-      <!-- Slot icons/reels -->
       <div id="reel1" class="reel"><img src="https://i.postimg.cc/s26Ryf7W/2.png" alt="Ring"></div>
       <div id="reel2" class="reel"><img src="https://i.postimg.cc/qRWVhmmM/3.png" alt="Graduation"></div>
       <div id="reel3" class="reel"><img src="https://i.postimg.cc/cCYqQQj7/4.png" alt="Briefcase"></div>
-      <!-- Spin Button -->
       <div class="spin-button" id="spinButton">
         <img src="https://i.postimg.cc/7hkzxGn5/Blue-Phone-Text-Message-Instagram-Reel-Video.png" alt="Spin"/>
       </div>
-      <!-- Reveal -->
       <div class="reveal-overlay" id="revealOverlay">
         <div class="reveal-text">
-          <div class="reveal-line1">We are expecting!</div>
+          <div class="reveal-line1"></div>
           <div class="reveal-line2">
             Baby <span class="baby-name"></span> coming <span class="baby-month"></span>
           </div>
+          <div class="reveal-parents"></div>
+          <img class="reveal-photo" style="display:none;"/>
         </div>
       </div>
-      <!-- Instructions -->
       <div class="instructions-overlay" id="instructionsOverlay" style="opacity:1;">
         <div class="instructions-container">
           <img src="https://i.postimg.cc/GpQmD1Y3/Untitled-design.png" alt="Instructions" class="instructions-image"/>
@@ -210,7 +181,7 @@
     </div>
   </div>
   <script>
-    // --- Reveal param text logic ---
+    // --- URL parameter logic & reveal text ---
     function getUrlParam(name, fallback = "") {
       try {
         const url = new URL(window.location.href);
@@ -218,14 +189,41 @@
       } catch { return fallback; }
     }
     function updateRevealTextFromParams() {
-      const name = getUrlParam('name', '');
-      const month = getUrlParam('month', 'soon!');
-      const nameDisplay = name ? name : '';
-      const monthDisplay = month;
-      document.querySelector('.baby-name').textContent = nameDisplay;
-      document.querySelector('.baby-month').textContent = monthDisplay;
+      // Language labels
+      const lang = getUrlParam('lang', 'en');
+      const labels = {
+        en: { headline: "We are expecting!", baby: "Baby", coming: "coming", parents: "Love," },
+        es: { headline: "¡Estamos esperando!", baby: "Bebé", coming: "llega", parents: "Con cariño," },
+        fr: { headline: "Nous attendons un bébé!", baby: "Bébé", coming: "arrive", parents: "Avec amour," }
+      };
+      const L = labels[lang] || labels.en;
+      // Get params (defaults for opt-out)
+      const headline = getUrlParam('headline', L.headline);
+      const babyName = getUrlParam('name', '');
+      const dueDate = getUrlParam('duedate', getUrlParam('month', 'soon!'));
+      const parents = getUrlParam('parents', '');
+      const photoUrl = getUrlParam('photo', '');
+      // Set reveal lines
+      document.querySelector('.reveal-line1').textContent = headline;
+      // Only show "Baby [name] coming [month]" if at least name or date
+      document.querySelector('.reveal-line2').innerHTML =
+        (babyName || dueDate)
+          ? `${L.baby} <span class="baby-name">${babyName}</span> ${L.coming} <span class="baby-month">${dueDate}</span>`
+          : "";
+      // Parent names
+      document.querySelector('.reveal-parents').textContent = parents ? `${L.parents} ${parents}` : "";
+      document.querySelector('.reveal-parents').style.display = parents ? "block" : "none";
+      // Photo
+      const photoEl = document.querySelector('.reveal-photo');
+      if (photoUrl) {
+        photoEl.src = photoUrl;
+        photoEl.style.display = "block";
+      } else {
+        photoEl.style.display = "none";
+      }
     }
-    // --- Main slot machine JS ---
+
+    // --- Main Slot Machine JS ---
     document.addEventListener('DOMContentLoaded', function () {
       const icons = [
         "https://i.postimg.cc/s26Ryf7W/2.png",
@@ -279,9 +277,7 @@
         if (navigator.vibrate) navigator.vibrate(24);
         playClickSound();
       });
-      spinButton.addEventListener('mouseup', function () {
-        this.classList.remove('pressed');
-      });
+      spinButton.addEventListener('mouseup', function () { this.classList.remove('pressed'); });
       spinButton.addEventListener('mouseleave', function () { this.classList.remove('pressed'); });
       spinButton.addEventListener('touchstart', function (e) {
         e.preventDefault();
@@ -352,20 +348,38 @@
           requestAnimationFrame(animate);
         }, delay);
       }
+
+      // --- Reveal Animation (pause between lines, show photo if exists) ---
       function showReveal() {
-        updateRevealTextFromParams(); // Update name/month from params
-        revealOverlay.style.opacity = '1';
-        revealOverlay.style.pointerEvents = 'auto';
+        updateRevealTextFromParams();
+        // Start hidden
+        const overlay = document.getElementById('revealOverlay');
+        const line1 = overlay.querySelector('.reveal-line1');
+        const line2 = overlay.querySelector('.reveal-line2');
+        const parents = overlay.querySelector('.reveal-parents');
+        const photo = overlay.querySelector('.reveal-photo');
+        overlay.style.opacity = '1';
+        overlay.style.pointerEvents = 'auto';
+        line1.style.opacity = 0; line2.style.opacity = 0; parents.style.opacity = 0; photo.style.opacity = 0;
         createConfetti();
 
-        // Dramatic reveal: fade in line 2 after a pause
-        const line2 = document.querySelector('.reveal-line2');
-        if (line2) {
-          line2.style.opacity = '0';
-          setTimeout(() => { line2.style.opacity = '1'; }, 1100); // adjust delay if desired
+        // Fade in headline, then line2, then optional parents, then optional photo
+        setTimeout(()=>{ line1.style.opacity = 1; }, 100);
+        setTimeout(()=>{ line2.style.opacity = 1; }, 1050);
+        if(parents.textContent.trim()) setTimeout(()=>{ parents.style.opacity = 1; }, 1800);
+        if(photo.src && photo.style.display !== "none") setTimeout(()=>{ photo.style.opacity = 1; }, 2000);
+
+        // Remove overlay ONLY when user taps/clicks (makes it "sticky" until dismissed)
+        function closeOverlay() {
+          overlay.style.opacity = '0';
+          overlay.style.pointerEvents = 'none';
+          overlay.removeEventListener('click', closeOverlay);
+          overlay.removeEventListener('touchstart', closeOverlay);
         }
-        // The overlay will STICK (not auto-dismiss) until page refresh
+        overlay.addEventListener('click', closeOverlay);
+        overlay.addEventListener('touchstart', closeOverlay);
       }
+
       function createConfetti() {
         document.querySelectorAll('.confetti').forEach(el => { if (el.parentNode) el.parentNode.removeChild(el); });
         const colors = [
