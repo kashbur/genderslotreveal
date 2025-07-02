@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
       rel="stylesheet"
     />
-    <script src="https://unpkg.com/fitty/dist/fitty.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/textfit/2.4.0/textFit.min.js"></script>
     <style>
       html,
       body {
@@ -552,11 +552,13 @@
 
         function fitRevealLine(el, type) {
           if (type === "photo") return;
-          fitty(el, {
-            minSize: 16,
-            maxSize: 100,
+          textFit(el, {
+            alignVert: true,
+            alignHoriz: true,
             multiLine: true,
-            observeMutations: false,
+            detectMultiLine: true,
+            minFontSize: 12,
+            maxFontSize: 160,
           });
         }
 
