@@ -199,6 +199,16 @@
         height:100%;                    /* fill overlay vertically */
         gap:clamp(.5rem,4vh,1.2rem);    /* responsive breathing room */
       }
+
+      .reveal-stage2 .reveal-lines{
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        gap:1.4rem;
+        height:100%;
+        width:100%;
+      }
       .reveal-line {
         width: 100%;
         text-align: center;
@@ -210,6 +220,10 @@
         -webkit-text-stroke: 1px #a59079;
         text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
         margin: 0;
+      }
+
+      .reveal-stage2 .reveal-line{
+        line-height:1.15;
       }
       .reveal-line.photo img {
         width: 96px;
@@ -253,6 +267,7 @@
           -webkit-text-stroke: 1px #a59079;
           text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
         }
+        .reveal-stage2 .reveal-lines{ gap:1.0rem; }
         .reveal-line.main {
           font-size: clamp(2rem, 12vw, 8rem);
         }
@@ -336,7 +351,7 @@
           <div class="color-overlay"></div>
           <div class="intro-message" id="introMessage"></div>
         </div>
-        <div class="reveal-overlay" id="revealOverlay">
+        <div class="reveal-overlay reveal-stage2" id="revealOverlay">
           <div class="color-overlay" id="colorOverlay"></div>
           <div class="reveal-content">
             <div class="reveal-lines" id="revealLines"></div>
@@ -402,6 +417,19 @@
           none: "transparent",
         };
         return overlays[color] || overlays.beige;
+      }
+
+      function fitRevealLine(el, type) {
+        const container = document.getElementById("revealOverlay");
+        let size = parseFloat(getComputedStyle(el).fontSize);
+        while (
+          (el.scrollWidth > container.clientWidth ||
+            el.scrollHeight > container.clientHeight) &&
+          size > 6
+        ) {
+          size -= 1;
+          el.style.fontSize = size + "px";
+        }
       }
       // ----------- Slot Machine Game Logic ----------
       document.addEventListener("DOMContentLoaded", function () {
@@ -677,6 +705,8 @@
                 div.textContent = line.content;
               }
               revealLinesDiv.appendChild(div);
+              fitRevealLine(div, line.type);
+              div.style.margin = "0";
             }
             const subLine = otherLines.find((l) => l.type === "sub");
             const dateLine = otherLines.find((l) => l.type === "date");
