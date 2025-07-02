@@ -218,14 +218,15 @@
         height: 100%;
       }
 
-      .reveal-stage2 .reveal-lines{
-        display:flex;
-        flex-direction:column;
-        align-items:center;
-        justify-content:center;
-        gap:1.0rem;
-        height:100%;
-        width:100%;
+      .reveal-stage2 .reveal-lines {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.4rem;
+        height: 100%;
+        width: 100%;
+        padding: 2rem 1rem;
       }
       .reveal-line {
         width: 100%;
@@ -250,21 +251,15 @@
 
 
       .reveal-stage2 .reveal-line {
-        font-size: clamp(1.8rem, 7vw, 3.4rem);
         line-height: 1.15;
+        font-size: clamp(1.8rem, 7.5vw, 3.8rem);
+        text-align: center;
       }
-      .reveal-line.photo img {
-        width: 96px;
-        height: 96px;
-        border-radius: 50%;
-        object-fit: cover;
-        margin-bottom: 1em;
-        border: 4px solid #fff5;
-        background: #f6f6f6;
-        box-shadow: 0 2px 16px #0002;
-      }
-      .reveal-photo {
+      .reveal-stage2 img {
+        max-width: 80%;
+        height: auto;
         margin: 1.2rem 0;
+        border-radius: 0.5rem;
       }
       .reveal-line.main {
         line-height: 1.1;
@@ -296,14 +291,11 @@
           -webkit-text-stroke: 1px #a59079;
           text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
         }
-        .reveal-stage2 .reveal-line {
-          font-size: clamp(1.6rem, 7.5vw, 2.8rem);
-          line-height: 1.15;
-        }
-
         .reveal-stage2 .reveal-lines {
           gap: 1rem;
-          padding: 1rem 0;    /* add top and bottom breathing room */
+        }
+        .reveal-stage2 .reveal-line {
+          font-size: clamp(1.6rem, 8.5vw, 3.2rem);
         }
         .reveal-line.main {
         }
@@ -390,9 +382,9 @@
             </div>
           </div>
         </div>
-        <div class="reveal-overlay reveal-stage2" id="revealOverlay">
+        <div class="reveal-overlay" id="revealOverlay">
           <div class="color-overlay" id="colorOverlay"></div>
-          <div class="reveal-content">
+          <div id="stageTwo" class="reveal-stage2">
             <div class="reveal-lines" id="revealLines"></div>
           </div>
         </div>
@@ -655,6 +647,16 @@
           return Math.max(1600, Math.min(ms, 6000));
         }
 
+        function fitRevealLine(el, type) {
+          if (type === "photo") return;
+          fitty(el, {
+            minSize: 16,
+            maxSize: 100,
+            multiLine: true,
+            observeMutations: false,
+          });
+        }
+
         // ------------- REVEAL LOGIC -----------------
         function showReveal() {
           const allLines = getRevealLinesFromParams(params);
@@ -669,7 +671,6 @@
               const div = document.createElement("div");
               div.className = "reveal-line fit-text " + line.type;
               if (line.type === "photo") {
-                div.classList.add("reveal-photo");
                 const img = document.createElement("img");
                 img.src = line.content;
                 img.alt = "photo";
@@ -682,7 +683,9 @@
               }
               div.style.color = safeTextColor;
               div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
+              div.style.margin = "0";
               revealLinesDiv.appendChild(div);
+              fitRevealLine(div, line.type);
             }
             const subLine = otherLines.find((l) => l.type === "sub");
             const dateLine = otherLines.find((l) => l.type === "date");
@@ -691,14 +694,6 @@
             [subLine, dateLine, photoLine, fromLine]
               .filter(Boolean)
               .forEach(addLine);
-            requestAnimationFrame(() => {
-              fitty('.fit-text', {
-                minSize: 16,
-                maxSize: 100,
-                multiLine: true,
-                observeMutations: false,
-              });
-            });
             const hideDelay = 30000;
 
 
