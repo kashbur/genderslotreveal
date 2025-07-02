@@ -91,13 +91,28 @@
       z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.2s;
       flex-direction: column;
     }
-    .reveal-overlay .color-overlay {
+    .reveal-overlay .color-overlay,
+    .intro-overlay .color-overlay {
       position: absolute; top: 0; left: 0; width: 100%; height: 100%;
       z-index: 1;
       pointer-events: none;
       opacity: 0.53;
       background: transparent;
       transition: background 0.3s;
+    }
+    .intro-overlay {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      background-color: rgba(238,222,197,0.93);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 10; opacity: 0; pointer-events: none; transition: opacity 0.4s;
+      flex-direction: column;
+    }
+    .intro-message {
+      position: relative; z-index: 2; width: 90%; text-align: center;
+      font-size: clamp(2.5rem, 12vw, 7rem); font-weight: 900;
+      text-transform: uppercase; color: #fff; word-break: keep-all;
+      text-wrap: balance; -webkit-text-stroke: 1px #A59079;
+      text-shadow: 0 0 1px rgba(0,0,0,0.2);
     }
     .reveal-content {
       position: relative;
@@ -223,6 +238,10 @@
       <div class="spin-button blur-background" id="spinButton">
         <img src="img/tap to spin.png" alt="Spin"/>
       </div>
+      <div class="intro-overlay" id="introOverlay">
+        <div class="color-overlay"></div>
+        <div class="intro-message" id="introMessage"></div>
+      </div>
       <div class="reveal-overlay" id="revealOverlay">
         <div class="color-overlay" id="colorOverlay"></div>
         <div class="reveal-content">
@@ -300,6 +319,9 @@
       const reel1 = document.getElementById('reel1');
       const reel2 = document.getElementById('reel2');
       const reel3 = document.getElementById('reel3');
+      const introOverlay = document.getElementById('introOverlay');
+      const introMessage = document.getElementById('introMessage');
+      const introColorOverlay = introOverlay.querySelector('.color-overlay');
       const revealOverlay = document.getElementById('revealOverlay');
       const revealLinesDiv = document.getElementById('revealLines');
       const colorOverlay = document.getElementById('colorOverlay');
@@ -346,10 +368,24 @@
         }
       }
 
+      function fitIntroText() {
+        let size = window.innerWidth <= 500 ? 4.5 : 7;
+        introMessage.style.fontSize = size + 'rem';
+        const container = introOverlay;
+        while ((introMessage.scrollWidth > container.clientWidth * 0.9 ||
+                introMessage.scrollHeight > container.clientHeight * 0.9) &&
+               size > 1) {
+          size -= 0.5;
+          introMessage.style.fontSize = size + 'rem';
+        }
+      }
+
       window.addEventListener('resize', resizeRevealText);
+      window.addEventListener('resize', fitIntroText);
 
       // Set overlay color on reveal
       colorOverlay.style.background = getColorOverlay(params);
+      introColorOverlay.style.background = getColorOverlay(params);
 
       // Hide instructions overlay
       function hideInstructionsOverlay() {
@@ -466,90 +502,92 @@
 
       // ------------- REVEAL LOGIC -----------------
       function showReveal() {
-        // 1. Clear any previous reveal lines!
-        revealLinesDiv.innerHTML = '';
+        const allLines = getRevealLinesFromParams(params);
+        const mainLine = allLines.find(l => l.type === 'main');
+        const otherLines = allLines.filter(l => l.type !== 'main');
 
-        // 2. Determine lines to reveal
-        const revealLines = getRevealLinesFromParams(params);
+        function showStageTwo() {
+          if (!otherLines.length) { createConfetti(); return; }
+          revealLinesDiv.innerHTML = '';
 
-        const singleDefault = revealLines.length === 1 &&
-          revealLines[0].type === 'main' &&
-          revealLines[0].content.trim().toLowerCase() === 'we are expecting!';
-        revealLinesDiv.classList.toggle('big-main', singleDefault);
-
-        // Calculate minimum height so lines can be inserted without layout shift
-        const tempContainer = document.createElement('div');
-        tempContainer.className = 'reveal-lines';
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.visibility = 'hidden';
-        tempContainer.style.pointerEvents = 'none';
-        tempContainer.style.minHeight = '0';
-        document.body.appendChild(tempContainer);
-        revealLines.forEach(line => {
-          const div = document.createElement('div');
-          div.className = 'reveal-line ' + line.type;
-          if (line.type === 'photo') {
-            const img = document.createElement('img');
-            img.src = line.content;
-            div.appendChild(img);
-          } else {
-            div.textContent = line.content;
-          }
-          tempContainer.appendChild(div);
-        });
-        const targetHeight = tempContainer.offsetHeight;
-        document.body.removeChild(tempContainer);
-        const currentMin = parseFloat(getComputedStyle(revealLinesDiv).minHeight);
-        const finalHeight = Math.max(targetHeight, currentMin || 0);
-        revealLinesDiv.style.minHeight = finalHeight + 'px';
-
-        // Helper to create and show a line
-        function revealLine(line, delay) {
-          setTimeout(() => {
+          const tempContainer = document.createElement('div');
+          tempContainer.className = 'reveal-lines';
+          tempContainer.style.position = 'absolute';
+          tempContainer.style.visibility = 'hidden';
+          tempContainer.style.pointerEvents = 'none';
+          tempContainer.style.minHeight = '0';
+          document.body.appendChild(tempContainer);
+          otherLines.forEach(line => {
             const div = document.createElement('div');
             div.className = 'reveal-line ' + line.type;
             if (line.type === 'photo') {
               const img = document.createElement('img');
               img.src = line.content;
-              img.alt = 'photo';
-              img.onerror = () => { div.style.display = 'none'; };
               div.appendChild(img);
             } else {
               div.textContent = line.content;
             }
-            revealLinesDiv.appendChild(div);
-            fitRevealLine(div);
-            resizeRevealText();
-            requestAnimationFrame(() => div.classList.add('shown'));
-          }, delay);
-        }
+            tempContainer.appendChild(div);
+          });
+          const targetHeight = tempContainer.offsetHeight;
+          document.body.removeChild(tempContainer);
+          revealLinesDiv.style.minHeight = targetHeight + 'px';
 
-        const delays = [];
-
-        function revealType(type, delay) {
-          const line = revealLines.find(l => l.type === type);
-          if (line) {
-            revealLine(line, delay);
-            delays.push(delay);
+          function revealLine(line, delay) {
+            setTimeout(() => {
+              const div = document.createElement('div');
+              div.className = 'reveal-line ' + line.type;
+              if (line.type === 'photo') {
+                const img = document.createElement('img');
+                img.src = line.content;
+                img.alt = 'photo';
+                img.onerror = () => { div.style.display = 'none'; };
+                div.appendChild(img);
+              } else {
+                div.textContent = line.content;
+              }
+              revealLinesDiv.appendChild(div);
+              fitRevealLine(div);
+              resizeRevealText();
+              requestAnimationFrame(() => div.classList.add('shown'));
+            }, delay);
           }
+
+          const delays = [];
+          const seq = ['sub', 'date', 'photo', 'from'];
+          let delay = 0;
+          seq.forEach(type => {
+            const line = otherLines.find(l => l.type === type);
+            if (line) {
+              revealLine(line, delay);
+              delays.push(delay);
+              delay += 800;
+            }
+          });
+
+          revealOverlay.style.opacity = '1';
+          revealOverlay.style.pointerEvents = 'auto';
+          createConfetti();
+          const totalDelay = delays.length ? Math.max(...delays) : 0;
+          setTimeout(() => {
+            revealOverlay.style.opacity = '0';
+            revealOverlay.style.pointerEvents = 'none';
+          }, totalDelay + 10000);
         }
 
-        revealType('main', 0);
-        revealType('photo', 800);
-        ['sub', 'date'].forEach(t => revealType(t, 1700));
-        revealType('from', 2600);
-        setTimeout(resizeRevealText, 2700);
-
-        const totalDelay = delays.length ? Math.max(...delays) : 0;
-
-        // 4. Show overlay and confetti
-        revealOverlay.style.opacity = '1';
-        revealOverlay.style.pointerEvents = 'auto';
-        createConfetti();
-        setTimeout(() => {
-          revealOverlay.style.opacity = '0';
-          revealOverlay.style.pointerEvents = 'none';
-        }, totalDelay + 30000);
+        if (mainLine) {
+          introMessage.textContent = mainLine.content;
+          fitIntroText();
+          introOverlay.style.opacity = '1';
+          introOverlay.style.pointerEvents = 'auto';
+          setTimeout(() => {
+            introOverlay.style.opacity = '0';
+            introOverlay.style.pointerEvents = 'none';
+            setTimeout(showStageTwo, 600);
+          }, 3500);
+        } else {
+          showStageTwo();
+        }
       }
       // -------- Confetti logic (unchanged) ----------
       function createConfetti() {
