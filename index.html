@@ -216,7 +216,7 @@
         flex-direction:column;
         align-items:center;
         justify-content:center;
-        gap:1.4rem;
+        gap:1.0rem;
         height:100%;
         width:100%;
       }
@@ -256,6 +256,9 @@
         background: #f6f6f6;
         box-shadow: 0 2px 16px #0002;
       }
+      .reveal-photo {
+        margin: 1.2rem 0;
+      }
       .reveal-line.main {
         font-size: clamp(4rem, 22vw, 150rem);
         line-height:1.1;
@@ -266,6 +269,9 @@
       .reveal-line.sub {
         font-size: clamp(2.5rem, 12vw, 7rem);
         font-weight: 700;
+      }
+      .reveal-stage2 .reveal-line.sub {
+        text-transform: uppercase;
       }
       .reveal-line.date {
         font-size: clamp(2.5rem, 12vw, 7rem);
@@ -650,6 +656,7 @@
               const div = document.createElement("div");
               div.className = "reveal-line fit-text " + line.type;
               if (line.type === "photo") {
+                div.classList.add("reveal-photo");
                 const img = document.createElement("img");
                 img.src = line.content;
                 img.alt = "photo";
