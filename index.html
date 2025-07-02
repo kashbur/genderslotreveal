@@ -12,6 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
       rel="stylesheet"
     />
+    <script src="https://unpkg.com/fitty/dist/fitty.min.js"></script>
     <style>
       html,
       body {
@@ -221,6 +222,14 @@
         text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
         margin: 0;
       }
+      .fit-text {
+        display: block;
+        text-align: center;
+        white-space: normal;
+        width: 100%;
+        padding: 0 1rem;
+      }
+
 
       .reveal-stage2 .reveal-line{
         line-height:1.15;
@@ -358,7 +367,7 @@
         </div>
         <div class="intro-overlay" id="introOverlay">
           <div class="color-overlay"></div>
-          <div class="intro-message" id="introMessage"></div>
+          <div class="intro-message fit-text main" id="introMessage"></div>
         </div>
         <div class="reveal-overlay reveal-stage2" id="revealOverlay">
           <div class="color-overlay" id="colorOverlay"></div>
@@ -428,19 +437,6 @@
         return overlays[color] || overlays.beige;
       }
 
-      function fitRevealLine(el, type) {
-        const container = document.getElementById("revealOverlay");
-        let size = parseFloat(getComputedStyle(el).fontSize);
-        while (
-          (el.scrollWidth > container.clientWidth ||
-            el.scrollHeight > container.clientHeight) &&
-          size > 6
-        ) {
-          size -= 1;
-          el.style.fontSize = size + "px";
-        }
-      }
-      // ----------- Slot Machine Game Logic ----------
       document.addEventListener("DOMContentLoaded", function () {
         const icons = [
           "img/ring.png",
@@ -471,71 +467,7 @@
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
 
-        function fitBlock() {
-          const container = revealOverlay;
-          const lines = Array.from(revealLinesDiv.querySelectorAll(".reveal-line"));
-          if (!lines.length) return;
-          const rootSize = parseFloat(
-            getComputedStyle(document.documentElement).fontSize,
-          );
-          const base = lines.map((l) =>
-            parseFloat(getComputedStyle(l).fontSize) / rootSize || 1,
-          );
-          let scale = 1;
-          const apply = () =>
-            lines.forEach((l, i) => (l.style.fontSize = base[i] * scale + "rem"));
-          apply();
-          const overflow = () =>
-            revealLinesDiv.scrollHeight > container.clientHeight ||
-            revealLinesDiv.scrollWidth > container.clientWidth;
-          while (overflow() && scale > 0.4) {
-            scale -= 0.05;
-            apply();
-          }
-          while (!overflow()) {
-            scale += 0.05;
-            apply();
-            if (overflow()) {
-              scale -= 0.05;
-              apply();
-              break;
-            }
-          }
-        }
 
-        function fitIntroText() {
-          let size = window.innerWidth <= 500 ? 18 : 24;
-          introMessage.style.fontSize = size + "rem";
-          const container = introOverlay;
-          while (
-            (introMessage.scrollWidth > container.clientWidth ||
-              introMessage.scrollHeight > container.clientHeight) &&
-            size > 1
-          ) {
-            size -= 0.5;
-            introMessage.style.fontSize = size + "rem";
-          }
-          while (
-            introMessage.scrollWidth <= container.clientWidth &&
-            introMessage.scrollHeight <= container.clientHeight
-          ) {
-            size += 0.5;
-            introMessage.style.fontSize = size + "rem";
-            if (
-              introMessage.scrollWidth > container.clientWidth ||
-              introMessage.scrollHeight > container.clientHeight
-            ) {
-              size -= 0.5;
-              introMessage.style.fontSize = size + "rem";
-              break;
-            }
-          }
-        }
-
-        window.addEventListener("resize", fitBlock);
-        window.addEventListener("orientationchange", fitBlock);
-        window.addEventListener("resize", fitIntroText);
-        window.addEventListener("orientationchange", fitIntroText);
 
         // Set overlay color on reveal
         colorOverlay.style.background = getColorOverlay(params);
@@ -701,7 +633,7 @@
 
             function addLine(line) {
               const div = document.createElement("div");
-              div.className = "reveal-line " + line.type;
+              div.className = "reveal-line fit-text " + line.type;
               if (line.type === "photo") {
                 const img = document.createElement("img");
                 img.src = line.content;
@@ -714,8 +646,6 @@
                 div.textContent = line.content;
               }
               revealLinesDiv.appendChild(div);
-              fitRevealLine(div, line.type);
-              div.style.margin = "0";
             }
             const subLine = otherLines.find((l) => l.type === "sub");
             const dateLine = otherLines.find((l) => l.type === "date");
@@ -724,7 +654,9 @@
             [subLine, dateLine, photoLine, fromLine]
               .filter(Boolean)
               .forEach(addLine);
-            fitBlock();
+            requestAnimationFrame(() => {
+              fitty(".fit-text", { minSize: 16, maxSize: 120, multiLine: true });
+            });
             const hideDelay = 30000;
 
 
@@ -742,8 +674,10 @@
           }
 
           if (mainLine) {
-            introMessage.textContent = mainLine.content;
-            fitIntroText();
+              introMessage.textContent = mainLine.content;
+              requestAnimationFrame(() => {
+                fitty(".fit-text", { minSize: 16, maxSize: 120, multiLine: true });
+              });
             introOverlay.style.opacity = "1";
             introOverlay.style.pointerEvents = "auto";
             if (!confettiShown) {
