@@ -129,22 +129,21 @@
         top: 0;
         left: 0;
         width: 100%;
-        height: 100%;
+        height: 100vh;
         background-color: rgba(238, 222, 197, 0.93);
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        padding: 2vh;
+        gap: 2vh;
+        box-sizing: border-box;
         z-index: 10;
         opacity: 0;
         pointer-events: none;
         transition: opacity 0.2s;
-        flex-direction: column;
       }
-      #revealOverlay {
-        height: 100vh;
-      }
-      .reveal-overlay .color-overlay,
-      .intro-overlay .color-overlay {
+      .reveal-overlay .color-overlay {
         position: absolute;
         top: 0;
         left: 0;
@@ -157,77 +156,18 @@
         transition: background 0.3s;
       }
       .intro-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(238, 222, 197, 0.93);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10;
-        opacity: 0;
-        pointer-events: none;
         transition: opacity 0.4s;
-        flex-direction: column;
-      }
-      .stage-one-fit-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-        height: 100vh;
-        padding: 1rem;
-        overflow: hidden;
-        box-sizing: border-box;
-      }
-      .intro-message {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        text-align: center;
-        font-size: clamp(2rem, 12vw, 8rem);
-        line-height: 1.1;
-        font-weight: 900;
-        text-transform: uppercase;
-        color: #fff;
-        word-break: keep-all;
-        text-wrap: balance;
-        -webkit-text-stroke: 1px #a59079;
-        text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
-      }
-      .reveal-content {
-        position: relative;
-        z-index: 2;
-        width: 95%;
-        max-width: 95vw;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
       }
       .reveal-lines {
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        width: 100%;
         height: 100%;
-        gap: clamp(0.5rem, 4vh, 1.2rem);
-      }
-      #revealOverlay .reveal-lines {
-        height: 100%;
+        gap: 2vh;
       }
 
-      .reveal-stage2 .reveal-lines {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 1.4rem;
-        height: 100%;
-        width: 100%;
-        padding: 2rem 1rem;
-      }
       .reveal-line {
         width: 100%;
         text-align: center;
@@ -239,27 +179,13 @@
         -webkit-text-stroke: 1px #a59079;
         text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
         margin: 0;
-      }
-      .fit-text {
-        width: 100%;
-        text-align: center;
-        white-space: normal !important;
-        overflow-wrap: break-word;
-        word-break: break-word;
-        line-height: 1.1;
-      }
-
-
-      .reveal-stage2 .reveal-line {
         line-height: 1.15;
-        font-size: clamp(1.8rem, 7.5vw, 3.8rem);
-        text-align: center;
       }
-      .reveal-stage2 img {
-        max-width: 80%;
-        height: auto;
-        margin: 1.2rem 0;
-        border-radius: 0.5rem;
+      .reveal-photo {
+        max-width: 90%;
+        max-height: 30vh;
+        object-fit: contain;
+        margin: 2vh 0;
       }
       .reveal-line.main {
         line-height: 1.1;
@@ -268,8 +194,6 @@
       }
       .reveal-line.sub {
         font-weight: 700;
-      }
-      .reveal-stage2 .reveal-line.sub {
         text-transform: uppercase;
       }
       .reveal-line.date {
@@ -290,21 +214,6 @@
         .reveal-line {
           -webkit-text-stroke: 1px #a59079;
           text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
-        }
-        .reveal-stage2 .reveal-lines {
-          gap: 1rem;
-        }
-        .reveal-stage2 .reveal-line {
-          font-size: clamp(1.6rem, 8.5vw, 3.2rem);
-        }
-        .reveal-line.main {
-        }
-        .reveal-line.sub,
-        .reveal-line.date,
-        .reveal-line.from {
-        }
-        .reveal-content {
-          max-width: 99vw;
         }
         .instructions-container {
           max-width: 96vw;
@@ -374,19 +283,13 @@
         <div class="spin-button blur-background" id="spinButton">
           <img src="img/tap to spin.png" alt="Spin" />
         </div>
-        <div class="intro-overlay" id="introOverlay">
+        <div class="reveal-overlay intro-overlay" id="introOverlay">
           <div class="color-overlay"></div>
-          <div class="stage-one-fit-wrapper">
-            <div class="fit-text">
-              <div class="intro-message main" id="introMessage"></div>
-            </div>
-          </div>
+          <div class="reveal-lines" id="introLines"></div>
         </div>
         <div class="reveal-overlay" id="revealOverlay">
           <div class="color-overlay" id="colorOverlay"></div>
-          <div id="stageTwo" class="reveal-stage2">
-            <div class="reveal-lines" id="revealLines"></div>
-          </div>
+          <div class="reveal-lines" id="revealLines"></div>
         </div>
         <div
           class="instructions-overlay"
@@ -479,7 +382,7 @@
         const reel2 = document.getElementById("reel2");
         const reel3 = document.getElementById("reel3");
         const introOverlay = document.getElementById("introOverlay");
-        const introMessage = document.getElementById("introMessage");
+        const introLinesDiv = document.getElementById("introLines");
         const introColorOverlay = introOverlay.querySelector(".color-overlay");
         const revealOverlay = document.getElementById("revealOverlay");
         const revealLinesDiv = document.getElementById("revealLines");
@@ -669,7 +572,7 @@
 
             function addLine(line) {
               const div = document.createElement("div");
-              div.className = "reveal-line fit-text " + line.type;
+              div.className = "reveal-line " + line.type;
               if (line.type === "photo") {
                 const img = document.createElement("img");
                 img.src = line.content;
@@ -677,9 +580,11 @@
                 img.onerror = () => {
                   div.style.display = "none";
                 };
+                img.className = "reveal-photo";
                 div.appendChild(img);
               } else {
-                div.textContent = line.content;
+                div.textContent =
+                  line.type === "sub" ? line.content.toUpperCase() : line.content;
               }
               div.style.color = safeTextColor;
               div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
@@ -711,24 +616,21 @@
           }
 
           if (mainLine) {
-              introMessage.textContent = mainLine.content;
-              introMessage.style.color = safeTextColor;
-              introMessage.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
-              requestAnimationFrame(() => {
-                fitty('.fit-text', {
-                  minSize: 16,
-                  maxSize: 100,
-                  multiLine: true,
-                  observeMutations: false,
-                });
-              });
+            introLinesDiv.innerHTML = "";
+            const div = document.createElement("div");
+            div.className = "reveal-line main";
+            div.textContent = mainLine.content;
+            div.style.color = safeTextColor;
+            div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
+            introLinesDiv.appendChild(div);
+            fitRevealLine(div, "main");
             introOverlay.style.opacity = "1";
             introOverlay.style.pointerEvents = "auto";
             if (!confettiShown) {
               createConfetti();
               confettiShown = true;
             }
-            const headline = params.main || "We're Expecting!";
+            const headline = mainLine.content;
             function proceed() {
               introOverlay.style.opacity = "0";
               introOverlay.style.pointerEvents = "none";
