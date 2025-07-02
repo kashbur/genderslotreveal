@@ -169,6 +169,13 @@
         transition: opacity 0.4s;
         flex-direction: column;
       }
+      .stage-one-fit-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        padding: 0 1rem;
+      }
       .intro-message {
         position: relative;
         z-index: 2;
@@ -223,11 +230,10 @@
         margin: 0;
       }
       .fit-text {
-        display: block;
         text-align: center;
-        white-space: normal;
         width: 100%;
-        padding: 0 1rem;
+        white-space: normal;
+        line-height: 1.1;
       }
 
 
@@ -367,7 +373,9 @@
         </div>
         <div class="intro-overlay" id="introOverlay">
           <div class="color-overlay"></div>
-          <div class="intro-message fit-text main" id="introMessage"></div>
+          <div class="stage-one-fit-wrapper">
+            <div class="intro-message fit-text main" id="introMessage"></div>
+          </div>
         </div>
         <div class="reveal-overlay reveal-stage2" id="revealOverlay">
           <div class="color-overlay" id="colorOverlay"></div>
@@ -676,7 +684,12 @@
           if (mainLine) {
               introMessage.textContent = mainLine.content;
               requestAnimationFrame(() => {
-                fitty(".fit-text", { minSize: 16, maxSize: 120, multiLine: true });
+                fitty('.stage-one-fit-wrapper .fit-text', {
+                  minSize: 24,
+                  maxSize: 150,
+                  multiLine: true,
+                  observeMutations: false,
+                });
               });
             introOverlay.style.opacity = "1";
             introOverlay.style.pointerEvents = "auto";
