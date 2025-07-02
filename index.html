@@ -135,8 +135,8 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        padding: 2vh;
-        gap: 2vh;
+        padding: 1vh;
+        gap: 1vh;
         box-sizing: border-box;
         z-index: 10;
         opacity: 0;
@@ -169,6 +169,10 @@
       }
 
       .reveal-line {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         width: 100%;
         text-align: center;
         white-space: normal;
@@ -562,6 +566,13 @@
           });
         }
 
+        function refitAllLines() {
+          document.querySelectorAll(".reveal-line").forEach((el) => {
+            const type = Array.from(el.classList).find((c) => c !== "reveal-line");
+            fitRevealLine(el, type);
+          });
+        }
+
         // ------------- REVEAL LOGIC -----------------
         function showReveal() {
           const allLines = getRevealLinesFromParams(params);
@@ -607,6 +618,7 @@
 
             revealOverlay.style.opacity = "1";
             revealOverlay.style.pointerEvents = "auto";
+            refitAllLines();
             if (!confettiShown) {
               createConfetti();
               confettiShown = true;
@@ -628,6 +640,7 @@
             fitRevealLine(div, "main");
             introOverlay.style.opacity = "1";
             introOverlay.style.pointerEvents = "auto";
+            refitAllLines();
             if (!confettiShown) {
               createConfetti();
               confettiShown = true;
@@ -756,8 +769,8 @@
                 }
               } else if (confetti.element.parentNode) {
                 confetti.element.parentNode.removeChild(confetti.element);
-              }
-            });
+          }
+        });
             if (activeConfetti)
               animationFrameId = requestAnimationFrame(animateAllConfetti);
             else
@@ -776,6 +789,7 @@
             }
           }, 8000);
         }
+        window.addEventListener("resize", refitAllLines);
       });
     </script>
   </body>
