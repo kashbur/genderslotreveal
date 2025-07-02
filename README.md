@@ -22,6 +22,10 @@ xdg-open index.html        # Linux
 - `photo` – URL to an image shown as a circular avatar
 - `from` – a closing signature line
 - `color` – overlay color when the message appears. Allowed values: `beige` (default), `pink`, `blue`, `yellow`, `green`, `purple`, `gold`, `none`.
+- `textColor` – color for the message text (any valid CSS color value)
+- `outlineColor` – color for the outline around the message text
+
+`color` only affects the overlay background, whereas `textColor` and `outlineColor` control the message text and its outline.
 
 ### Example links
 
@@ -31,6 +35,10 @@ index.html?main=We%27re%20Engaged!&sub=Save%20the%20Date&date=June%202024
 
 ```
 index.html?main=It%27s%20a%20Boy%21&photo=https%3A%2F%2Fexample.com%2Fbaby.jpg&from=Love%2C%20Alice%20and%20Bob&color=blue
+```
+
+```
+index.html?main=We%27re%20expecting%21&sub=Baby%20Miller%20%233&date=Arriving%20January%202026&photo=<url>&from=Love%2C%20Geoffrey%20and%20Kristina&color=beige&textColor=%23000000&outlineColor=%23888888
 ```
 
 Open one of these URLs in your browser to see the customized reveal.
