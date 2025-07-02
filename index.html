@@ -173,8 +173,11 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 100vw;
         height: 100vh;
-        padding: 0 1rem;
+        padding: 1rem;
+        overflow: hidden;
+        box-sizing: border-box;
       }
       .intro-message {
         position: relative;
@@ -230,9 +233,11 @@
         margin: 0;
       }
       .fit-text {
-        text-align: center;
         width: 100%;
+        text-align: center;
         white-space: normal;
+        overflow-wrap: break-word;
+        word-break: break-word;
         line-height: 1.1;
       }
 
@@ -663,7 +668,12 @@
               .filter(Boolean)
               .forEach(addLine);
             requestAnimationFrame(() => {
-              fitty(".fit-text", { minSize: 16, maxSize: 120, multiLine: true });
+              fitty('.fit-text', {
+                minSize: 20,
+                maxSize: 100,
+                multiLine: true,
+                observeMutations: false,
+              });
             });
             const hideDelay = 30000;
 
@@ -684,9 +694,9 @@
           if (mainLine) {
               introMessage.textContent = mainLine.content;
               requestAnimationFrame(() => {
-                fitty('.stage-one-fit-wrapper .fit-text', {
-                  minSize: 24,
-                  maxSize: 150,
+                fitty('.fit-text', {
+                  minSize: 20,
+                  maxSize: 100,
                   multiLine: true,
                   observeMutations: false,
                 });
