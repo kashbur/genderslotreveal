@@ -423,6 +423,17 @@
         return params;
       }
 
+      const isValidHex = (str) => /^#([0-9A-F]{3}){1,2}$/i.test(str);
+
+      function sanitizeColor(value, fallback) {
+        if (!value) return fallback;
+        value = value.trim();
+        if (isValidHex(value)) return value;
+        const test = new Option().style;
+        test.color = value;
+        return test.color ? value : fallback;
+      }
+
       function getRevealLinesFromParams(params) {
         // Defaults
         const lines = [];
@@ -485,6 +496,8 @@
           "instructionsOverlay",
         );
         const params = getParams();
+        const safeTextColor = sanitizeColor(params.textColor, "#ffffff");
+        const safeOutlineColor = sanitizeColor(params.outlineColor, "#7e5e4f");
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
 
@@ -667,6 +680,8 @@
               } else {
                 div.textContent = line.content;
               }
+              div.style.color = safeTextColor;
+              div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
               revealLinesDiv.appendChild(div);
             }
             const subLine = otherLines.find((l) => l.type === "sub");
@@ -702,6 +717,8 @@
 
           if (mainLine) {
               introMessage.textContent = mainLine.content;
+              introMessage.style.color = safeTextColor;
+              introMessage.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
               requestAnimationFrame(() => {
                 fitty('.fit-text', {
                   minSize: 16,
