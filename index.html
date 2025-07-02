@@ -152,13 +152,10 @@
         text-shadow: 0 0 1px rgba(0,0,0,0.2);
         margin-bottom: 1em;
         opacity: 0;
-        transform: translateY(16px);
-        will-change: opacity, transform;
-        transition: opacity 0.6s ease, transform 0.6s ease;
+        transition: opacity 0.6s ease;
       }
     .reveal-line.shown {
       opacity: 1;
-      transform: translateY(0);
     }
     .reveal-line.photo img {
       width: 108px;
@@ -369,7 +366,7 @@
       }
 
       function fitIntroText() {
-        let size = window.innerWidth <= 500 ? 4.5 : 7;
+        let size = window.innerWidth <= 500 ? 8 : 12;
         introMessage.style.fontSize = size + 'rem';
         const container = introOverlay;
         while ((introMessage.scrollWidth > container.clientWidth * 0.9 ||
@@ -505,9 +502,10 @@
         const allLines = getRevealLinesFromParams(params);
         const mainLine = allLines.find(l => l.type === 'main');
         const otherLines = allLines.filter(l => l.type !== 'main');
+        let confettiShown = false;
 
         function showStageTwo() {
-          if (!otherLines.length) { createConfetti(); return; }
+          if (!otherLines.length) { if (!confettiShown) { createConfetti(); confettiShown = true; } return; }
           revealLinesDiv.innerHTML = '';
 
           const tempContainer = document.createElement('div');
@@ -567,7 +565,7 @@
 
           revealOverlay.style.opacity = '1';
           revealOverlay.style.pointerEvents = 'auto';
-          createConfetti();
+          if (!confettiShown) { createConfetti(); confettiShown = true; }
           const totalDelay = delays.length ? Math.max(...delays) : 0;
           setTimeout(() => {
             revealOverlay.style.opacity = '0';
@@ -580,11 +578,14 @@
           fitIntroText();
           introOverlay.style.opacity = '1';
           introOverlay.style.pointerEvents = 'auto';
+          if (!confettiShown) { createConfetti(); confettiShown = true; }
           setTimeout(() => {
             introOverlay.style.opacity = '0';
             introOverlay.style.pointerEvents = 'none';
-            setTimeout(showStageTwo, 600);
-          }, 3500);
+            revealOverlay.style.opacity = '1';
+            revealOverlay.style.pointerEvents = 'auto';
+            setTimeout(showStageTwo, 100);
+          }, 3000);
         } else {
           showStageTwo();
         }
