@@ -127,8 +127,8 @@
     .reveal-line {
         width: 100%;
         text-align: center;
-        overflow-wrap: anywhere;
-        word-break: break-word;
+        white-space: nowrap;
+        overflow: hidden;
         font-family: 'Poppins', sans-serif;
         color: #fff;
         -webkit-text-stroke: 1px #A59079;
@@ -298,9 +298,35 @@
       const revealOverlay = document.getElementById('revealOverlay');
       const revealLinesDiv = document.getElementById('revealLines');
       const colorOverlay = document.getElementById('colorOverlay');
-        const instructionsOverlay = document.getElementById('instructionsOverlay');
-        const params = getParams();
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const instructionsOverlay = document.getElementById('instructionsOverlay');
+      const params = getParams();
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+      function fitRevealLine(line) {
+        if (!line.classList.contains('main') &&
+            !line.classList.contains('sub') &&
+            !line.classList.contains('from')) return;
+        const isMobile = window.innerWidth <= 500;
+        const maxSizes = isMobile ? { main: 1.75, sub: 1.35, from: 1.35 } :
+                                   { main: 2.15, sub: 1.35, from: 1.3 };
+        const minSize = isMobile ? 1 : 1.2;
+        const type = line.classList.contains('main') ? 'main' :
+                     line.classList.contains('sub') ? 'sub' : 'from';
+        let size = maxSizes[type];
+        line.style.fontSize = size + 'rem';
+        const containerWidth = line.parentElement.clientWidth;
+        const width = line.scrollWidth;
+        if (width > containerWidth) {
+          size = Math.max(minSize, size * containerWidth / width);
+          line.style.fontSize = size + 'rem';
+        }
+      }
+
+      function resizeRevealText() {
+        revealLinesDiv.querySelectorAll('.reveal-line').forEach(fitRevealLine);
+      }
+
+      window.addEventListener('resize', resizeRevealText);
 
       // Set overlay color on reveal
       colorOverlay.style.background = getColorOverlay(params);
@@ -472,6 +498,7 @@
               div.textContent = line.content;
             }
             revealLinesDiv.appendChild(div);
+            fitRevealLine(div);
             requestAnimationFrame(() => div.classList.add('shown'));
           }, delay);
         }
