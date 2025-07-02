@@ -316,8 +316,12 @@
         const url = new URL(window.location.href);
         const params = {};
         for (const [k, v] of url.searchParams.entries()) {
-          // Replace + with spaces to handle form submissions correctly
-          params[k] = v.replace(/\+/g, " ");
+          // Normalize keys to lower case
+          const key = k.toLowerCase();
+          const value = v.replace(/\+/g, " ");
+          params[key] = value;
+          // Preserve original casing for backward compatibility
+          if (key !== k) params[k] = value;
         }
         return params;
       }
@@ -395,8 +399,8 @@
           "instructionsOverlay",
         );
         const params = getParams();
-        const safeTextColor = sanitizeColor(params.textColor, "#ffffff");
-        const safeOutlineColor = sanitizeColor(params.outlineColor, "#7e5e4f");
+        const safeTextColor = sanitizeColor(params.textcolor, "#ffffff");
+        const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
 
