@@ -235,7 +235,7 @@
       .fit-text {
         width: 100%;
         text-align: center;
-        white-space: normal;
+        white-space: normal !important;
         overflow-wrap: break-word;
         word-break: break-word;
         line-height: 1.1;
@@ -379,7 +379,9 @@
         <div class="intro-overlay" id="introOverlay">
           <div class="color-overlay"></div>
           <div class="stage-one-fit-wrapper">
-            <div class="intro-message fit-text main" id="introMessage"></div>
+            <div class="fit-text">
+              <div class="intro-message main" id="introMessage"></div>
+            </div>
           </div>
         </div>
         <div class="reveal-overlay reveal-stage2" id="revealOverlay">
@@ -669,7 +671,7 @@
               .forEach(addLine);
             requestAnimationFrame(() => {
               fitty('.fit-text', {
-                minSize: 20,
+                minSize: 16,
                 maxSize: 100,
                 multiLine: true,
                 observeMutations: false,
@@ -695,7 +697,7 @@
               introMessage.textContent = mainLine.content;
               requestAnimationFrame(() => {
                 fitty('.fit-text', {
-                  minSize: 20,
+                  minSize: 16,
                   maxSize: 100,
                   multiLine: true,
                   observeMutations: false,
