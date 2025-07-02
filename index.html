@@ -237,15 +237,15 @@
         text-transform: uppercase;
       }
       .reveal-line.sub {
-        font-size: clamp(2.8rem, 12vw, 120rem);
+        font-size: clamp(2.5rem, 12vw, 7rem);
         font-weight: 700;
       }
       .reveal-line.date {
-        font-size: 1.14rem;
+        font-size: clamp(2.5rem, 12vw, 7rem);
         font-weight: 700;
       }
       .reveal-line.from {
-        font-size: clamp(2.4rem, 10vw, 110rem);
+        font-size: clamp(2.5rem, 12vw, 7rem);
         font-weight: 700;
         font-style: italic;
         margin-top: 2.5em;
@@ -268,13 +268,13 @@
           font-size: clamp(3.5rem, 28vw, 150rem);
         }
         .reveal-line.sub {
-          font-size: clamp(2.4rem, 18vw, 120rem);
+          font-size: clamp(2.5rem, 12vw, 7rem);
         }
         .reveal-line.date {
-          font-size: 1.25rem;
+          font-size: clamp(2.5rem, 12vw, 7rem);
         }
         .reveal-line.from {
-          font-size: clamp(2.2rem, 16vw, 110rem);
+          font-size: clamp(2.5rem, 12vw, 7rem);
           -webkit-text-stroke: 1px #a59079;
           text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
         }
@@ -450,12 +450,12 @@
         const params = getParams();
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
-        let minHeightLocked = false;
 
         function fitRevealLine(line) {
           if (
             !line.classList.contains("main") &&
             !line.classList.contains("sub") &&
+            !line.classList.contains("date") &&
             !line.classList.contains("from")
           )
             return;
@@ -494,25 +494,9 @@
 
         function resizeRevealText() {
           const lines = Array.from(
-            revealLinesDiv.querySelectorAll(
-              ".reveal-line.main, .reveal-line.sub, .reveal-line.from",
-            ),
+            revealLinesDiv.querySelectorAll(".reveal-line")
           );
           lines.forEach(fitRevealLine);
-          const availableHeight = revealOverlay.clientHeight * 0.9;
-          const totalHeight = revealLinesDiv.scrollHeight;
-          if (totalHeight > 0) {
-            const scale = availableHeight / totalHeight;
-            lines.forEach((line) => {
-              const current = parseFloat(line.style.fontSize);
-              line.style.fontSize = current * scale + "rem";
-            });
-          }
-          const targetHeight = revealLinesDiv.scrollHeight;
-          if (!minHeightLocked) {
-            revealLinesDiv.style.minHeight = targetHeight + "px";
-            minHeightLocked = true;
-          }
         }
 
         function fitIntroText() {
@@ -711,40 +695,31 @@
           function showStageTwo() {
             revealLinesDiv.innerHTML = "";
 
-            function revealLine(line, delay) {
-              setTimeout(() => {
-                const div = document.createElement("div");
-                div.className = "reveal-line " + line.type;
-                if (line.type === "photo") {
-                  const img = document.createElement("img");
-                  img.src = line.content;
-                  img.alt = "photo";
-                  img.onerror = () => {
-                    div.style.display = "none";
-                  };
-                  div.appendChild(img);
-                } else {
-                  div.textContent = line.content;
-                }
-                revealLinesDiv.appendChild(div);
-                requestAnimationFrame(() => {
-                  div.classList.add("shown");
-                });
-              }, delay);
+            function addLine(line) {
+              const div = document.createElement("div");
+              div.className = "reveal-line " + line.type;
+              if (line.type === "photo") {
+                const img = document.createElement("img");
+                img.src = line.content;
+                img.alt = "photo";
+                img.onerror = () => {
+                  div.style.display = "none";
+                };
+                div.appendChild(img);
+              } else {
+                div.textContent = line.content;
+              }
+              revealLinesDiv.appendChild(div);
+              div.classList.add("shown");
             }
-            const photoLine = otherLines.find(l => l.type === "photo");
-            const subLine = otherLines.find(l => l.type === "sub");
-            const dateLine = otherLines.find(l => l.type === "date");
-            const fromLine = otherLines.find(l => l.type === "from");
-            const stage2 = [photoLine, [subLine, dateLine].filter(Boolean), fromLine].filter(item => Array.isArray(item) ? item.length : item);
-            let delay = 0;
-            stage2.forEach(step => {
-              if (Array.isArray(step)) step.forEach(l => revealLine(l, delay));
-              else revealLine(step, delay);
-              delay += 900;
-            });
-            // Wait until all lines are in the DOM, then size everything once
-            setTimeout(resizeRevealText, delay);
+            const subLine = otherLines.find((l) => l.type === "sub");
+            const dateLine = otherLines.find((l) => l.type === "date");
+            const photoLine = otherLines.find((l) => l.type === "photo");
+            const fromLine = otherLines.find((l) => l.type === "from");
+            [subLine, dateLine, photoLine, fromLine]
+              .filter(Boolean)
+              .forEach(addLine);
+            resizeRevealText();
             const hideDelay = 30000;
 
 
