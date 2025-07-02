@@ -130,6 +130,7 @@
         white-space: normal;
         word-break: keep-all;
         overflow-wrap: normal;
+        text-wrap: balance;
         font-family: 'Poppins', sans-serif;
         color: #fff;
         -webkit-text-stroke: 1px #A59079;
@@ -156,15 +157,18 @@
       box-shadow: 0 2px 16px #0002;
     }
     .reveal-line.main {
-      font-size: 2.15rem;
+      font-size: clamp(2rem, 6vw, 5.5rem);
       font-weight: 900;
       margin-top: 0.16em;
       text-transform: uppercase;
     }
-    .reveal-line.sub { font-size: 1.35rem; font-weight: 700; }
+    .reveal-line.sub {
+      font-size: clamp(1.25rem, 4.5vw, 3rem);
+      font-weight: 700;
+    }
     .reveal-line.date { font-size: 1.14rem; font-weight: 700; }
     .reveal-line.from {
-      font-size: 1.3rem;
+      font-size: clamp(1.25rem, 4.5vw, 3rem);
       font-weight: 700;
       font-style: italic;
       margin-top: 2.5em;
@@ -178,11 +182,11 @@
         -webkit-text-stroke: 1px #A59079;
         text-shadow: 0 0 1px rgba(0,0,0,0.15);
       }
-      .reveal-line.main { font-size: 1.75rem; }
-      .reveal-line.sub { font-size: 1.35rem; }
+      .reveal-line.main { font-size: clamp(1.5rem, 10vw, 4rem); }
+      .reveal-line.sub { font-size: clamp(1.1rem, 6vw, 2.4rem); }
       .reveal-line.date { font-size: 1.25rem; }
       .reveal-line.from {
-        font-size: 1.35rem;
+        font-size: clamp(1.1rem, 6vw, 2.4rem);
         -webkit-text-stroke: 1px #A59079;
         text-shadow: 0 0 1px rgba(0,0,0,0.15);
       }
@@ -309,25 +313,37 @@
             !line.classList.contains('from')) return;
         const isMobile = window.innerWidth <= 500;
         const maxSizes = isMobile ?
-          { main: 1.75, sub: 1.35, from: 1.35 } :
-          { main: 2.15, sub: 1.35, from: 1.3 };
-        const minSizes = isMobile ?
-          { main: 1, sub: 0.85, from: 0.85 } :
-          { main: 1.2, sub: 1, from: 1 };
+          { main: 4, sub: 2.4, from: 2.4 } :
+          { main: 5.5, sub: 3, from: 3 };
+        const minSizes = { main: 1, sub: 0.8, from: 0.8 };
         const type = line.classList.contains('main') ? 'main' :
                      line.classList.contains('sub') ? 'sub' : 'from';
         let size = maxSizes[type];
         line.style.fontSize = size + 'rem';
-        const containerWidth = line.parentElement.clientWidth;
-        const width = line.scrollWidth;
-        if (width > containerWidth) {
-          size = Math.max(minSizes[type], size * containerWidth / width);
+        const containerWidth = line.parentElement.clientWidth - 8;
+        if (line.scrollWidth > containerWidth) {
+          size *= containerWidth / line.scrollWidth;
           line.style.fontSize = size + 'rem';
+        }
+        if (size < minSizes[type]) {
+          line.style.fontSize = minSizes[type] + 'rem';
         }
       }
 
       function resizeRevealText() {
-        revealLinesDiv.querySelectorAll('.reveal-line').forEach(fitRevealLine);
+        const lines = Array.from(
+          revealLinesDiv.querySelectorAll('.reveal-line.main, .reveal-line.sub, .reveal-line.from')
+        );
+        lines.forEach(fitRevealLine);
+        const availableHeight = revealOverlay.clientHeight * 0.9;
+        const totalHeight = revealLinesDiv.scrollHeight;
+        if (totalHeight > 0 && (totalHeight > availableHeight || totalHeight < availableHeight * 0.7)) {
+          const scale = Math.min(availableHeight / totalHeight, 1.3);
+          lines.forEach(line => {
+            const current = parseFloat(line.style.fontSize);
+            line.style.fontSize = (current * scale) + 'rem';
+          });
+        }
       }
 
       window.addEventListener('resize', resizeRevealText);
@@ -503,6 +519,7 @@
             }
             revealLinesDiv.appendChild(div);
             fitRevealLine(div);
+            resizeRevealText();
             requestAnimationFrame(() => div.classList.add('shown'));
           }, delay);
         }
@@ -521,6 +538,7 @@
         revealType('photo', 800);
         ['sub', 'date'].forEach(t => revealType(t, 1700));
         revealType('from', 2600);
+        setTimeout(resizeRevealText, 2700);
 
         const totalDelay = delays.length ? Math.max(...delays) : 0;
 
