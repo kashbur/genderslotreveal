@@ -450,6 +450,7 @@
         const params = getParams();
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
+        let minHeightLocked = false;
 
         function fitRevealLine(line) {
           if (
@@ -506,6 +507,11 @@
               const current = parseFloat(line.style.fontSize);
               line.style.fontSize = current * scale + "rem";
             });
+          }
+          const targetHeight = revealLinesDiv.scrollHeight;
+          if (!minHeightLocked) {
+            revealLinesDiv.style.minHeight = targetHeight + "px";
+            minHeightLocked = true;
           }
         }
 
@@ -721,8 +727,6 @@
                   div.textContent = line.content;
                 }
                 revealLinesDiv.appendChild(div);
-                fitRevealLine(div);
-                resizeRevealText();
                 requestAnimationFrame(() => {
                   div.classList.add("shown");
                 });
@@ -739,6 +743,8 @@
               else revealLine(step, delay);
               delay += 900;
             });
+            // Wait until all lines are in the DOM, then size everything once
+            setTimeout(resizeRevealText, delay);
             const hideDelay = 30000;
 
 
