@@ -152,13 +152,10 @@
         text-shadow: 0 0 1px rgba(0,0,0,0.2);
         margin-bottom: 1em;
         opacity: 0;
-        transform: translateY(16px);
-        will-change: opacity, transform;
-        transition: opacity 0.6s ease, transform 0.6s ease;
+        transition: opacity 0.6s ease;
       }
     .reveal-line.shown {
       opacity: 1;
-      transform: translateY(0);
     }
     .reveal-line.photo img {
       width: 108px;
@@ -369,7 +366,7 @@
       }
 
       function fitIntroText() {
-        let size = window.innerWidth <= 500 ? 4.5 : 7;
+        let size = window.innerWidth <= 500 ? 14 : 20;
         introMessage.style.fontSize = size + 'rem';
         const container = introOverlay;
         while ((introMessage.scrollWidth > container.clientWidth * 0.9 ||
@@ -505,70 +502,46 @@
         const allLines = getRevealLinesFromParams(params);
         const mainLine = allLines.find(l => l.type === 'main');
         const otherLines = allLines.filter(l => l.type !== 'main');
+        let confettiShown = false;
 
         function showStageTwo() {
-          if (!otherLines.length) { createConfetti(); return; }
+          if (!otherLines.length) {
+            if (!confettiShown) { createConfetti(); confettiShown = true; }
+            return;
+          }
+
           revealLinesDiv.innerHTML = '';
+          const seq = ['sub', 'date', 'photo', 'from'];
+          const stageLines = [];
 
-          const tempContainer = document.createElement('div');
-          tempContainer.className = 'reveal-lines';
-          tempContainer.style.position = 'absolute';
-          tempContainer.style.visibility = 'hidden';
-          tempContainer.style.pointerEvents = 'none';
-          tempContainer.style.minHeight = '0';
-          document.body.appendChild(tempContainer);
-          otherLines.forEach(line => {
-            const div = document.createElement('div');
-            div.className = 'reveal-line ' + line.type;
-            if (line.type === 'photo') {
-              const img = document.createElement('img');
-              img.src = line.content;
-              div.appendChild(img);
-            } else {
-              div.textContent = line.content;
-            }
-            tempContainer.appendChild(div);
-          });
-          const targetHeight = tempContainer.offsetHeight;
-          document.body.removeChild(tempContainer);
-          revealLinesDiv.style.minHeight = targetHeight + 'px';
-
-          function revealLine(line, delay) {
-            setTimeout(() => {
+          seq.forEach(type => {
+            const line = otherLines.find(l => l.type === type);
+            if (line) {
               const div = document.createElement('div');
               div.className = 'reveal-line ' + line.type;
               if (line.type === 'photo') {
                 const img = document.createElement('img');
                 img.src = line.content;
-                img.alt = 'photo';
-                img.onerror = () => { div.style.display = 'none'; };
                 div.appendChild(img);
               } else {
                 div.textContent = line.content;
               }
               revealLinesDiv.appendChild(div);
               fitRevealLine(div);
-              resizeRevealText();
-              requestAnimationFrame(() => div.classList.add('shown'));
-            }, delay);
-          }
-
-          const delays = [];
-          const seq = ['sub', 'date', 'photo', 'from'];
-          let delay = 0;
-          seq.forEach(type => {
-            const line = otherLines.find(l => l.type === type);
-            if (line) {
-              revealLine(line, delay);
-              delays.push(delay);
-              delay += 800;
+              stageLines.push(div);
             }
+          });
+
+          resizeRevealText();
+
+          stageLines.forEach((div, i) => {
+            setTimeout(() => div.classList.add('shown'), i * 800);
           });
 
           revealOverlay.style.opacity = '1';
           revealOverlay.style.pointerEvents = 'auto';
-          createConfetti();
-          const totalDelay = delays.length ? Math.max(...delays) : 0;
+          if (!confettiShown) { createConfetti(); confettiShown = true; }
+          const totalDelay = stageLines.length ? (stageLines.length - 1) * 800 : 0;
           setTimeout(() => {
             revealOverlay.style.opacity = '0';
             revealOverlay.style.pointerEvents = 'none';
@@ -580,11 +553,14 @@
           fitIntroText();
           introOverlay.style.opacity = '1';
           introOverlay.style.pointerEvents = 'auto';
+          if (!confettiShown) { createConfetti(); confettiShown = true; }
           setTimeout(() => {
             introOverlay.style.opacity = '0';
             introOverlay.style.pointerEvents = 'none';
-            setTimeout(showStageTwo, 600);
-          }, 3500);
+            revealOverlay.style.opacity = '1';
+            revealOverlay.style.pointerEvents = 'auto';
+            setTimeout(showStageTwo, 50);
+          }, 2600);
         } else {
           showStageTwo();
         }
