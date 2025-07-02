@@ -196,7 +196,6 @@
         flex-direction: column;
         align-items: center;
         width: 100%;
-        min-height: 20rem;
       }
       .reveal-line {
         width: 100%;
@@ -210,12 +209,14 @@
         -webkit-text-stroke: 1px #a59079;
         text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
         margin-bottom: 1em;
-        opacity: 0;
-        transition: opacity 0.6s ease;
+        opacity:0;
+        transform:translateY(8px);
+        transition:opacity .6s,transform .6s;
         will-change: transform, opacity;
       }
       .reveal-line.shown {
         opacity: 1;
+        transform:translateY(0);
       }
       .reveal-line.photo img {
         width: 108px;
@@ -229,14 +230,14 @@
         box-shadow: 0 2px 16px #0002;
       }
       .reveal-line.main {
-        font-size: clamp(4rem, 18vw, 999rem);
-        line-height: 1.15;
+        font-size: clamp(4rem, 22vw, 150rem);
+        line-height:1.1;
         font-weight: 900;
         margin-top: 0.16em;
         text-transform: uppercase;
       }
       .reveal-line.sub {
-        font-size: clamp(2.5rem, 10vw, 100rem);
+        font-size: clamp(2.8rem, 12vw, 120rem);
         font-weight: 700;
       }
       .reveal-line.date {
@@ -244,7 +245,7 @@
         font-weight: 700;
       }
       .reveal-line.from {
-        font-size: clamp(2.2rem, 8vw, 80rem);
+        font-size: clamp(2.4rem, 10vw, 110rem);
         font-weight: 700;
         font-style: italic;
         margin-top: 2.5em;
@@ -259,18 +260,21 @@
         .reveal-line {
           -webkit-text-stroke: 1px #a59079;
           text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
+        opacity:0;
+        transform:translateY(8px);
+        transition:opacity .6s,transform .6s;
         }
         .reveal-line.main {
-          font-size: clamp(3.2rem, 24vw, 999rem);
+          font-size: clamp(3.5rem, 28vw, 150rem);
         }
         .reveal-line.sub {
-          font-size: clamp(2rem, 14vw, 100rem);
+          font-size: clamp(2.4rem, 18vw, 120rem);
         }
         .reveal-line.date {
           font-size: 1.25rem;
         }
         .reveal-line.from {
-          font-size: clamp(1.8rem, 12vw, 80rem);
+          font-size: clamp(2.2rem, 16vw, 110rem);
           -webkit-text-stroke: 1px #a59079;
           text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
         }
@@ -448,28 +452,22 @@
           window.webkitAudioContext)();
 
         function fitRevealLine(line) {
-          if (
-            !line.classList.contains("main") &&
-            !line.classList.contains("sub") &&
-            !line.classList.contains("from")
-          )
-            return;
-          const rootSize = parseFloat(
-            getComputedStyle(document.documentElement).fontSize,
-          );
+          if (!line.classList.contains("main") && !line.classList.contains("sub") && !line.classList.contains("from")) return;
+          const rootSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
           let size = parseFloat(getComputedStyle(line).fontSize) / rootSize;
           const container = line.parentElement;
-          const w = container.clientWidth - 4;
-          const h = container.clientHeight || revealOverlay.clientHeight;
+          const maxSize = 150;
           line.style.fontSize = size + "rem";
-          while (
-            (line.scrollWidth > w || line.scrollHeight > h) &&
-            size > 0.5
-          ) {
+          while ((line.scrollWidth > container.clientWidth || line.scrollHeight > container.clientHeight) && size > 0.5) {
             size -= 0.25;
             line.style.fontSize = size + "rem";
           }
+          while (size < maxSize && line.scrollWidth <= container.clientWidth * 0.95 && line.scrollHeight <= container.clientHeight * 0.9) {
+            size += 0.25;
+            line.style.fontSize = size + "rem";
+          }
         }
+
 
         function resizeRevealText() {
           const lines = Array.from(
@@ -508,7 +506,9 @@
         }
 
         window.addEventListener("resize", resizeRevealText);
+        window.addEventListener("orientationchange", resizeRevealText);
         window.addEventListener("resize", fitIntroText);
+        window.addEventListener("orientationchange", fitIntroText);
 
         // Set overlay color on reveal
         colorOverlay.style.background = getColorOverlay(params);
@@ -663,37 +663,7 @@
           let confettiShown = false;
 
           function showStageTwo() {
-            if (!otherLines.length) {
-              if (!confettiShown) {
-                createConfetti();
-                confettiShown = true;
-              }
-              return;
-            }
             revealLinesDiv.innerHTML = "";
-
-            const tempContainer = document.createElement("div");
-            tempContainer.className = "reveal-lines";
-            tempContainer.style.position = "absolute";
-            tempContainer.style.visibility = "hidden";
-            tempContainer.style.pointerEvents = "none";
-            tempContainer.style.minHeight = "0";
-            document.body.appendChild(tempContainer);
-            otherLines.forEach((line) => {
-              const div = document.createElement("div");
-              div.className = "reveal-line " + line.type;
-              if (line.type === "photo") {
-                const img = document.createElement("img");
-                img.src = line.content;
-                div.appendChild(img);
-              } else {
-                div.textContent = line.content;
-              }
-              tempContainer.appendChild(div);
-            });
-            const targetHeight = tempContainer.offsetHeight;
-            document.body.removeChild(tempContainer);
-            revealLinesDiv.style.minHeight = targetHeight + "px";
 
             function revealLine(line, delay) {
               setTimeout(() => {
@@ -715,19 +685,23 @@
                 resizeRevealText();
                 requestAnimationFrame(() => {
                   div.classList.add("shown");
-                  div.style.transform = "translateZ(0)";
                 });
               }, delay);
             }
+            const photoLine = otherLines.find(l => l.type === "photo");
+            const subLine = otherLines.find(l => l.type === "sub");
+            const dateLine = otherLines.find(l => l.type === "date");
+            const fromLine = otherLines.find(l => l.type === "from");
+            const stage2 = [photoLine, [subLine, dateLine].filter(Boolean), fromLine].filter(item => Array.isArray(item) ? item.length : item);
+            let delay = 0;
+            stage2.forEach(step => {
+              if (Array.isArray(step)) step.forEach(l => revealLine(l, delay));
+              else revealLine(step, delay);
+              delay += 900;
+            });
+            const hideDelay = delay + 4000;
 
-            const photoLine = otherLines.find((l) => l.type === "photo");
-            if (photoLine) revealLine(photoLine, 800);
-            const subLine = otherLines.find((l) => l.type === "sub");
-            if (subLine) revealLine(subLine, 1600);
-            const dateLine = otherLines.find((l) => l.type === "date");
-            if (dateLine) revealLine(dateLine, 1600);
-            const fromLine = otherLines.find((l) => l.type === "from");
-            if (fromLine) revealLine(fromLine, 2800);
+
 
             revealOverlay.style.opacity = "1";
             revealOverlay.style.pointerEvents = "auto";
@@ -738,7 +712,7 @@
             setTimeout(() => {
               revealOverlay.style.opacity = "0";
               revealOverlay.style.pointerEvents = "none";
-            }, 30000);
+            }, hideDelay);
           }
 
           if (mainLine) {
