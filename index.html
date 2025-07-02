@@ -167,6 +167,8 @@
         width: 100%;
         height: 100%;
         gap: 2vh;
+        padding: 2vh 3vw;
+        box-sizing: border-box;
       }
 
       .reveal-line {
@@ -229,6 +231,9 @@
           width: 100%;
           height: 100%;
           border-radius: 0;
+        }
+        .reveal-lines {
+          padding-top: calc(2vh + env(safe-area-inset-top, 1vh));
         }
       }
       .confetti {
