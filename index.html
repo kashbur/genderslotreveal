@@ -194,29 +194,22 @@
       .reveal-lines {
         display: flex;
         flex-direction: column;
+        justify-content: center;
         align-items: center;
+        height: 100%;
         width: 100%;
       }
       .reveal-line {
         width: 100%;
         text-align: center;
         white-space: normal;
-        word-break: keep-all;
-        overflow-wrap: normal;
+        overflow-wrap: break-word;
         text-wrap: balance;
         font-family: "Poppins", sans-serif;
         color: #fff;
         -webkit-text-stroke: 1px #a59079;
         text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
         margin-bottom: 1em;
-        opacity:0;
-        transform:translateY(8px);
-        transition:opacity .6s,transform .6s;
-        will-change: transform, opacity;
-      }
-      .reveal-line.shown {
-        opacity: 1;
-        transform:translateY(0);
       }
       .reveal-line.photo img {
         width: 108px;
@@ -260,23 +253,14 @@
         .reveal-line {
           -webkit-text-stroke: 1px #a59079;
           text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
-        opacity:0;
-        transform:translateY(8px);
-        transition:opacity .6s,transform .6s;
         }
         .reveal-line.main {
-          font-size: clamp(3.5rem, 28vw, 150rem);
+          font-size: clamp(2rem, 12vw, 8rem);
         }
-        .reveal-line.sub {
-          font-size: clamp(2.5rem, 12vw, 7rem);
-        }
-        .reveal-line.date {
-          font-size: clamp(2.5rem, 12vw, 7rem);
-        }
+        .reveal-line.sub,
+        .reveal-line.date,
         .reveal-line.from {
-          font-size: clamp(2.5rem, 12vw, 7rem);
-          -webkit-text-stroke: 1px #a59079;
-          text-shadow: 0 0 1px rgba(0, 0, 0, 0.15);
+          font-size: clamp(1.4rem, 8vw, 5rem);
         }
         .reveal-content {
           max-width: 99vw;
@@ -451,52 +435,36 @@
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
 
-        function fitRevealLine(line) {
-          if (
-            !line.classList.contains("main") &&
-            !line.classList.contains("sub") &&
-            !line.classList.contains("date") &&
-            !line.classList.contains("from")
-          )
-            return;
+        function fitBlock() {
+          const container = revealOverlay;
+          const lines = Array.from(revealLinesDiv.querySelectorAll(".reveal-line"));
+          if (!lines.length) return;
           const rootSize = parseFloat(
             getComputedStyle(document.documentElement).fontSize,
           );
-          let size =
-            parseFloat(getComputedStyle(line).fontSize) / rootSize || 1;
-          const container = line.parentElement;
-          line.style.fontSize = size + "rem";
-          while (
-            (line.scrollWidth > container.clientWidth ||
-              line.scrollHeight > container.clientHeight) &&
-            size > 0.5
-          ) {
-            size -= 0.25;
-            line.style.fontSize = size + "rem";
+          const base = lines.map((l) =>
+            parseFloat(getComputedStyle(l).fontSize) / rootSize || 1,
+          );
+          let scale = 1;
+          const apply = () =>
+            lines.forEach((l, i) => (l.style.fontSize = base[i] * scale + "rem"));
+          apply();
+          const overflow = () =>
+            revealLinesDiv.scrollHeight > container.clientHeight ||
+            revealLinesDiv.scrollWidth > container.clientWidth;
+          while (overflow() && scale > 0.4) {
+            scale -= 0.05;
+            apply();
           }
-          while (
-            line.scrollWidth <= container.clientWidth &&
-            line.scrollHeight <= container.clientHeight
-          ) {
-            size += 0.25;
-            line.style.fontSize = size + "rem";
-            if (
-              line.scrollWidth > container.clientWidth ||
-              line.scrollHeight > container.clientHeight
-            ) {
-              size -= 0.25;
-              line.style.fontSize = size + "rem";
+          while (!overflow()) {
+            scale += 0.05;
+            apply();
+            if (overflow()) {
+              scale -= 0.05;
+              apply();
               break;
             }
           }
-        }
-
-
-        function resizeRevealText() {
-          const lines = Array.from(
-            revealLinesDiv.querySelectorAll(".reveal-line")
-          );
-          lines.forEach(fitRevealLine);
         }
 
         function fitIntroText() {
@@ -528,8 +496,8 @@
           }
         }
 
-        window.addEventListener("resize", resizeRevealText);
-        window.addEventListener("orientationchange", resizeRevealText);
+        window.addEventListener("resize", fitBlock);
+        window.addEventListener("orientationchange", fitBlock);
         window.addEventListener("resize", fitIntroText);
         window.addEventListener("orientationchange", fitIntroText);
 
@@ -710,7 +678,6 @@
                 div.textContent = line.content;
               }
               revealLinesDiv.appendChild(div);
-              div.classList.add("shown");
             }
             const subLine = otherLines.find((l) => l.type === "sub");
             const dateLine = otherLines.find((l) => l.type === "date");
@@ -719,7 +686,7 @@
             [subLine, dateLine, photoLine, fromLine]
               .filter(Boolean)
               .forEach(addLine);
-            resizeRevealText();
+            fitBlock();
             const hideDelay = 30000;
 
 
@@ -749,14 +716,10 @@
             function proceed() {
               introOverlay.style.opacity = "0";
               introOverlay.style.pointerEvents = "none";
-              revealOverlay.style.opacity = "1";
-              revealOverlay.style.pointerEvents = "auto";
-              setTimeout(showStageTwo, 140);
+              setTimeout(showStageTwo, 400);
             }
             setTimeout(proceed, readingDelay(headline));
           } else {
-            revealOverlay.style.opacity = "1";
-            revealOverlay.style.pointerEvents = "auto";
             setTimeout(showStageTwo, 100);
           }
         }
