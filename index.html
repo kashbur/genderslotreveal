@@ -688,6 +688,13 @@
           }, delay);
         }
 
+        function readingDelay(text, wps = 110) {
+          const words = text.trim().split(/\s+/).filter(Boolean).length || 1;
+          // (words ÷ wps) seconds  + 0.8 s buffer, clamped 1.6-6 s
+          const ms = Math.round((words / wps) * 1000) + 800;
+          return Math.max(1600, Math.min(ms, 6000));
+        }
+
         // ------------- REVEAL LOGIC -----------------
         function showReveal() {
           const allLines = getRevealLinesFromParams(params);
@@ -757,14 +764,15 @@
               createConfetti();
               confettiShown = true;
             }
+            const headline = params.main || "We're Expecting!";
             function proceed() {
               introOverlay.style.opacity = "0";
               introOverlay.style.pointerEvents = "none";
               revealOverlay.style.opacity = "1";
               revealOverlay.style.pointerEvents = "auto";
-              setTimeout(showStageTwo, 100);
+              setTimeout(showStageTwo, 140);
             }
-            setTimeout(proceed, 800);
+            setTimeout(proceed, readingDelay(headline));
           } else {
             revealOverlay.style.opacity = "1";
             revealOverlay.style.pointerEvents = "auto";
