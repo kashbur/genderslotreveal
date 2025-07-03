@@ -152,7 +152,7 @@
         border-radius: inherit;
         z-index: 0;
         pointer-events: none;
-        opacity: 0.53;
+        opacity: 1;
         background: transparent;
         transition: background 0.3s;
       }
@@ -375,13 +375,13 @@
         // Pink, blue, yellow, green, purple, gold, none
         let color = (params.color || "beige").toLowerCase();
         const overlays = {
-          beige: "rgba(238, 222, 197, 0.93)",
-          pink: "rgba(249, 185, 215, 0.93)",
-          blue: "rgba(173, 212, 253, 0.93)",
-          yellow: "rgba(254, 243, 199, 0.93)",
-          green: "rgba(203, 247, 208, 0.93)",
-          purple: "rgba(210, 197, 252, 0.93)",
-          gold: "rgba(255, 223, 154, 0.93)",
+          beige: "rgb(238, 222, 197)",
+          pink: "rgb(249, 185, 215)",
+          blue: "rgb(173, 212, 253)",
+          yellow: "rgb(254, 243, 199)",
+          green: "rgb(203, 247, 208)",
+          purple: "rgb(210, 197, 252)",
+          gold: "rgb(255, 223, 154)",
           none: "transparent",
         };
         return overlays[color] || overlays.beige;
