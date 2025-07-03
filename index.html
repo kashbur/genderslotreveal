@@ -372,16 +372,24 @@
         return lines;
       }
       function getColorOverlay(params) {
-        // Pink, blue, yellow, green, purple, gold, none
-        let color = (params.color || "beige").toLowerCase();
+        // Pink, blue, yellow, green, purple, gold, white, none
+        const input = params.color ? params.color.trim() : "";
+        // Allow custom CSS colors
+        if (isValidHex(input)) return input;
+        const test = new Option().style;
+        test.color = input;
+        if (test.color) return input;
+
+        const color = (input || "beige").toLowerCase();
         const overlays = {
           beige: "rgb(238, 222, 197)",
-          pink: "rgb(249, 185, 215)",
+          pink: "#fcc0c5",
           blue: "rgb(173, 212, 253)",
           yellow: "rgb(254, 243, 199)",
           green: "rgb(203, 247, 208)",
           purple: "rgb(210, 197, 252)",
           gold: "rgb(255, 223, 154)",
+          white: "#ffffff",
           none: "transparent",
         };
         return overlays[color] || overlays.beige;
