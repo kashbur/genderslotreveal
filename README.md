@@ -24,6 +24,7 @@ xdg-open index.html        # Linux
 - `color` – overlay color when the message appears. Allowed values: `beige` (default), `pink`, `blue`, `yellow`, `green`, `purple`, `gold`, `white`, `none`. You can also supply any valid hex or CSS color value for a custom overlay.
 - `textColor` – color for the message text (any valid CSS color value)
 - `outlineColor` – color for the outline around the message text
+- `font` – Google Fonts family name to use for all text (e.g. `font=Playfair+Display`)
 
 `color` only affects the overlay background, whereas `textColor` and `outlineColor` control the message text and its outline.
 
@@ -31,6 +32,10 @@ xdg-open index.html        # Linux
 
 ```
 index.html?main=We%27re%20Engaged!&sub=Save%20the%20Date&date=June%202024
+```
+
+```
+index.html?main=We%E2%80%99re%20expecting&font=Playfair+Display
 ```
 
 ```

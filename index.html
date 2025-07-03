@@ -14,6 +14,9 @@
     />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/textfit/2.4.0/textFit.min.js"></script>
     <style>
+      :root {
+        --font-family: 'Poppins';
+      }
       html,
       body {
         margin: 0;
@@ -21,7 +24,7 @@
         height: 100%;
         width: 100%;
         background: #f0f0f0;
-        font-family: "Poppins", sans-serif;
+        font-family: var(--font-family), sans-serif;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -183,7 +186,7 @@
         white-space: normal;
         overflow-wrap: break-word;
         text-wrap: balance;
-        font-family: "Poppins", sans-serif;
+        font-family: var(--font-family), sans-serif;
         color: #fff;
         -webkit-text-stroke: 1px #a59079;
         text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
@@ -426,6 +429,19 @@
         const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
+
+        // Apply custom font
+        if (params.font) {
+          const fontName = params.font.replace(/\+/g, " ");
+          const link = document.createElement("link");
+          link.href = `https://fonts.googleapis.com/css2?family=${params.font}&display=swap`;
+          link.rel = "stylesheet";
+          document.head.appendChild(link);
+          document.documentElement.style.setProperty(
+            "--font-family",
+            `'${fontName}'`,
+          );
+        }
 
 
 
