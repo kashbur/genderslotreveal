@@ -21,7 +21,7 @@ xdg-open index.html        # Linux
 - `date` – additional date or detail line
 - `photo` – URL to an image shown as a circular avatar
 - `from` – a closing signature line
-- `color` – overlay color when the message appears. Allowed values: `beige` (default), `pink`, `blue`, `yellow`, `green`, `purple`, `gold`, `none`.
+- `color` – overlay color when the message appears. Allowed values: `beige` (default), `pink`, `blue`, `yellow`, `green`, `purple`, `gold`, `white`, `none`. You can also supply any valid hex or CSS color value for a custom overlay.
 - `textColor` – color for the message text (any valid CSS color value)
 - `outlineColor` – color for the outline around the message text
 
@@ -34,7 +34,7 @@ index.html?main=We%27re%20Engaged!&sub=Save%20the%20Date&date=June%202024
 ```
 
 ```
-index.html?main=It%27s%20a%20Boy%21&photo=https%3A%2F%2Fexample.com%2Fbaby.jpg&from=Love%2C%20Alice%20and%20Bob&color=blue
+index.html?main=It%27s%20a%20Boy%21&photo=https%3A%2F%2Fexample.com%2Fbaby.jpg&from=Love%2C%20Alice%20and%20Bob&color=coral
 ```
 
 ```
