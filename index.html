@@ -74,22 +74,53 @@
         position: absolute;
         width: 19.2%;
         height: 14.4%;
-        top: 34.2%;
         background: transparent;
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 2;
         transition: filter 0.5s ease;
+        perspective: 600px;
+        overflow: hidden;
+      }
+      .reel-inner {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        transition: transform 0.25s linear;
+      }
+      @keyframes slot-spin-down {
+        0% {
+          transform: translateY(-20%);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      .reel-strip.spinning {
+        animation: slot-spin-down 0.2s linear infinite;
+      }
+      .reel-strip {
+        display: flex;
+        flex-direction: column;
+      }
+      .reel-item {
+        height: 100%;
       }
       #reel1 {
         left: 20.4%;
+        top: 33.9%;
       }
       #reel2 {
         left: 42.7%;
+        top: 33.7%;
       }
       #reel3 {
         left: 65.1%;
+        top: 33.9%;
       }
       .reel img {
         width: 85%;
@@ -100,6 +131,9 @@
         background: transparent;
         transition: transform 0.05s;
         box-shadow: none;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
+        transform-origin: 50% 50%;
       }
       .spin-button {
         position: absolute;
@@ -286,13 +320,19 @@
       <div class="slot-machine-container">
         <div class="slot-machine blur-background" id="slotMachine"></div>
         <div id="reel1" class="reel blur-background">
-          <img src="img/ring.png" alt="Ring" />
+          <div class="reel-inner">
+            <img src="img/ring.png" alt="Ring" />
+          </div>
         </div>
         <div id="reel2" class="reel blur-background">
-          <img src="img/graduation cap.png" alt="Graduation" />
+          <div class="reel-inner">
+            <img src="img/graduation cap.png" alt="Graduation" />
+          </div>
         </div>
         <div id="reel3" class="reel blur-background">
-          <img src="img/briefcase.png" alt="Briefcase" />
+          <div class="reel-inner">
+            <img src="img/briefcase.png" alt="Briefcase" />
+          </div>
         </div>
         <div class="spin-button blur-background" id="spinButton">
           <img src="img/tap to spin.png" alt="Spin" />
@@ -400,6 +440,32 @@
           "img/baby-bottle.png",
           "img/box.png",
         ];
+
+        function getRandomIcon() {
+          return icons[Math.floor(Math.random() * icons.length)];
+        }
+
+        function createSingleIcon(reel, icon) {
+          reel.innerHTML = `<div class="reel-inner"><img src="${icon}" alt="Slot Icon"></div>`;
+        }
+
+        function createReelStrip(reel) {
+          reel.innerHTML = "";
+          const strip = document.createElement("div");
+          strip.className = "reel-strip";
+          for (let i = 0; i < 10; i++) {
+            const item = document.createElement("div");
+            item.className = "reel-item";
+            const img = document.createElement("img");
+            img.src = getRandomIcon();
+            img.alt = "Slot Icon";
+            item.appendChild(img);
+            strip.appendChild(item);
+          }
+          reel.appendChild(strip);
+          return strip;
+        }
+
         let spinCount = 0;
         let currentSymbols = [icons[0], icons[1], icons[2]];
         const slotMachine = document.getElementById("slotMachine");
@@ -523,22 +589,23 @@
           spinButton.style.pointerEvents = "none";
           const reel1Delay = 0,
             reel2Delay = 600,
-            reel3Delay = 1200;
+            reel3Delay = 1200,
+            spinDuration = 900;
           if (spinCount === 4) {
             const babyBottle = icons[5];
-            spinReelWithResult(reel1, babyBottle, reel1Delay);
-            spinReelWithResult(reel2, babyBottle, reel2Delay);
-            spinReelWithResult(reel3, babyBottle, reel3Delay, showReveal);
+            spinReel(reel1, reel1Delay, spinDuration, babyBottle);
+            spinReel(reel2, reel2Delay, spinDuration, babyBottle);
+            spinReel(reel3, reel3Delay, spinDuration, babyBottle, showReveal);
             currentSymbols = [babyBottle, babyBottle, babyBottle];
           } else {
             generateRandomNonMatchingSymbols();
-            spinReelWithResult(reel1, currentSymbols[0], reel1Delay);
-            spinReelWithResult(reel2, currentSymbols[1], reel2Delay);
-            spinReelWithResult(reel3, currentSymbols[2], reel3Delay);
+            spinReel(reel1, reel1Delay, spinDuration, currentSymbols[0]);
+            spinReel(reel2, reel2Delay, spinDuration, currentSymbols[1]);
+            spinReel(reel3, reel3Delay, spinDuration, currentSymbols[2]);
           }
           setTimeout(() => {
             spinButton.style.pointerEvents = "auto";
-          }, reel3Delay + 900);
+          }, reel3Delay + spinDuration);
         }
         function generateRandomNonMatchingSymbols() {
           let idx = [];
@@ -548,37 +615,15 @@
           }
           currentSymbols = [icons[idx[0]], icons[idx[1]], icons[idx[2]]];
         }
-        function spinReelWithResult(reel, finalIcon, delay, callback) {
+        function spinReel(reel, delay, duration, finalIcon, callback) {
           setTimeout(() => {
-            const maxSpins = 26,
-              spinInterval = 34,
-              totalDuration = maxSpins * spinInterval;
-            let startTime = null;
-            function animate(timestamp) {
-              if (!startTime) startTime = timestamp;
-              const elapsed = timestamp - startTime;
-              const progress = elapsed / totalDuration;
-              const img = reel.querySelector("img");
-              if (progress < 1) {
-                const frameIndex = Math.floor(progress * maxSpins);
-                if (frameIndex < maxSpins - 1) {
-                  img.src = icons[Math.floor(Math.random() * icons.length)];
-                  const scaleEffect =
-                    1 + Math.sin(progress * Math.PI * 8) * 0.04;
-                  img.style.transform = `scale(${scaleEffect})`;
-                } else {
-                  img.src = finalIcon;
-                  img.style.transform = "scale(1)";
-                }
-                requestAnimationFrame(animate);
-              } else {
-                img.src = finalIcon;
-                img.style.transform = "scale(1)";
-                if (callback && reel === reel3 && progress >= 1)
-                  setTimeout(callback, 300);
-              }
-            }
-            requestAnimationFrame(animate);
+            const strip = createReelStrip(reel);
+            strip.classList.add("spinning");
+            setTimeout(() => {
+              strip.classList.remove("spinning");
+              createSingleIcon(reel, finalIcon || getRandomIcon());
+              if (callback) callback();
+            }, duration);
           }, delay);
         }
 
