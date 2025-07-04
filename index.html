@@ -81,6 +81,16 @@
         z-index: 2;
         transition: filter 0.5s ease;
         perspective: 600px;
+        overflow: hidden;
+      }
+      .reel-inner {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        transition: transform 0.25s linear;
       }
       #reel1 {
         left: 20.4%;
@@ -292,13 +302,19 @@
       <div class="slot-machine-container">
         <div class="slot-machine blur-background" id="slotMachine"></div>
         <div id="reel1" class="reel blur-background">
-          <img src="img/ring.png" alt="Ring" />
+          <div class="reel-inner">
+            <img src="img/ring.png" alt="Ring" />
+          </div>
         </div>
         <div id="reel2" class="reel blur-background">
-          <img src="img/graduation cap.png" alt="Graduation" />
+          <div class="reel-inner">
+            <img src="img/graduation cap.png" alt="Graduation" />
+          </div>
         </div>
         <div id="reel3" class="reel blur-background">
-          <img src="img/briefcase.png" alt="Briefcase" />
+          <div class="reel-inner">
+            <img src="img/briefcase.png" alt="Briefcase" />
+          </div>
         </div>
         <div class="spin-button blur-background" id="spinButton">
           <img src="img/tap to spin.png" alt="Spin" />
@@ -554,35 +570,53 @@
           }
           currentSymbols = [icons[idx[0]], icons[idx[1]], icons[idx[2]]];
         }
-        function spinReelWithResult(reel, finalIcon, delay, callback, spinsParam = 2) {
+        function spinReelWithResult(reel, finalIcon, delay, callback) {
           setTimeout(() => {
+            const reelInner = reel.querySelector(".reel-inner");
+            const symbolHeight = reel.clientHeight;
             const maxSpins = 26,
               spinInterval = 34,
               totalDuration = maxSpins * spinInterval;
-            let startTime = null;
+            let startTime = null,
+              lastSpin = -1;
+
+            // ensure a next symbol exists for smooth scrolling
+            const preload = document.createElement("img");
+            preload.src = icons[Math.floor(Math.random() * icons.length)];
+            reelInner.appendChild(preload);
+
             function animate(timestamp) {
               if (!startTime) startTime = timestamp;
               const elapsed = timestamp - startTime;
-              const progress = elapsed / totalDuration;
-              const img = reel.querySelector("img");
-              const spins = spinsParam;
-              if (progress < 1) {
-                const frameIndex = Math.floor(progress * maxSpins);
-                if (frameIndex < maxSpins - 1) {
-                  img.src = icons[Math.floor(Math.random() * icons.length)];
-                } else {
-                  img.src = finalIcon;
-                }
-                const angle = progress * 360 * spins;
-                img.style.transform = `rotateX(${angle}deg)`;
-                requestAnimationFrame(animate);
-              } else {
-                img.src = finalIcon;
-                img.style.transform = "rotateX(0deg)";
-                if (callback && reel === reel3 && progress >= 1)
-                  setTimeout(callback, 300);
+
+              if (elapsed >= totalDuration) {
+                // end of spin
+                reelInner.style.transform = "translateY(0)";
+                reelInner.innerHTML = `<img src="${finalIcon}" alt="" />`;
+                if (callback && reel === reel3) setTimeout(callback, 300);
+                return;
               }
+
+              const spinIndex = Math.floor(elapsed / spinInterval);
+              const progress = (elapsed % spinInterval) / spinInterval;
+
+              if (spinIndex !== lastSpin) {
+                // advance to next symbol
+                if (reelInner.firstElementChild)
+                  reelInner.removeChild(reelInner.firstElementChild);
+                const img = document.createElement("img");
+                img.src =
+                  spinIndex >= maxSpins - 1
+                    ? finalIcon
+                    : icons[Math.floor(Math.random() * icons.length)];
+                reelInner.appendChild(img);
+                lastSpin = spinIndex;
+              }
+
+              reelInner.style.transform = `translateY(${-progress * symbolHeight}px)`;
+              requestAnimationFrame(animate);
             }
+
             requestAnimationFrame(animate);
           }, delay);
         }
