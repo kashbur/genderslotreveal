@@ -107,6 +107,13 @@
         display: flex;
         flex-direction: column;
       }
+      .reel-strip.stopped {
+        transform: translateY(-75%);
+        transition: transform 0.25s ease;
+      }
+      .reel-strip.stopped .reel-item {
+        margin-bottom: -25%;
+      }
       .reel-item {
         height: 100%;
       }
@@ -445,9 +452,6 @@
           return icons[Math.floor(Math.random() * icons.length)];
         }
 
-        function createSingleIcon(reel, icon) {
-          reel.innerHTML = `<div class="reel-inner"><img src="${icon}" alt="Slot Icon"></div>`;
-        }
 
         function createReelStrip(reel) {
           reel.innerHTML = "";
@@ -621,7 +625,19 @@
             strip.classList.add("spinning");
             setTimeout(() => {
               strip.classList.remove("spinning");
-              createSingleIcon(reel, finalIcon || getRandomIcon());
+              const icon = finalIcon || getRandomIcon();
+              strip.innerHTML = "";
+              strip.classList.add("stopped");
+              const iconsToShow = [getRandomIcon(), icon, getRandomIcon()];
+              iconsToShow.forEach((src) => {
+                const item = document.createElement("div");
+                item.className = "reel-item";
+                const img = document.createElement("img");
+                img.src = src;
+                img.alt = "Slot Icon";
+                item.appendChild(img);
+                strip.appendChild(item);
+              });
               if (callback) callback();
             }, duration);
           }, delay);
