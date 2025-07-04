@@ -595,7 +595,13 @@
             const babyBottle = icons[5];
             spinReel(reel1, reel1Delay, spinDuration, babyBottle);
             spinReel(reel2, reel2Delay, spinDuration, babyBottle);
-            spinReel(reel3, reel3Delay, spinDuration, babyBottle, showReveal);
+            spinReel(
+              reel3,
+              reel3Delay,
+              spinDuration,
+              babyBottle,
+              () => setTimeout(showReveal, 1000),
+            );
             currentSymbols = [babyBottle, babyBottle, babyBottle];
           } else {
             generateRandomNonMatchingSymbols();
