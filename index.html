@@ -215,9 +215,6 @@
         font-weight: 700;
         font-style: italic;
         margin-top: 0;
-        color: #fff;
-        -webkit-text-stroke: 1px #a59079;
-        text-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
       }
       @media (max-width: 500px) {
         .aspect-container {
@@ -644,6 +641,10 @@
               }
               div.style.color = safeTextColor;
               div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
+              div.style.webkitTextStroke =
+                safeOutlineColor === "transparent"
+                  ? "0"
+                  : `1px ${safeOutlineColor}`;
               div.style.margin = "0";
               revealLinesDiv.appendChild(div);
               fitRevealLine(div, line.type);
@@ -679,6 +680,10 @@
             div.textContent = mainLine.content;
             div.style.color = safeTextColor;
             div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
+            div.style.webkitTextStroke =
+              safeOutlineColor === "transparent"
+                ? "0"
+                : `1px ${safeOutlineColor}`;
             introLinesDiv.appendChild(div);
             fitRevealLine(div, "main");
             introOverlay.style.opacity = "1";
