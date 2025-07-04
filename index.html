@@ -74,22 +74,25 @@
         position: absolute;
         width: 19.2%;
         height: 14.4%;
-        top: 34.2%;
         background: transparent;
         display: flex;
         justify-content: center;
         align-items: center;
         z-index: 2;
         transition: filter 0.5s ease;
+        perspective: 600px;
       }
       #reel1 {
         left: 20.4%;
+        top: 33.9%;
       }
       #reel2 {
         left: 42.7%;
+        top: 33.7%;
       }
       #reel3 {
         left: 65.1%;
+        top: 33.9%;
       }
       .reel img {
         width: 85%;
@@ -100,6 +103,8 @@
         background: transparent;
         transition: transform 0.05s;
         box-shadow: none;
+        backface-visibility: hidden;
+        transform-style: preserve-3d;
       }
       .spin-button {
         position: absolute;
@@ -563,17 +568,15 @@
                 const frameIndex = Math.floor(progress * maxSpins);
                 if (frameIndex < maxSpins - 1) {
                   img.src = icons[Math.floor(Math.random() * icons.length)];
-                  const scaleEffect =
-                    1 + Math.sin(progress * Math.PI * 8) * 0.04;
-                  img.style.transform = `scale(${scaleEffect})`;
                 } else {
                   img.src = finalIcon;
-                  img.style.transform = "scale(1)";
                 }
+                const angle = progress * 720;
+                img.style.transform = `rotateX(${angle}deg)`;
                 requestAnimationFrame(animate);
               } else {
                 img.src = finalIcon;
-                img.style.transform = "scale(1)";
+                img.style.transform = "rotateX(0deg)";
                 if (callback && reel === reel3 && progress >= 1)
                   setTimeout(callback, 300);
               }
