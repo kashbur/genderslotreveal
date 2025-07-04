@@ -92,6 +92,24 @@
         justify-content: flex-start;
         transition: transform 0.25s linear;
       }
+      @keyframes slot-spin-down {
+        0% {
+          transform: translateY(-20%);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+      .reel-strip.spinning {
+        animation: slot-spin-down 0.2s linear infinite;
+      }
+      .reel-strip {
+        display: flex;
+        flex-direction: column;
+      }
+      .reel-item {
+        height: 100%;
+      }
       #reel1 {
         left: 20.4%;
         top: 33.9%;
@@ -422,6 +440,32 @@
           "img/baby-bottle.png",
           "img/box.png",
         ];
+
+        function getRandomIcon() {
+          return icons[Math.floor(Math.random() * icons.length)];
+        }
+
+        function createSingleIcon(reel, icon) {
+          reel.innerHTML = `<div class="reel-inner"><img src="${icon}" alt="Slot Icon"></div>`;
+        }
+
+        function createReelStrip(reel) {
+          reel.innerHTML = "";
+          const strip = document.createElement("div");
+          strip.className = "reel-strip";
+          for (let i = 0; i < 10; i++) {
+            const item = document.createElement("div");
+            item.className = "reel-item";
+            const img = document.createElement("img");
+            img.src = getRandomIcon();
+            img.alt = "Slot Icon";
+            item.appendChild(img);
+            strip.appendChild(item);
+          }
+          reel.appendChild(strip);
+          return strip;
+        }
+
         let spinCount = 0;
         let currentSymbols = [icons[0], icons[1], icons[2]];
         const slotMachine = document.getElementById("slotMachine");
@@ -545,22 +589,23 @@
           spinButton.style.pointerEvents = "none";
           const reel1Delay = 0,
             reel2Delay = 600,
-            reel3Delay = 1200;
+            reel3Delay = 1200,
+            spinDuration = 900;
           if (spinCount === 4) {
             const babyBottle = icons[5];
-            spinReelWithResult(reel1, babyBottle, reel1Delay);
-            spinReelWithResult(reel2, babyBottle, reel2Delay);
-            spinReelWithResult(reel3, babyBottle, reel3Delay, showReveal);
+            spinReel(reel1, reel1Delay, spinDuration, babyBottle);
+            spinReel(reel2, reel2Delay, spinDuration, babyBottle);
+            spinReel(reel3, reel3Delay, spinDuration, babyBottle, showReveal);
             currentSymbols = [babyBottle, babyBottle, babyBottle];
           } else {
             generateRandomNonMatchingSymbols();
-            spinReelWithResult(reel1, currentSymbols[0], reel1Delay);
-            spinReelWithResult(reel2, currentSymbols[1], reel2Delay);
-            spinReelWithResult(reel3, currentSymbols[2], reel3Delay);
+            spinReel(reel1, reel1Delay, spinDuration, currentSymbols[0]);
+            spinReel(reel2, reel2Delay, spinDuration, currentSymbols[1]);
+            spinReel(reel3, reel3Delay, spinDuration, currentSymbols[2]);
           }
           setTimeout(() => {
             spinButton.style.pointerEvents = "auto";
-          }, reel3Delay + 900);
+          }, reel3Delay + spinDuration);
         }
         function generateRandomNonMatchingSymbols() {
           let idx = [];
@@ -570,54 +615,15 @@
           }
           currentSymbols = [icons[idx[0]], icons[idx[1]], icons[idx[2]]];
         }
-        function spinReelWithResult(reel, finalIcon, delay, callback) {
+        function spinReel(reel, delay, duration, finalIcon, callback) {
           setTimeout(() => {
-            const reelInner = reel.querySelector(".reel-inner");
-            const symbolHeight = reel.clientHeight;
-            const maxSpins = 26,
-              spinInterval = 34,
-              totalDuration = maxSpins * spinInterval;
-            let startTime = null,
-              lastSpin = -1;
-
-            // ensure a next symbol exists for smooth scrolling
-            const preload = document.createElement("img");
-            preload.src = icons[Math.floor(Math.random() * icons.length)];
-            reelInner.appendChild(preload);
-
-            function animate(timestamp) {
-              if (!startTime) startTime = timestamp;
-              const elapsed = timestamp - startTime;
-
-              if (elapsed >= totalDuration) {
-                // end of spin
-                reelInner.style.transform = "translateY(0)";
-                reelInner.innerHTML = `<img src="${finalIcon}" alt="" />`;
-                if (callback && reel === reel3) setTimeout(callback, 300);
-                return;
-              }
-
-              const spinIndex = Math.floor(elapsed / spinInterval);
-              const progress = (elapsed % spinInterval) / spinInterval;
-
-              if (spinIndex !== lastSpin) {
-                // advance to next symbol
-                if (reelInner.firstElementChild)
-                  reelInner.removeChild(reelInner.firstElementChild);
-                const img = document.createElement("img");
-                img.src =
-                  spinIndex >= maxSpins - 1
-                    ? finalIcon
-                    : icons[Math.floor(Math.random() * icons.length)];
-                reelInner.appendChild(img);
-                lastSpin = spinIndex;
-              }
-
-              reelInner.style.transform = `translateY(${-progress * symbolHeight}px)`;
-              requestAnimationFrame(animate);
-            }
-
-            requestAnimationFrame(animate);
+            const strip = createReelStrip(reel);
+            strip.classList.add("spinning");
+            setTimeout(() => {
+              strip.classList.remove("spinning");
+              createSingleIcon(reel, finalIcon || getRandomIcon());
+              if (callback) callback();
+            }, duration);
           }, delay);
         }
 
