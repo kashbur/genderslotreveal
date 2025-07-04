@@ -108,7 +108,9 @@
         flex-direction: column;
       }
       .reel-strip.stopped {
-        transform: translateY(-75%);
+        /* Shift so the center icon is fully visible with partial items above
+           and below */
+        transform: translateY(-33.333%);
         transition: transform 0.25s ease;
       }
       .reel-strip.stopped .reel-item {
