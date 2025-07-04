@@ -553,7 +553,7 @@
           }
           currentSymbols = [icons[idx[0]], icons[idx[1]], icons[idx[2]]];
         }
-        function spinReelWithResult(reel, finalIcon, delay, callback) {
+        function spinReelWithResult(reel, finalIcon, delay, callback, spinsParam = 2) {
           setTimeout(() => {
             const maxSpins = 26,
               spinInterval = 34,
@@ -564,6 +564,7 @@
               const elapsed = timestamp - startTime;
               const progress = elapsed / totalDuration;
               const img = reel.querySelector("img");
+              const spins = spinsParam;
               if (progress < 1) {
                 const frameIndex = Math.floor(progress * maxSpins);
                 if (frameIndex < maxSpins - 1) {
@@ -571,7 +572,7 @@
                 } else {
                   img.src = finalIcon;
                 }
-                const angle = progress * 720;
+                const angle = progress * 360 * spins;
                 img.style.transform = `rotateX(${angle}deg)`;
                 requestAnimationFrame(animate);
               } else {
