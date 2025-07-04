@@ -608,9 +608,11 @@
             spinReel(reel2, reel2Delay, spinDuration, currentSymbols[1]);
             spinReel(reel3, reel3Delay, spinDuration, currentSymbols[2]);
           }
+          const pointerDelay =
+            reel3Delay + spinDuration + (spinCount === 4 ? 500 : 0);
           setTimeout(() => {
             spinButton.style.pointerEvents = "auto";
-          }, reel3Delay + spinDuration);
+          }, pointerDelay);
         }
         function generateRandomNonMatchingSymbols() {
           let idx = [];
