@@ -616,6 +616,17 @@
           });
         }
 
+        function applyTextStyles(el, color, outlineColor) {
+          el.style.color = color;
+          if (outlineColor === "transparent") {
+            el.style.textShadow = "none";
+            el.style.webkitTextStroke = "0";
+          } else {
+            el.style.textShadow = `-1px -1px 0 ${outlineColor}, 1px -1px 0 ${outlineColor}, -1px 1px 0 ${outlineColor}, 1px 1px 0 ${outlineColor}`;
+            el.style.webkitTextStroke = `1px ${outlineColor}`;
+          }
+        }
+
         // ------------- REVEAL LOGIC -----------------
         function showReveal() {
           const allLines = getRevealLinesFromParams(params);
@@ -642,13 +653,7 @@
                 div.textContent =
                   line.type === "sub" ? line.content.toUpperCase() : line.content;
               }
-              div.style.color = safeTextColor;
-              div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
-              if (safeOutlineColor === "transparent") {
-                div.style.webkitTextStroke = "0";
-              } else {
-                div.style.webkitTextStroke = `1px ${safeOutlineColor}`;
-              }
+              applyTextStyles(div, safeTextColor, safeOutlineColor);
               div.style.margin = "0";
               revealLinesDiv.appendChild(div);
               fitRevealLine(div, line.type);
@@ -682,13 +687,7 @@
             const div = document.createElement("div");
             div.className = "reveal-line main";
             div.textContent = mainLine.content;
-            div.style.color = safeTextColor;
-            div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
-            if (safeOutlineColor === "transparent") {
-              div.style.webkitTextStroke = "0";
-            } else {
-              div.style.webkitTextStroke = `1px ${safeOutlineColor}`;
-            }
+            applyTextStyles(div, safeTextColor, safeOutlineColor);
             introLinesDiv.appendChild(div);
             fitRevealLine(div, "main");
             introOverlay.style.opacity = "1";
