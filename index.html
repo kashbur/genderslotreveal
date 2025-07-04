@@ -644,6 +644,11 @@
               }
               div.style.color = safeTextColor;
               div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
+              if (safeOutlineColor === "transparent") {
+                div.style.webkitTextStroke = "0";
+              } else {
+                div.style.webkitTextStroke = `1px ${safeOutlineColor}`;
+              }
               div.style.margin = "0";
               revealLinesDiv.appendChild(div);
               fitRevealLine(div, line.type);
@@ -679,6 +684,11 @@
             div.textContent = mainLine.content;
             div.style.color = safeTextColor;
             div.style.textShadow = `-1px -1px 0 ${safeOutlineColor}, 1px -1px 0 ${safeOutlineColor}, -1px 1px 0 ${safeOutlineColor}, 1px 1px 0 ${safeOutlineColor}`;
+            if (safeOutlineColor === "transparent") {
+              div.style.webkitTextStroke = "0";
+            } else {
+              div.style.webkitTextStroke = `1px ${safeOutlineColor}`;
+            }
             introLinesDiv.appendChild(div);
             fitRevealLine(div, "main");
             introOverlay.style.opacity = "1";
