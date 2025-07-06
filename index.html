@@ -111,15 +111,39 @@
       }
       #reel1 {
         left: 20.4%;
-        top: 33.9%;
+        top: 19.5%;
       }
       #reel2 {
         left: 42.7%;
-        top: 33.7%;
+        top: 19.5%;
       }
       #reel3 {
         left: 65.1%;
+        top: 19.5%;
+      }
+      #reel4 {
+        left: 20.4%;
         top: 33.9%;
+      }
+      #reel5 {
+        left: 42.7%;
+        top: 33.9%;
+      }
+      #reel6 {
+        left: 65.1%;
+        top: 33.9%;
+      }
+      #reel7 {
+        left: 20.4%;
+        top: 48.3%;
+      }
+      #reel8 {
+        left: 42.7%;
+        top: 48.3%;
+      }
+      #reel9 {
+        left: 65.1%;
+        top: 48.3%;
       }
       .reel img {
         width: 85%;
@@ -333,6 +357,36 @@
             <img src="img/briefcase.png" alt="Briefcase" />
           </div>
         </div>
+        <div id="reel4" class="reel blur-background">
+          <div class="reel-inner">
+            <img src="img/house.png" alt="House" />
+          </div>
+        </div>
+        <div id="reel5" class="reel blur-background">
+          <div class="reel-inner">
+            <img src="img/scroll.png" alt="Scroll" />
+          </div>
+        </div>
+        <div id="reel6" class="reel blur-background">
+          <div class="reel-inner">
+            <img src="img/baby-bottle.png" alt="Bottle" />
+          </div>
+        </div>
+        <div id="reel7" class="reel blur-background">
+          <div class="reel-inner">
+            <img src="img/box.png" alt="Box" />
+          </div>
+        </div>
+        <div id="reel8" class="reel blur-background">
+          <div class="reel-inner">
+            <img src="img/ring.png" alt="Ring" />
+          </div>
+        </div>
+        <div id="reel9" class="reel blur-background">
+          <div class="reel-inner">
+            <img src="img/graduation cap.png" alt="Graduation" />
+          </div>
+        </div>
         <div class="spin-button blur-background" id="spinButton">
           <img src="img/tap to spin.png" alt="Spin" />
         </div>
@@ -466,12 +520,13 @@
         }
 
         let spinCount = 0;
-        let currentSymbols = [icons[0], icons[1], icons[2]];
+        let currentSymbols = [];
         const slotMachine = document.getElementById("slotMachine");
         const spinButton = document.getElementById("spinButton");
-        const reel1 = document.getElementById("reel1");
-        const reel2 = document.getElementById("reel2");
-        const reel3 = document.getElementById("reel3");
+        const reels = [];
+        for (let i = 1; i <= 9; i++) {
+          reels.push(document.getElementById(`reel${i}`));
+        }
         const introOverlay = document.getElementById("introOverlay");
         const introLinesDiv = document.getElementById("introLines");
         const introColorOverlay = introOverlay.querySelector(".color-overlay");
@@ -528,9 +583,7 @@
         function hideInstructionsOverlay() {
           instructionsOverlay.style.opacity = "0";
           slotMachine.classList.remove("blur-background");
-          reel1.classList.remove("blur-background");
-          reel2.classList.remove("blur-background");
-          reel3.classList.remove("blur-background");
+          reels.forEach((r) => r.classList.remove("blur-background"));
           spinButton.classList.remove("blur-background");
           instructionsOverlay.style.pointerEvents = "none";
           setTimeout(() => {
@@ -604,41 +657,36 @@
         function handleSpin() {
           spinCount++;
           spinButton.style.pointerEvents = "none";
-          const reel1Delay = 0,
-            reel2Delay = 600,
-            reel3Delay = 1200,
-            spinDuration = 900;
+          const spinDuration = 900;
+          const delayStep = 600;
           if (spinCount === 4) {
             const babyBottle = icons[5];
-            spinReel(reel1, reel1Delay, spinDuration, babyBottle);
-            spinReel(reel2, reel2Delay, spinDuration, babyBottle);
-            spinReel(
-              reel3,
-              reel3Delay,
-              spinDuration,
-              babyBottle,
-              () => setTimeout(showReveal, 500),
-            );
-            currentSymbols = [babyBottle, babyBottle, babyBottle];
+            reels.forEach((reel, i) => {
+              const delay = i * delayStep;
+              const callback =
+                i === reels.length - 1 ? () => setTimeout(showReveal, 500) : null;
+              spinReel(reel, delay, spinDuration, babyBottle, callback);
+            });
+            currentSymbols = reels.map(() => babyBottle);
           } else {
             generateRandomNonMatchingSymbols();
-            spinReel(reel1, reel1Delay, spinDuration, currentSymbols[0]);
-            spinReel(reel2, reel2Delay, spinDuration, currentSymbols[1]);
-            spinReel(reel3, reel3Delay, spinDuration, currentSymbols[2]);
+            reels.forEach((reel, i) => {
+              const delay = i * delayStep;
+              spinReel(reel, delay, spinDuration, currentSymbols[i]);
+            });
           }
           const pointerDelay =
-            reel3Delay + spinDuration + (spinCount === 4 ? 500 : 0);
+            delayStep * (reels.length - 1) + spinDuration + (spinCount === 4 ? 500 : 0);
           setTimeout(() => {
             spinButton.style.pointerEvents = "auto";
           }, pointerDelay);
         }
         function generateRandomNonMatchingSymbols() {
-          let idx = [];
-          while (idx.length < 3) {
-            let r = Math.floor(Math.random() * icons.length);
-            if (!idx.includes(r)) idx.push(r);
-          }
-          currentSymbols = [icons[idx[0]], icons[idx[1]], icons[idx[2]]];
+          let symbols;
+          do {
+            symbols = reels.map(() => getRandomIcon());
+          } while (new Set(symbols).size < 2);
+          currentSymbols = symbols;
         }
         function spinReel(reel, delay, duration, finalIcon, callback) {
           setTimeout(() => {

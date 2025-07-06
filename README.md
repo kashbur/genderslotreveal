@@ -60,14 +60,14 @@ Open one of these URLs in your browser to see the customized reveal.
 
 ## How the reel spinning works
 
-The spinning animation is handled entirely in `index.html`. When the spin
-button is pressed, the `handleSpin()` function disables the button and calls
-`spinReel()` for each of the three reels. Each call uses a short delay so the
-reels start one after another. `spinReel()` creates a vertical strip of random
-icons and applies the `spinning` CSS class, which runs a `slot-spin-down`
-animation. After the configured duration, the class is removed and
-`createSingleIcon()` displays the final symbol for that reel.
+The slot machine now shows a **3×3 grid** of icons. Each of the three columns is
+a reel that spins vertically. When the spin button is pressed, the
+`handleSpin()` function disables the button and calls `spinReel()` for each reel
+using small delays so they start one after another. `spinReel()` builds a
+vertical strip of random icons and applies the `spinning` CSS class, which runs
+a `slot-spin-down` animation. After the configured duration, the class is
+removed and `createSingleIcon()` displays the final symbol for that reel.
 
-During the first three spins the final symbols are random and guaranteed not to
-match. On the fourth spin all reels are forced to stop on the baby bottle icon
-and `showReveal()` is triggered, revealing the personalized message overlay.
+During the first three spins the grid stops on random, nonmatching symbols. On
+the fourth spin all reels are forced to stop on the baby bottle icon and
+`showReveal()` is triggered, revealing the personalized message overlay.
