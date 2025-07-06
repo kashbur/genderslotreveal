@@ -60,7 +60,7 @@ Open one of these URLs in your browser to see the customized reveal.
 
 ## How the reel spinning works
 
-The slot machine now shows a **3×3 grid** of icons. Each of the three columns is
+The slot machine now shows a **1×3 grid** of icons. Each of the three columns is
 a reel that spins vertically. When the spin button is pressed, the
 `handleSpin()` function disables the button and calls `spinReel()` for each reel
 using small delays so they start one after another. `spinReel()` builds a
@@ -69,5 +69,5 @@ a `slot-spin-down` animation. After the configured duration, the class is
 removed and `createSingleIcon()` displays the final symbol for that reel.
 
 During the first three spins the grid stops on random, nonmatching symbols. On
-the fourth spin all reels are forced to stop on the baby bottle icon and
+the fourth spin all reels are forced to stop on the blue bottle icon and
 `showReveal()` is triggered, revealing the personalized message overlay.
