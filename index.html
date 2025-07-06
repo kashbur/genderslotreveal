@@ -111,39 +111,15 @@
       }
       #reel1 {
         left: 20.4%;
-        top: 19.5%;
+        top: 33.9%;
       }
       #reel2 {
         left: 42.7%;
-        top: 19.5%;
+        top: 33.9%;
       }
       #reel3 {
         left: 65.1%;
-        top: 19.5%;
-      }
-      #reel4 {
-        left: 20.4%;
         top: 33.9%;
-      }
-      #reel5 {
-        left: 42.7%;
-        top: 33.9%;
-      }
-      #reel6 {
-        left: 65.1%;
-        top: 33.9%;
-      }
-      #reel7 {
-        left: 20.4%;
-        top: 48.3%;
-      }
-      #reel8 {
-        left: 42.7%;
-        top: 48.3%;
-      }
-      #reel9 {
-        left: 65.1%;
-        top: 48.3%;
       }
       .reel img {
         width: 85%;
@@ -357,36 +333,6 @@
             <img src="img/briefcase.png" alt="Briefcase" />
           </div>
         </div>
-        <div id="reel4" class="reel blur-background">
-          <div class="reel-inner">
-            <img src="img/house.png" alt="House" />
-          </div>
-        </div>
-        <div id="reel5" class="reel blur-background">
-          <div class="reel-inner">
-            <img src="img/scroll.png" alt="Scroll" />
-          </div>
-        </div>
-        <div id="reel6" class="reel blur-background">
-          <div class="reel-inner">
-            <img src="img/baby-bottle.png" alt="Bottle" />
-          </div>
-        </div>
-        <div id="reel7" class="reel blur-background">
-          <div class="reel-inner">
-            <img src="img/box.png" alt="Box" />
-          </div>
-        </div>
-        <div id="reel8" class="reel blur-background">
-          <div class="reel-inner">
-            <img src="img/ring.png" alt="Ring" />
-          </div>
-        </div>
-        <div id="reel9" class="reel blur-background">
-          <div class="reel-inner">
-            <img src="img/graduation cap.png" alt="Graduation" />
-          </div>
-        </div>
         <div class="spin-button blur-background" id="spinButton">
           <img src="img/tap to spin.png" alt="Spin" />
         </div>
@@ -524,7 +470,7 @@
         const slotMachine = document.getElementById("slotMachine");
         const spinButton = document.getElementById("spinButton");
         const reels = [];
-        for (let i = 1; i <= 9; i++) {
+        for (let i = 1; i <= 3; i++) {
           reels.push(document.getElementById(`reel${i}`));
         }
         const introOverlay = document.getElementById("introOverlay");
