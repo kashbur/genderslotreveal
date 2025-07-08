@@ -485,6 +485,25 @@
         const params = getParams();
         const safeTextColor = sanitizeColor(params.textcolor, "#ffffff");
         const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
+
+        const lineColors = {
+          main: {
+            text: sanitizeColor(params.maintextcolor, safeTextColor),
+            outline: sanitizeColor(params.mainoutlinecolor, safeOutlineColor),
+          },
+          sub: {
+            text: sanitizeColor(params.subtextcolor, safeTextColor),
+            outline: sanitizeColor(params.suboutlinecolor, safeOutlineColor),
+          },
+          date: {
+            text: sanitizeColor(params.datetextcolor, safeTextColor),
+            outline: sanitizeColor(params.dateoutlinecolor, safeOutlineColor),
+          },
+          from: {
+            text: sanitizeColor(params.fromtextcolor, safeTextColor),
+            outline: sanitizeColor(params.fromoutlinecolor, safeOutlineColor),
+          },
+        };
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
 
@@ -712,7 +731,8 @@
                 div.textContent =
                   line.type === "sub" ? line.content.toUpperCase() : line.content;
               }
-              applyTextStyles(div, safeTextColor, safeOutlineColor, fonts[line.type]);
+              const colors = lineColors[line.type] || { text: safeTextColor, outline: safeOutlineColor };
+              applyTextStyles(div, colors.text, colors.outline, fonts[line.type]);
               div.style.margin = "0";
               revealLinesDiv.appendChild(div);
               fitRevealLine(div, line.type);
@@ -746,7 +766,7 @@
             const div = document.createElement("div");
             div.className = "reveal-line main";
             div.textContent = mainLine.content;
-            applyTextStyles(div, safeTextColor, safeOutlineColor, fonts.main);
+            applyTextStyles(div, lineColors.main.text, lineColors.main.outline, fonts.main);
             introLinesDiv.appendChild(div);
             fitRevealLine(div, "main");
             introOverlay.style.opacity = "1";

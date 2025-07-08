@@ -24,6 +24,14 @@ xdg-open index.html        # Linux
 - `color` – overlay color when the message appears. Allowed values: `beige` (default), `pink`, `blue`, `yellow`, `green`, `purple`, `gold`, `white`, `none`. You can also supply any valid hex or CSS color value for a custom overlay.
 - `textColor` – color for the message text (any valid CSS color value)
 - `outlineColor` – color for the outline around the message text
+- `mainTextColor` – text color for the main headline
+- `mainOutlineColor` – outline color for the main headline
+- `subTextColor` – text color for the secondary line
+- `subOutlineColor` – outline color for the secondary line
+- `dateTextColor` – text color for the date line
+- `dateOutlineColor` – outline color for the date line
+- `fromTextColor` – text color for the closing signature
+- `fromOutlineColor` – outline color for the closing signature
 - `font` – Google Fonts family name to use for all text (e.g. `font=Playfair+Display`)
 - `fontMain` – font family for the main headline
 - `fontSub` – font family for the secondary line
@@ -31,6 +39,8 @@ xdg-open index.html        # Linux
 - `fontFrom` – font family for the closing signature
 
 Font parameters expect Google Fonts family names just like `font`, using `+` instead of spaces.
+
+Line-specific color parameters fall back to `textColor` and `outlineColor` if omitted.
 
 `color` only affects the overlay background, whereas `textColor` and `outlineColor` control the message text and its outline.
 
