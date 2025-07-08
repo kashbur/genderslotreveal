@@ -700,7 +700,7 @@
           return Math.max(1600, Math.min(ms, 6000));
         }
 
-        function fitRevealLine(el, type) {
+        function fitRevealLine(el, type, maxFont = 160) {
           if (type === "photo") return;
           textFit(el, {
             alignVert: true,
@@ -708,14 +708,23 @@
             multiLine: true,
             detectMultiLine: true,
             minFontSize: 12,
-            maxFontSize: 160,
+            maxFontSize: maxFont,
           });
         }
 
         function refitAllLines() {
-          document.querySelectorAll(".reveal-line").forEach((el) => {
+          const mainEl = introLinesDiv.querySelector(".reveal-line.main");
+          let mainSize = 160;
+          if (mainEl) {
+            const max = parseFloat(mainEl.dataset.maxFont) || 160;
+            fitRevealLine(mainEl, "main", max);
+            mainSize = parseFloat(getComputedStyle(mainEl).fontSize) || mainSize;
+          }
+          const otherMax = Math.round(mainSize * 0.8);
+          document.querySelectorAll("#revealLines .reveal-line").forEach((el) => {
             const type = Array.from(el.classList).find((c) => c !== "reveal-line");
-            fitRevealLine(el, type);
+            el.dataset.maxFont = otherMax;
+            fitRevealLine(el, type, otherMax);
           });
         }
 
@@ -739,6 +748,7 @@
           const mainLine = allLines.find((l) => l.type === "main");
           const otherLines = allLines.filter((l) => l.type !== "main");
           let confettiShown = false;
+          let otherMaxFont = 128;
 
           function showStageTwo() {
             revealLinesDiv.innerHTML = "";
@@ -762,8 +772,9 @@
               const colors = lineColors[line.type] || { text: safeTextColor, outline: safeOutlineColor };
               applyTextStyles(div, colors.text, colors.outline, fonts[line.type]);
               div.style.margin = "0";
+              div.dataset.maxFont = otherMaxFont;
               revealLinesDiv.appendChild(div);
-              fitRevealLine(div, line.type);
+              fitRevealLine(div, line.type, otherMaxFont);
             }
             const subLine = otherLines.find((l) => l.type === "sub");
             const dateLine = otherLines.find((l) => l.type === "date");
@@ -793,10 +804,12 @@
             introLinesDiv.innerHTML = "";
             const div = document.createElement("div");
             div.className = "reveal-line main";
+            div.dataset.maxFont = 160;
             div.textContent = mainLine.content;
             applyTextStyles(div, lineColors.main.text, lineColors.main.outline, fonts.main);
             introLinesDiv.appendChild(div);
-            fitRevealLine(div, "main");
+            fitRevealLine(div, "main", 160);
+            otherMaxFont = Math.round(parseFloat(getComputedStyle(div).fontSize) * 0.8);
             introOverlay.style.opacity = "1";
             introOverlay.style.pointerEvents = "auto";
             refitAllLines();
