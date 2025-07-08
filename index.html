@@ -359,7 +359,6 @@
         </div>
       </div>
     </div>
-    <button id="copyUrlButton" class="copy-url-button">Copy URL</button>
     <script>
       // -------------- URL Params Logic -------------
       function getParams() {
@@ -920,18 +919,6 @@
               });
             }
           }, 8000);
-        }
-        const copyBtn = document.getElementById("copyUrlButton");
-        if (copyBtn && navigator.clipboard) {
-          copyBtn.addEventListener("click", function (e) {
-            e.preventDefault();
-            navigator.clipboard.writeText(window.location.href).then(() => {
-              copyBtn.textContent = "Copied!";
-              setTimeout(() => {
-                copyBtn.textContent = "Copy URL";
-              }, 2000);
-            });
-          });
         }
         window.addEventListener("resize", refitAllLines);
       });
