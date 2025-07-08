@@ -160,6 +160,22 @@
       .spin-button:active {
         transform: translateX(-50%) scale(0.95);
       }
+
+      .copy-url-button {
+        position: fixed;
+        bottom: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 6px 12px;
+        font-family: var(--font-family), sans-serif;
+        font-size: 14px;
+        color: #fff;
+        background: #333;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        z-index: 30;
+      }
       .reveal-overlay {
         position: absolute;
         top: 0;
@@ -359,6 +375,7 @@
         </div>
       </div>
     </div>
+    <button id="copyUrlButton" class="copy-url-button">Copy URL</button>
     <script>
       // -------------- URL Params Logic -------------
       function getParams() {
@@ -919,6 +936,18 @@
               });
             }
           }, 8000);
+        }
+        const copyBtn = document.getElementById("copyUrlButton");
+        if (copyBtn && navigator.clipboard) {
+          copyBtn.addEventListener("click", function (e) {
+            e.preventDefault();
+            navigator.clipboard.writeText(window.location.href).then(() => {
+              copyBtn.textContent = "Copied!";
+              setTimeout(() => {
+                copyBtn.textContent = "Copy URL";
+              }, 2000);
+            });
+          });
         }
         window.addEventListener("resize", refitAllLines);
       });
