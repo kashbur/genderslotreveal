@@ -509,13 +509,16 @@
 
         // --------- Font loading logic ---------
         function loadGoogleFont(familyParam) {
-          if (!familyParam) return null;
+          if (!familyParam) return Promise.resolve(null);
           const familyName = familyParam.replace(/\+/g, " ");
           const link = document.createElement("link");
           link.href = `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`;
           link.rel = "stylesheet";
           document.head.appendChild(link);
-          return `'${familyName}'`;
+          return document.fonts
+            .load(`1em '${familyName}'`)
+            .then(() => `'${familyName}'`)
+            .catch(() => `'${familyName}'`);
         }
 
         const fonts = {
@@ -524,19 +527,44 @@
           date: null,
           from: null,
         };
+        const fontPromises = [];
 
         // Global font applied via CSS variable
         if (params.font) {
-          const ff = loadGoogleFont(params.font);
-          if (ff)
-            document.documentElement.style.setProperty("--font-family", ff);
-          fonts.main = fonts.sub = fonts.date = fonts.from = ff;
+          fontPromises.push(
+            loadGoogleFont(params.font).then((ff) => {
+              if (ff) {
+                document.documentElement.style.setProperty("--font-family", ff);
+                fonts.main = fonts.sub = fonts.date = fonts.from = ff;
+              }
+            })
+          );
         }
 
-        fonts.main = loadGoogleFont(params.fontmain) || fonts.main;
-        fonts.sub = loadGoogleFont(params.fontsub) || fonts.sub;
-        fonts.date = loadGoogleFont(params.fontdate) || fonts.date;
-        fonts.from = loadGoogleFont(params.fontfrom) || fonts.from;
+        fontPromises.push(
+          loadGoogleFont(params.fontmain).then((ff) => {
+            if (ff) fonts.main = ff;
+          })
+        );
+        fontPromises.push(
+          loadGoogleFont(params.fontsub).then((ff) => {
+            if (ff) fonts.sub = ff;
+          })
+        );
+        fontPromises.push(
+          loadGoogleFont(params.fontdate).then((ff) => {
+            if (ff) fonts.date = ff;
+          })
+        );
+        fontPromises.push(
+          loadGoogleFont(params.fontfrom).then((ff) => {
+            if (ff) fonts.from = ff;
+          })
+        );
+
+        Promise.all(fontPromises).then(() =>
+          document.fonts.ready.then(refitAllLines)
+        );
 
 
 
