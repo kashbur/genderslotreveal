@@ -320,17 +320,23 @@
         <div class="slot-machine blur-background" id="slotMachine"></div>
         <div id="reel1" class="reel blur-background">
           <div class="reel-inner">
-            <img src="img/ring.png" alt="Ring" />
+            <img
+              src="https://i.postimg.cc/y6bFTQmv/blue-balloon.png"
+              alt="Blue Balloon"
+            />
           </div>
         </div>
         <div id="reel2" class="reel blur-background">
           <div class="reel-inner">
-            <img src="img/graduation cap.png" alt="Graduation" />
+            <img
+              src="https://i.postimg.cc/T38gzKHb/bottle.png"
+              alt="Bottle"
+            />
           </div>
         </div>
         <div id="reel3" class="reel blur-background">
           <div class="reel-inner">
-            <img src="img/briefcase.png" alt="Briefcase" />
+            <img src="https://i.postimg.cc/YSMgSJ7q/boy.png" alt="Boy" />
           </div>
         </div>
         <div class="spin-button blur-background" id="spinButton">
@@ -431,13 +437,15 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         const icons = [
-          "img/ring.png",
-          "img/graduation cap.png",
-          "img/briefcase.png",
-          "img/house.png",
-          "img/scroll.png",
-          "img/baby-bottle.png",
-          "img/box.png",
+          "https://i.postimg.cc/y6bFTQmv/blue-balloon.png",
+          "https://i.postimg.cc/T38gzKHb/bottle.png",
+          "https://i.postimg.cc/YSMgSJ7q/boy.png",
+          "https://i.postimg.cc/6qk4xPzK/confetti.png",
+          "https://i.postimg.cc/BQF1BqQn/elephant.png",
+          "https://i.postimg.cc/25kbYhd1/girl.png",
+          "https://i.postimg.cc/hjwfVYkm/pink-balloon.png",
+          "https://i.postimg.cc/65ZMS2hs/rainbow.png",
+          "https://i.postimg.cc/Mp8986sn/teddy-bear.png",
         ];
 
         function getRandomIcon() {
@@ -653,14 +661,14 @@
           const spinDuration = 900;
           const delayStep = 600;
           if (spinCount === 4) {
-            const babyBottle = icons[5];
+            const finalIcon = icons[1];
             reels.forEach((reel, i) => {
               const delay = i * delayStep;
               const callback =
                 i === reels.length - 1 ? () => setTimeout(showReveal, 500) : null;
-              spinReel(reel, delay, spinDuration, babyBottle, callback);
+              spinReel(reel, delay, spinDuration, finalIcon, callback);
             });
-            currentSymbols = reels.map(() => babyBottle);
+            currentSymbols = reels.map(() => finalIcon);
           } else {
             generateRandomNonMatchingSymbols();
             reels.forEach((reel, i) => {

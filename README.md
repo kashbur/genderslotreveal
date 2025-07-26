@@ -79,5 +79,5 @@ a `slot-spin-down` animation. After the configured duration, the class is
 removed and `createSingleIcon()` displays the final symbol for that reel.
 
 During the first three spins the grid stops on random, nonmatching symbols. On
-the fourth spin all reels are forced to stop on the blue bottle icon and
+the fourth spin all reels are forced to stop on the bottle icon and
 `showReveal()` is triggered, revealing the personalized message overlay.
