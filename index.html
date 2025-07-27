@@ -285,6 +285,49 @@
         height: 10px;
         border-radius: 50%;
       }
+
+      .gender-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(255, 255, 255, 0.6);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 12;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+      .gender-text {
+        font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+        font-weight: bold;
+        color: #ffa98e;
+        text-shadow: -3px -3px 0 #ffffff, 3px -3px 0 #ffffff,
+          -3px 3px 0 #ffffff, 3px 3px 0 #ffffff;
+        font-size: 80px;
+        animation: gender-bounce 0.6s ease-in-out 3;
+      }
+      @keyframes gender-bounce {
+        0%, 100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+      }
+      @media (max-width: 500px) {
+        .gender-text {
+          font-size: 60px;
+        }
+      }
+      @media (max-width: 350px) {
+        .gender-text {
+          font-size: 40px;
+        }
+      }
       /* Instructions Overlay */
       .instructions-overlay {
         position: absolute;
@@ -349,6 +392,9 @@
         <div class="reveal-overlay" id="revealOverlay">
           <div class="color-overlay" id="colorOverlay"></div>
           <div class="reveal-lines" id="revealLines"></div>
+        </div>
+        <div class="gender-overlay" id="genderOverlay">
+          <div class="gender-text">IT'S A GIRL!</div>
         </div>
         <div
           class="instructions-overlay"
@@ -490,7 +536,11 @@
         const instructionsOverlay = document.getElementById(
           "instructionsOverlay",
         );
+        const genderOverlay = document.getElementById("genderOverlay");
         const params = getParams();
+        const surpriseCode = params.s;
+        const isGirl = surpriseCode === "2" || (params.gender || "").toLowerCase() === "girl";
+        const isBoy = (params.gender || "").toLowerCase() === "boy";
         const safeTextColor = sanitizeColor(params.textcolor, "#ffffff");
         const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
 
@@ -661,11 +711,16 @@
           const spinDuration = 900;
           const delayStep = 600;
           if (spinCount === 4) {
-            const finalIcon = icons[1];
+            let finalIcon = icons[1];
+            if (isGirl) finalIcon = icons[5];
+            else if (isBoy) finalIcon = icons[2];
+            const endCallback =
+              isGirl
+                ? () => setTimeout(showGenderReveal, 500)
+                : () => setTimeout(showReveal, 500);
             reels.forEach((reel, i) => {
               const delay = i * delayStep;
-              const callback =
-                i === reels.length - 1 ? () => setTimeout(showReveal, 500) : null;
+              const callback = i === reels.length - 1 ? endCallback : null;
               spinReel(reel, delay, spinDuration, finalIcon, callback);
             });
             currentSymbols = reels.map(() => finalIcon);
@@ -823,12 +878,29 @@
             setTimeout(showStageTwo, 100);
           }
         }
+
+        function showGenderReveal() {
+          genderOverlay.style.opacity = "1";
+          genderOverlay.style.pointerEvents = "auto";
+          createConfetti([
+            "#ffa98e",
+            "#FFB6C1",
+            "#FFC0CB",
+            "#FFFFFF",
+            "#FF1493",
+            "#DB7093",
+          ]);
+          setTimeout(() => {
+            genderOverlay.style.opacity = "0";
+            genderOverlay.style.pointerEvents = "none";
+          }, 8000);
+        }
         // -------- Confetti logic (unchanged) ----------
-        function createConfetti() {
+        function createConfetti(customColors) {
           document.querySelectorAll(".confetti").forEach((el) => {
             if (el.parentNode) el.parentNode.removeChild(el);
           });
-          const colors = [
+          const colors = customColors || [
             "#FFD700",
             "#FFC125",
             "#EEC900",

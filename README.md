@@ -37,6 +37,7 @@ xdg-open index.html        # Linux
 - `fontSub` – font family for the secondary line
 - `fontDate` – font family for the date line
 - `fontFrom` – font family for the closing signature
+- `s` – optional surprise code. Set `s=2` to show a pink confetti overlay with "IT'S A GIRL!" text and matching icons.
 
 Font parameters expect Google Fonts family names just like `font`, using `+` instead of spaces.
 
@@ -52,6 +53,10 @@ index.html?main=We%27re%20Engaged!&sub=Save%20the%20Date&date=June%202024
 
 ```
 index.html?main=We%E2%80%99re%20expecting&font=Playfair+Display
+```
+
+```
+index.html?s=2
 ```
 
 ```
