@@ -105,6 +105,7 @@
       .reel-strip {
         display: flex;
         flex-direction: column;
+        will-change: transform;
       }
       .reel-item {
         height: 100%;
@@ -133,6 +134,7 @@
         backface-visibility: hidden;
         transform-style: preserve-3d;
         transform-origin: 50% 50%;
+        will-change: transform;
       }
       .spin-button {
         position: absolute;
@@ -482,6 +484,8 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
+        const params = getParams();
+
         const icons = [
           "https://i.postimg.cc/y6bFTQmv/blue-balloon.png",
           "https://i.postimg.cc/T38gzKHb/bottle.png",
@@ -493,6 +497,21 @@
           "https://i.postimg.cc/65ZMS2hs/rainbow.png",
           "https://i.postimg.cc/Mp8986sn/teddy-bear.png",
         ];
+
+        function preloadImages(urls) {
+          urls.forEach((url) => {
+            const img = new Image();
+            img.src = url;
+          });
+        }
+
+        preloadImages([
+          ...icons,
+          "img/background.png",
+          "img/tap to spin.png",
+          "img/directions.png",
+          ...(params.photo ? [params.photo] : []),
+        ]);
 
         function getRandomIcon() {
           return icons[Math.floor(Math.random() * icons.length)];
@@ -538,7 +557,6 @@
         );
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
-        const params = getParams();
         const surpriseCode = params.s;
         const isGirl = surpriseCode === "2" || (params.gender || "").toLowerCase() === "girl";
         const isBoy = surpriseCode === "1" || (params.gender || "").toLowerCase() === "boy";
