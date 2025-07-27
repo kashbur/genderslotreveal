@@ -537,10 +537,11 @@
           "instructionsOverlay",
         );
         const genderOverlay = document.getElementById("genderOverlay");
+        const genderText = genderOverlay.querySelector(".gender-text");
         const params = getParams();
         const surpriseCode = params.s;
         const isGirl = surpriseCode === "2" || (params.gender || "").toLowerCase() === "girl";
-        const isBoy = (params.gender || "").toLowerCase() === "boy";
+        const isBoy = surpriseCode === "1" || (params.gender || "").toLowerCase() === "boy";
         const safeTextColor = sanitizeColor(params.textcolor, "#ffffff");
         const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
 
@@ -715,7 +716,7 @@
             if (isGirl) finalIcon = icons[5];
             else if (isBoy) finalIcon = icons[2];
             const endCallback =
-              isGirl
+              isGirl || isBoy
                 ? () => setTimeout(showGenderReveal, 500)
                 : () => setTimeout(showReveal, 500);
             reels.forEach((reel, i) => {
@@ -886,14 +887,28 @@
         function showGenderReveal() {
           genderOverlay.style.opacity = "1";
           genderOverlay.style.pointerEvents = "auto";
-          createConfetti([
-            "#ffa98e",
-            "#FFB6C1",
-            "#FFC0CB",
-            "#FFFFFF",
-            "#FF1493",
-            "#DB7093",
-          ]);
+          if (isBoy) {
+            genderText.textContent = "IT'S A BOY!";
+            genderText.style.color = "#ffffff";
+            genderText.style.textShadow =
+              "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
+            genderOverlay.style.background = "rgba(203, 226, 207, 0.6)";
+            createConfetti(["#cbe2cf", "#ffffff", "#ffd700"]);
+          } else {
+            genderText.textContent = "IT'S A GIRL!";
+            genderText.style.color = "#ffa98e";
+            genderText.style.textShadow =
+              "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
+            genderOverlay.style.background = "rgba(255, 255, 255, 0.6)";
+            createConfetti([
+              "#ffa98e",
+              "#FFB6C1",
+              "#FFC0CB",
+              "#FFFFFF",
+              "#FF1493",
+              "#DB7093",
+            ]);
+          }
           setTimeout(() => {
             genderOverlay.style.opacity = "0";
             genderOverlay.style.pointerEvents = "none";
