@@ -83,6 +83,8 @@ vertical strip of random icons and applies the `spinning` CSS class, which runs
 a `slot-spin-down` animation. After the configured duration, the class is
 removed and `createSingleIcon()` displays the final symbol for that reel.
 
-During the first three spins the grid stops on random, nonmatching symbols. On
-the fourth spin all reels are forced to stop on the bottle icon and
-`showReveal()` is triggered, revealing the personalized message overlay.
+During the first three spins the grid stops on random symbols that never match
+across all three reels. On the fourth spin all reels are forced to stop on the
+bottle icon and `showReveal()` is triggered, revealing the personalized message
+overlay. Any spins after the reveal go back to being completely random, so
+matches can happen naturally.

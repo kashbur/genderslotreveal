@@ -739,9 +739,13 @@
         }
         function generateRandomNonMatchingSymbols() {
           let symbols;
-          do {
+          if (spinCount < 4) {
+            do {
+              symbols = reels.map(() => getRandomIcon());
+            } while (new Set(symbols).size < 2); // avoid 3-of-a-kind
+          } else {
             symbols = reels.map(() => getRandomIcon());
-          } while (new Set(symbols).size < 2);
+          }
           currentSymbols = symbols;
         }
         function spinReel(reel, delay, duration, finalIcon, callback) {
