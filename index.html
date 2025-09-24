@@ -21,6 +21,31 @@
     <link rel="preload" as="image" href="img/Assets/bottle.png" />
     <link rel="preload" as="image" href="img/Assets/boy.png" />
     <link rel="preload" as="image" href="img/Assets/girl.png" />
+    <link
+      rel="preload"
+      as="image"
+      href="img/Assets/Spanish/background-spanish.png"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="img/Assets/Spanish/taptospin-spanish.png"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="img/Assets/Spanish/instructions-spanish.png"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="img/Assets/Spanish/boy-spanish.png"
+    />
+    <link
+      rel="preload"
+      as="image"
+      href="img/Assets/Spanish/girl-spanish.png"
+    />
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/textfit/2.4.0/textFit.min.js"
       defer
@@ -369,43 +394,17 @@
     <div class="aspect-container">
       <div class="slot-machine-container">
         <div class="slot-machine blur-background" id="slotMachine"></div>
-        <div id="reel1" class="reel blur-background">
-          <div class="reel-inner">
-            <img
-              src="img/Assets/blue-balloon.png"
-              alt="Blue Balloon"
-              decoding="async"
-              fetchpriority="high"
-            />
-          </div>
-        </div>
-        <div id="reel2" class="reel blur-background">
-          <div class="reel-inner">
-            <img
-              src="img/Assets/bottle.png"
-              alt="Bottle"
-              decoding="async"
-              fetchpriority="high"
-            />
-          </div>
-        </div>
-        <div id="reel3" class="reel blur-background">
-          <div class="reel-inner">
-            <img
-              src="img/Assets/boy.png"
-              alt="Boy"
-              decoding="async"
-              fetchpriority="high"
-            />
-          </div>
-        </div>
+        <div id="reel1" class="reel blur-background"></div>
+        <div id="reel2" class="reel blur-background"></div>
+        <div id="reel3" class="reel blur-background"></div>
         <div class="spin-button blur-background" id="spinButton">
           <img
-            src="img/Assets/taptospin.png"
+            src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
             alt="Spin"
             decoding="async"
             fetchpriority="high"
             loading="eager"
+            style="visibility: hidden"
           />
         </div>
         <div class="reveal-overlay intro-overlay" id="introOverlay">
@@ -426,12 +425,13 @@
         >
           <div class="instructions-container">
             <img
-              src="img/Assets/instructions.png"
+              src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
               alt="Instructions"
               class="instructions-image"
               decoding="async"
               loading="eager"
               fetchpriority="high"
+              style="visibility: hidden"
             />
           </div>
         </div>
@@ -552,7 +552,9 @@
       }
 
       const languageAssets = resolveLanguageAssets(normalizedLanguage);
+      const englishAssets = LANGUAGE_ASSET_MAP.en;
       const ICON_SOURCES = buildIconSources(languageAssets);
+      const ENGLISH_ICON_SOURCES = buildIconSources(englishAssets);
       const CRITICAL_IMAGE_SOURCES = [
         languageAssets.background,
         languageAssets.tapToSpin,
@@ -560,8 +562,20 @@
         languageAssets.boyIcon,
         languageAssets.girlIcon,
       ];
+      const ENGLISH_CRITICAL_IMAGE_SOURCES = [
+        englishAssets.background,
+        englishAssets.tapToSpin,
+        englishAssets.instructions,
+        englishAssets.boyIcon,
+        englishAssets.girlIcon,
+      ];
       const ALL_IMAGE_SOURCES = Array.from(
-        new Set([...ICON_SOURCES, ...CRITICAL_IMAGE_SOURCES]),
+        new Set([
+          ...ICON_SOURCES,
+          ...ENGLISH_ICON_SOURCES,
+          ...CRITICAL_IMAGE_SOURCES,
+          ...ENGLISH_CRITICAL_IMAGE_SOURCES,
+        ]),
       );
       const assetPreloadPromise = preloadImages(ALL_IMAGE_SOURCES, "high").catch(
         () => {},
@@ -777,6 +791,16 @@
         if (instructionsImage) {
           instructionsImage.style.visibility = "hidden";
         }
+
+        function populateInitialReels() {
+          if (!reels.length) return;
+          const initialIcons = [icons[0], icons[1], icons[2]];
+          reels.forEach((reel, index) => {
+            const icon = initialIcons[index] || getRandomIcon();
+            createSingleIcon(reel, icon);
+          });
+        }
+
         function applyLocalizedAssets() {
           if (slotMachine) {
             slotMachine.style.backgroundImage = `url("${languageAssets.background}")`;
@@ -789,6 +813,7 @@
             instructionsImage.src = languageAssets.instructions;
             instructionsImage.style.visibility = "visible";
           }
+          populateInitialReels();
         }
         assetPreloadPromise.then(applyLocalizedAssets);
         const genderOverlay = document.getElementById("genderOverlay");
