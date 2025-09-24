@@ -428,7 +428,18 @@
       document.addEventListener("DOMContentLoaded", function () {
         const params = getParams();
 
-        const normalizedLanguage = params.lang.split(/[-_]/)[0];
+        const languageAliases = {
+          english: "en",
+          spanish: "es",
+          espanol: "es",
+          "español": "es",
+        };
+        const rawLanguage = (params.lang || "").trim();
+        const baseLanguage = rawLanguage.split(/[-_]/)[0];
+        const normalizedLanguage =
+          languageAliases[rawLanguage] ||
+          languageAliases[baseLanguage] ||
+          baseLanguage;
         const translations = {
           en: {
             htmlLang: "en",
@@ -561,7 +572,7 @@
           locale.revealDefaults || translations.en.revealDefaults;
         const genderTranslations = locale.gender || translations.en.gender;
 
-        const icons = [
+        let icons = [
           "img/Assets/blue-balloon.png",
           "img/Assets/bottle.png",
           "img/Assets/boy.png",
@@ -573,6 +584,18 @@
           "img/Assets/teddy-bear.png",
         ];
 
+        let backgroundImage = "img/Assets/background.png";
+        let tapToSpinImage = "img/Assets/taptospin.png";
+        let instructionsImage = "img/Assets/instructions.png";
+
+        if (normalizedLanguage === "es") {
+          icons[2] = "img/Assets/Spanish/boy-spanish.png";
+          icons[5] = "img/Assets/Spanish/girl-spanish.png";
+          backgroundImage = "img/Assets/Spanish/background-spanish.png";
+          tapToSpinImage = "img/Assets/Spanish/taptospin-spanish.png";
+          instructionsImage = "img/Assets/Spanish/instructions-spanish.png";
+        }
+
         function preloadImages(urls) {
           urls.forEach((url) => {
             const img = new Image();
@@ -582,9 +605,9 @@
 
         preloadImages([
           ...icons,
-          "img/Assets/background.png",
-          "img/Assets/taptospin.png",
-          "img/Assets/instructions.png",
+          backgroundImage,
+          tapToSpinImage,
+          instructionsImage,
         ]);
 
         function getRandomIcon() {
@@ -615,11 +638,19 @@
         let spinCount = 0;
         let currentSymbols = [];
         const slotMachine = document.getElementById("slotMachine");
+        slotMachine.style.backgroundImage = `url("${backgroundImage}")`;
         const spinButton = document.getElementById("spinButton");
+        const spinButtonImage = spinButton.querySelector("img");
+        if (spinButtonImage) {
+          spinButtonImage.src = tapToSpinImage;
+        }
         const reels = [];
         for (let i = 1; i <= 3; i++) {
           reels.push(document.getElementById(`reel${i}`));
         }
+        if (reels[0]) createSingleIcon(reels[0], icons[0]);
+        if (reels[1]) createSingleIcon(reels[1], icons[1]);
+        if (reels[2]) createSingleIcon(reels[2], icons[2]);
         const introOverlay = document.getElementById("introOverlay");
         const introLinesDiv = document.getElementById("introLines");
         const introColorOverlay = introOverlay.querySelector(".color-overlay");
@@ -629,6 +660,12 @@
         const instructionsOverlay = document.getElementById(
           "instructionsOverlay",
         );
+        const instructionsImageElement = instructionsOverlay
+          ? instructionsOverlay.querySelector(".instructions-image")
+          : null;
+        if (instructionsImageElement) {
+          instructionsImageElement.src = instructionsImage;
+        }
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
         const isGirl = params.gender === "girl";
