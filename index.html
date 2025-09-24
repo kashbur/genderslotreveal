@@ -257,15 +257,17 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        width: 100%;
+        width: min(84%, 360px);
         height: 100%;
         gap: 2vh;
         padding: 2vh 3vw;
+        margin: 0 auto;
         box-sizing: border-box;
+        text-align: center;
       }
 
       .reveal-line {
-        flex: 1;
+        flex: 0 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -278,6 +280,25 @@
         color: #fff;
         margin: 0;
         line-height: 1.15;
+        animation: reveal-pulse 2.8s ease-in-out infinite;
+        transform-origin: center;
+        will-change: transform, opacity;
+      }
+      @keyframes reveal-pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.06);
+          opacity: 0.9;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .reveal-line {
+          animation: none;
+        }
       }
       .reveal-line.main {
         line-height: 1.1;
@@ -343,8 +364,12 @@
         height: 100%;
         background: rgba(255, 255, 255, 0.6);
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        text-align: center;
+        padding: 2vh 6vw;
+        box-sizing: border-box;
         z-index: 12;
         pointer-events: none;
         opacity: 0;
@@ -357,6 +382,8 @@
         text-shadow: -3px -3px 0 #ffffff, 3px -3px 0 #ffffff,
           -3px 3px 0 #ffffff, 3px 3px 0 #ffffff;
         font-size: 80px;
+        width: 100%;
+        text-align: center;
         animation: gender-bounce 0.6s ease-in-out 3;
       }
       @keyframes gender-bounce {
