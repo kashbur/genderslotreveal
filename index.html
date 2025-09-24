@@ -59,7 +59,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background-image: url("img/background.png");
+        background-image: url("img/Assets/background.png");
         background-size: 100% 100%;
         background-position: center;
         background-repeat: no-repeat;
@@ -359,27 +359,21 @@
         <div class="slot-machine blur-background" id="slotMachine"></div>
         <div id="reel1" class="reel blur-background">
           <div class="reel-inner">
-            <img
-              src="https://i.postimg.cc/y6bFTQmv/blue-balloon.png"
-              alt="Blue Balloon"
-            />
+            <img src="img/Assets/blue-balloon.png" alt="Blue Balloon" />
           </div>
         </div>
         <div id="reel2" class="reel blur-background">
           <div class="reel-inner">
-            <img
-              src="https://i.postimg.cc/T38gzKHb/bottle.png"
-              alt="Bottle"
-            />
+            <img src="img/Assets/bottle.png" alt="Bottle" />
           </div>
         </div>
         <div id="reel3" class="reel blur-background">
           <div class="reel-inner">
-            <img src="https://i.postimg.cc/YSMgSJ7q/boy.png" alt="Boy" />
+            <img src="img/Assets/boy.png" alt="Boy" />
           </div>
         </div>
         <div class="spin-button blur-background" id="spinButton">
-          <img src="img/tap to spin.png" alt="Spin" />
+          <img src="img/Assets/taptospin.png" alt="Spin" />
         </div>
         <div class="reveal-overlay intro-overlay" id="introOverlay">
           <div class="color-overlay"></div>
@@ -399,7 +393,7 @@
         >
           <div class="instructions-container">
             <img
-              src="img/directions.png"
+              src="img/Assets/instructions.png"
               alt="Instructions"
               class="instructions-image"
             />
@@ -568,15 +562,15 @@
         const genderTranslations = locale.gender || translations.en.gender;
 
         const icons = [
-          "https://i.postimg.cc/y6bFTQmv/blue-balloon.png",
-          "https://i.postimg.cc/T38gzKHb/bottle.png",
-          "https://i.postimg.cc/YSMgSJ7q/boy.png",
-          "https://i.postimg.cc/6qk4xPzK/confetti.png",
-          "https://i.postimg.cc/BQF1BqQn/elephant.png",
-          "https://i.postimg.cc/25kbYhd1/girl.png",
-          "https://i.postimg.cc/hjwfVYkm/pink-balloon.png",
-          "https://i.postimg.cc/65ZMS2hs/rainbow.png",
-          "https://i.postimg.cc/Mp8986sn/teddy-bear.png",
+          "img/Assets/blue-balloon.png",
+          "img/Assets/bottle.png",
+          "img/Assets/boy.png",
+          "img/Assets/confetti.png",
+          "img/Assets/elephant.png",
+          "img/Assets/girl.png",
+          "img/Assets/pink-balloon.png",
+          "img/Assets/rainbow.png",
+          "img/Assets/teddy-bear.png",
         ];
 
         function preloadImages(urls) {
@@ -588,9 +582,9 @@
 
         preloadImages([
           ...icons,
-          "img/background.png",
-          "img/tap to spin.png",
-          "img/directions.png",
+          "img/Assets/background.png",
+          "img/Assets/taptospin.png",
+          "img/Assets/instructions.png",
         ]);
 
         function getRandomIcon() {
