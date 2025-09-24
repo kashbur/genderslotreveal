@@ -71,7 +71,7 @@
         position: absolute;
         width: 100%;
         height: 100%;
-        background-image: url("img/Assets/background.png");
+        background-image: none;
         background-size: 100% 100%;
         background-position: center;
         background-repeat: no-repeat;
@@ -438,28 +438,6 @@
       </div>
     </div>
     <script>
-      const ICON_SOURCES = [
-        "img/Assets/blue-balloon.png",
-        "img/Assets/bottle.png",
-        "img/Assets/boy.png",
-        "img/Assets/confetti.png",
-        "img/Assets/elephant.png",
-        "img/Assets/girl.png",
-        "img/Assets/pink-balloon.png",
-        "img/Assets/rainbow.png",
-        "img/Assets/teddy-bear.png",
-      ];
-
-      const CRITICAL_IMAGE_SOURCES = [
-        "img/Assets/background.png",
-        "img/Assets/taptospin.png",
-        "img/Assets/instructions.png",
-        "img/Assets/blue-balloon.png",
-        "img/Assets/bottle.png",
-        "img/Assets/boy.png",
-        "img/Assets/girl.png",
-      ];
-
       const imageCache = new Map();
 
       function loadImage(src, priority = "auto") {
@@ -519,20 +497,6 @@
         return img;
       }
 
-      preloadImages(CRITICAL_IMAGE_SOURCES, "high").catch(() => {});
-
-      const warmIconCache = () => preloadImages(ICON_SOURCES, "low");
-      if (typeof window !== "undefined") {
-        if ("requestIdleCallback" in window) {
-          requestIdleCallback(warmIconCache);
-        } else {
-          window.addEventListener("load", () => {
-            setTimeout(warmIconCache, 0);
-          });
-        }
-      }
-
-      // -------------- URL Params Logic -------------
       function getParams() {
         const url = new URL(window.location.href);
         const langParam = (
@@ -541,6 +505,67 @@
         const genderParam = (url.searchParams.get("gender") || "").toLowerCase();
         return { lang: langParam, gender: genderParam };
       }
+
+      const params = getParams();
+      const normalizedLanguage = params.lang.split(/[-_]/)[0] || "";
+
+      const LANGUAGE_ASSET_MAP = {
+        en: {
+          background: "img/Assets/background.png",
+          tapToSpin: "img/Assets/taptospin.png",
+          instructions: "img/Assets/instructions.png",
+          boyIcon: "img/Assets/boy.png",
+          girlIcon: "img/Assets/girl.png",
+        },
+        es: {
+          background: "img/Assets/Spanish/background-spanish.png",
+          tapToSpin: "img/Assets/Spanish/taptospin-spanish.png",
+          instructions: "img/Assets/Spanish/instructions-spanish.png",
+          boyIcon: "img/Assets/Spanish/boy-spanish.png",
+          girlIcon: "img/Assets/Spanish/girl-spanish.png",
+        },
+      };
+
+      const STATIC_ICON_SOURCES = [
+        "img/Assets/blue-balloon.png",
+        "img/Assets/bottle.png",
+        { key: "boyIcon" },
+        "img/Assets/confetti.png",
+        "img/Assets/elephant.png",
+        { key: "girlIcon" },
+        "img/Assets/pink-balloon.png",
+        "img/Assets/rainbow.png",
+        "img/Assets/teddy-bear.png",
+      ];
+
+      function resolveLanguageAssets(languageCode) {
+        if (languageCode && LANGUAGE_ASSET_MAP[languageCode]) {
+          return LANGUAGE_ASSET_MAP[languageCode];
+        }
+        return LANGUAGE_ASSET_MAP.en;
+      }
+
+      function buildIconSources(config) {
+        return STATIC_ICON_SOURCES.map((source) =>
+          typeof source === "string" ? source : config[source.key],
+        );
+      }
+
+      const languageAssets = resolveLanguageAssets(normalizedLanguage);
+      const ICON_SOURCES = buildIconSources(languageAssets);
+      const CRITICAL_IMAGE_SOURCES = [
+        languageAssets.background,
+        languageAssets.tapToSpin,
+        languageAssets.instructions,
+        languageAssets.boyIcon,
+        languageAssets.girlIcon,
+      ];
+      const ALL_IMAGE_SOURCES = Array.from(
+        new Set([...ICON_SOURCES, ...CRITICAL_IMAGE_SOURCES]),
+      );
+      const assetPreloadPromise = preloadImages(ALL_IMAGE_SOURCES, "high").catch(
+        () => {},
+      );
 
       function buildRevealLines(defaults = {}) {
         const lines = [];
@@ -556,9 +581,6 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        const params = getParams();
-
-        const normalizedLanguage = params.lang.split(/[-_]/)[0];
         const translations = {
           en: {
             htmlLang: "en",
@@ -743,6 +765,32 @@
         const instructionsOverlay = document.getElementById(
           "instructionsOverlay",
         );
+        const spinButtonImage = spinButton
+          ? spinButton.querySelector("img")
+          : null;
+        const instructionsImage = instructionsOverlay
+          ? instructionsOverlay.querySelector(".instructions-image")
+          : null;
+        if (spinButtonImage) {
+          spinButtonImage.style.visibility = "hidden";
+        }
+        if (instructionsImage) {
+          instructionsImage.style.visibility = "hidden";
+        }
+        function applyLocalizedAssets() {
+          if (slotMachine) {
+            slotMachine.style.backgroundImage = `url("${languageAssets.background}")`;
+          }
+          if (spinButtonImage) {
+            spinButtonImage.src = languageAssets.tapToSpin;
+            spinButtonImage.style.visibility = "visible";
+          }
+          if (instructionsImage) {
+            instructionsImage.src = languageAssets.instructions;
+            instructionsImage.style.visibility = "visible";
+          }
+        }
+        assetPreloadPromise.then(applyLocalizedAssets);
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
         const isGirl = params.gender === "2";
