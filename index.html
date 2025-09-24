@@ -53,6 +53,12 @@
     <style>
       :root {
         --font-family: 'Poppins';
+        --reel-icon-scale: 0.595;
+        --reel-icon-max-size: 112px;
+        --spin-button-width: 34%;
+        --spin-button-max-width: 170px;
+        --spin-button-aspect: 2019 / 657;
+        --instructions-max-width: 580px;
       }
       html,
       body {
@@ -97,7 +103,7 @@
         width: 100%;
         height: 100%;
         background-image: none;
-        background-size: 100% 100%;
+        background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         transition: filter 0.5s ease;
@@ -126,8 +132,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
-        transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);      }
+        justify-content: center;
+        transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+      }
       @keyframes slot-spin-down {
         0% {
           transform: translateY(-20%);
@@ -142,10 +149,15 @@
       .reel-strip {
         display: flex;
         flex-direction: column;
+        align-items: center;
         will-change: transform;
       }
       .reel-item {
         height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       #reel1 {
         left: 20.4%;
@@ -160,8 +172,10 @@
         top: 33.9%;
       }
       .reel img {
-        width: 59.5%;
-        height: 59.5%;
+        width: calc(var(--reel-icon-scale) * 100%);
+        height: calc(var(--reel-icon-scale) * 100%);
+        max-width: var(--reel-icon-max-size);
+        max-height: var(--reel-icon-max-size);
         object-fit: contain;
         display: block;
         margin: auto;
@@ -175,8 +189,8 @@
       }
       .spin-button {
         position: absolute;
-        width: 34%;
-        max-width: 170px;
+        width: var(--spin-button-width);
+        max-width: var(--spin-button-max-width);
         left: 50%;
         top: 62.5%;
         transform: translateX(-50%);
@@ -190,6 +204,8 @@
       .spin-button img {
         width: 100%;
         height: auto;
+        aspect-ratio: var(--spin-button-aspect);
+        object-fit: contain;
         display: block;
         border-radius: 0;
         background: transparent;
@@ -378,12 +394,14 @@
       }
       .instructions-container {
         width: 97%;
-        max-width: 580px;
+        max-width: var(--instructions-max-width);
         position: relative;
       }
       .instructions-image {
         width: 100%;
         height: auto;
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
         border-radius: 12px;
         /* box-shadow: none; */
         /* border: none; */
