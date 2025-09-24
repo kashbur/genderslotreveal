@@ -38,6 +38,7 @@ xdg-open index.html        # Linux
 - `fontDate` – font family for the date line
 - `fontFrom` – font family for the closing signature
 - `s` – optional surprise code. Set `s=1` for a blue "IT'S A BOY!" reveal or `s=2` for a pink "IT'S A GIRL!" reveal, each with matching icons and confetti.
+- `lang` – optional locale code for built-in translations of the default reveal headline and gender message. Supported values include `en`, `es`, `fr`, `de`, `pt`, `it`, `nl`, `sv`, and `ar`. You can also use region-specific variants like `pt-BR`. Unknown values fall back to English. The alias `language` works as well.
 
 Font parameters expect Google Fonts family names just like `font`, using `+` instead of spaces.
 

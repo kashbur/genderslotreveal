@@ -440,7 +440,7 @@
         return test.color ? value : fallback;
       }
 
-      function getRevealLinesFromParams(params) {
+      function getRevealLinesFromParams(params, defaults = {}) {
         // Defaults
         const lines = [];
         let photo = params.photo ? decodeURIComponent(params.photo) : "";
@@ -448,10 +448,10 @@
         if (photo && !/^(https?:|data:image\/)/i.test(photo)) {
           photo = "";
         }
-        const main = params.main || "We are expecting!";
-        const sub = params.sub || "";
-        const date = params.date || "";
-        const from = params.from || "";
+        const main = params.main || defaults.main || "We are expecting!";
+        const sub = params.sub || defaults.sub || "";
+        const date = params.date || defaults.date || "";
+        const from = params.from || defaults.from || "";
         if (main) lines.push({ type: "main", content: main });
         if (sub) lines.push({ type: "sub", content: sub });
         if (date) lines.push({ type: "date", content: date });
@@ -485,6 +485,139 @@
 
       document.addEventListener("DOMContentLoaded", function () {
         const params = getParams();
+
+        const languageParam = (params.lang || params.language || "").toLowerCase();
+        const normalizedLanguage = languageParam.split(/[-_]/)[0];
+        const translations = {
+          en: {
+            htmlLang: "en",
+            revealDefaults: {
+              main: "We are expecting!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "IT'S A BOY!",
+              girl: "IT'S A GIRL!",
+            },
+          },
+          es: {
+            htmlLang: "es",
+            revealDefaults: {
+              main: "¡Estamos esperando!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "¡ES UN NIÑO!",
+              girl: "¡ES UNA NIÑA!",
+            },
+          },
+          fr: {
+            htmlLang: "fr",
+            revealDefaults: {
+              main: "Nous attendons un bébé !",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "C'EST UN GARÇON !",
+              girl: "C'EST UNE FILLE !",
+            },
+          },
+          de: {
+            htmlLang: "de",
+            revealDefaults: {
+              main: "Wir erwarten ein Baby!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "ES IST EIN JUNGE!",
+              girl: "ES IST EIN MÄDCHEN!",
+            },
+          },
+          pt: {
+            htmlLang: "pt",
+            revealDefaults: {
+              main: "Estamos esperando!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "É UM MENINO!",
+              girl: "É UMA MENINA!",
+            },
+          },
+          it: {
+            htmlLang: "it",
+            revealDefaults: {
+              main: "Aspettiamo un bambino!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "È UN MASCHIETTO!",
+              girl: "È UNA FEMMINUCCIA!",
+            },
+          },
+          nl: {
+            htmlLang: "nl",
+            revealDefaults: {
+              main: "We verwachten een baby!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "HET IS EEN JONGEN!",
+              girl: "HET IS EEN MEISJE!",
+            },
+          },
+          sv: {
+            htmlLang: "sv",
+            revealDefaults: {
+              main: "Vi väntar barn!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "DET ÄR EN POJKE!",
+              girl: "DET ÄR EN FLICKA!",
+            },
+          },
+          ar: {
+            htmlLang: "ar",
+            dir: "rtl",
+            revealDefaults: {
+              main: "نحن ننتظر!",
+              sub: "",
+              date: "",
+              from: "",
+            },
+            gender: {
+              boy: "إنه صبي!",
+              girl: "إنها فتاة!",
+            },
+          },
+        };
+        const locale = translations[normalizedLanguage] || translations.en;
+        const htmlLang = locale.htmlLang || normalizedLanguage || "en";
+        document.documentElement.setAttribute("lang", htmlLang);
+        if (locale.dir) {
+          document.documentElement.setAttribute("dir", locale.dir);
+        } else {
+          document.documentElement.removeAttribute("dir");
+        }
+        const revealDefaults = locale.revealDefaults || translations.en.revealDefaults;
+        const genderTranslations = locale.gender || translations.en.gender;
 
         const icons = [
           "https://i.postimg.cc/y6bFTQmv/blue-balloon.png",
@@ -560,6 +693,9 @@
         const surpriseCode = params.s;
         const isGirl = surpriseCode === "2" || (params.gender || "").toLowerCase() === "girl";
         const isBoy = surpriseCode === "1" || (params.gender || "").toLowerCase() === "boy";
+        genderText.textContent = isBoy
+          ? genderTranslations.boy
+          : genderTranslations.girl;
         const safeTextColor = sanitizeColor(params.textcolor, "#ffffff");
         const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
 
@@ -821,7 +957,7 @@
 
         // ------------- REVEAL LOGIC -----------------
         function showReveal() {
-          const allLines = getRevealLinesFromParams(params);
+          const allLines = getRevealLinesFromParams(params, revealDefaults);
           const mainLine = allLines.find((l) => l.type === "main");
           const otherLines = allLines.filter((l) => l.type !== "main");
           let confettiShown = false;
@@ -906,14 +1042,14 @@
           genderOverlay.style.opacity = "1";
           genderOverlay.style.pointerEvents = "auto";
           if (isBoy) {
-            genderText.textContent = "IT'S A BOY!";
+            genderText.textContent = genderTranslations.boy;
             genderText.style.color = "#ffffff";
             genderText.style.textShadow =
               "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
             genderOverlay.style.background = "rgba(203, 226, 207, 0.6)";
             createConfetti(["#cbe2cf", "#ffffff", "#ffd700"]);
           } else {
-            genderText.textContent = "IT'S A GIRL!";
+            genderText.textContent = genderTranslations.girl;
             genderText.style.color = "#ffa98e";
             genderText.style.textShadow =
               "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
