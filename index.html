@@ -134,6 +134,7 @@
         align-items: center;
         justify-content: center;
         transition: transform 0.35s cubic-bezier(0.22, 0.61, 0.36, 1);
+        overflow: hidden;
       }
       @keyframes slot-spin-down {
         0% {
@@ -154,6 +155,7 @@
         transform: translate3d(0, 0, 0);
         backface-visibility: hidden;
         contain: paint;
+        overflow: hidden;
       }
       .reel-item {
         height: 100%;
@@ -174,12 +176,16 @@
         left: 65.1%;
         top: 33.9%;
       }
-      .reel-icon {
-        width: var(--icon-w);
-        height: var(--icon-h);
+      .reel img {
+        max-width: 75%;
+        max-height: 75%;
         object-fit: contain;
         display: block;
         margin: auto;
+      }
+      .reel-icon {
+        width: auto;
+        height: auto;
         background: transparent;
       }
       .spin-button {
