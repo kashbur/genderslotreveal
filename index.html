@@ -53,8 +53,8 @@
     <style>
       :root {
         --font-family: 'Poppins';
-        --reel-icon-scale: 0.595;
-        --reel-icon-max-size: 112px;
+        --icon-w: 112px;
+        --icon-h: 112px;
         --spin-button-width: 34%;
         --spin-button-max-width: 170px;
         --spin-button-aspect: 2019 / 657;
@@ -151,6 +151,9 @@
         flex-direction: column;
         align-items: center;
         will-change: transform;
+        transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        contain: paint;
       }
       .reel-item {
         height: 100%;
@@ -171,21 +174,13 @@
         left: 65.1%;
         top: 33.9%;
       }
-      .reel img {
-        width: calc(var(--reel-icon-scale) * 100%);
-        height: calc(var(--reel-icon-scale) * 100%);
-        max-width: var(--reel-icon-max-size);
-        max-height: var(--reel-icon-max-size);
+      .reel-icon {
+        width: var(--icon-w);
+        height: var(--icon-h);
         object-fit: contain;
         display: block;
         margin: auto;
         background: transparent;
-        transition: transform 0.05s;
-        box-shadow: none;
-        backface-visibility: hidden;
-        transform-style: preserve-3d;
-        transform-origin: 50% 50%;
-        will-change: transform;
       }
       .spin-button {
         position: absolute;
@@ -457,6 +452,23 @@
     </div>
     <script>
       const imageCache = new Map();
+      const ICON_BOX_DIMENSIONS = {
+        width: 112,
+        height: 112,
+      };
+
+      function syncIconDimensionsWithCSS() {
+        if (!window.getComputedStyle) return;
+        const styles = getComputedStyle(document.documentElement);
+        const widthValue = parseFloat(styles.getPropertyValue("--icon-w"));
+        const heightValue = parseFloat(styles.getPropertyValue("--icon-h"));
+        if (!Number.isNaN(widthValue)) {
+          ICON_BOX_DIMENSIONS.width = widthValue;
+        }
+        if (!Number.isNaN(heightValue)) {
+          ICON_BOX_DIMENSIONS.height = heightValue;
+        }
+      }
 
       function loadImage(src, priority = "auto") {
         const cached = imageCache.get(src);
@@ -503,6 +515,9 @@
         const cached = imageCache.get(src);
         img.src = cached && cached.img ? cached.img.currentSrc || src : src;
         img.alt = alt;
+        img.classList.add("reel-icon");
+        img.width = ICON_BOX_DIMENSIONS.width;
+        img.height = ICON_BOX_DIMENSIONS.height;
         if ("decoding" in img) {
           img.decoding = "async";
         }
@@ -613,6 +628,7 @@
       }
 
       document.addEventListener("DOMContentLoaded", function () {
+        syncIconDimensionsWithCSS();
         const translations = {
           en: {
             htmlLang: "en",
