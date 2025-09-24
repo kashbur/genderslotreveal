@@ -8,11 +8,23 @@
       name="description"
       content="A fun surprise reveal with optional gender and language selection."
     />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
       rel="stylesheet"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/textfit/2.4.0/textFit.min.js"></script>
+    <link rel="preload" as="image" href="img/Assets/background.png" />
+    <link rel="preload" as="image" href="img/Assets/taptospin.png" />
+    <link rel="preload" as="image" href="img/Assets/instructions.png" />
+    <link rel="preload" as="image" href="img/Assets/blue-balloon.png" />
+    <link rel="preload" as="image" href="img/Assets/bottle.png" />
+    <link rel="preload" as="image" href="img/Assets/boy.png" />
+    <link rel="preload" as="image" href="img/Assets/girl.png" />
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/textfit/2.4.0/textFit.min.js"
+      defer
+    ></script>
     <style>
       :root {
         --font-family: 'Poppins';
@@ -359,21 +371,42 @@
         <div class="slot-machine blur-background" id="slotMachine"></div>
         <div id="reel1" class="reel blur-background">
           <div class="reel-inner">
-            <img src="img/Assets/blue-balloon.png" alt="Blue Balloon" />
+            <img
+              src="img/Assets/blue-balloon.png"
+              alt="Blue Balloon"
+              decoding="async"
+              fetchpriority="high"
+            />
           </div>
         </div>
         <div id="reel2" class="reel blur-background">
           <div class="reel-inner">
-            <img src="img/Assets/bottle.png" alt="Bottle" />
+            <img
+              src="img/Assets/bottle.png"
+              alt="Bottle"
+              decoding="async"
+              fetchpriority="high"
+            />
           </div>
         </div>
         <div id="reel3" class="reel blur-background">
           <div class="reel-inner">
-            <img src="img/Assets/boy.png" alt="Boy" />
+            <img
+              src="img/Assets/boy.png"
+              alt="Boy"
+              decoding="async"
+              fetchpriority="high"
+            />
           </div>
         </div>
         <div class="spin-button blur-background" id="spinButton">
-          <img src="img/Assets/taptospin.png" alt="Spin" />
+          <img
+            src="img/Assets/taptospin.png"
+            alt="Spin"
+            decoding="async"
+            fetchpriority="high"
+            loading="eager"
+          />
         </div>
         <div class="reveal-overlay intro-overlay" id="introOverlay">
           <div class="color-overlay"></div>
@@ -396,12 +429,109 @@
               src="img/Assets/instructions.png"
               alt="Instructions"
               class="instructions-image"
+              decoding="async"
+              loading="eager"
+              fetchpriority="high"
             />
           </div>
         </div>
       </div>
     </div>
     <script>
+      const ICON_SOURCES = [
+        "img/Assets/blue-balloon.png",
+        "img/Assets/bottle.png",
+        "img/Assets/boy.png",
+        "img/Assets/confetti.png",
+        "img/Assets/elephant.png",
+        "img/Assets/girl.png",
+        "img/Assets/pink-balloon.png",
+        "img/Assets/rainbow.png",
+        "img/Assets/teddy-bear.png",
+      ];
+
+      const CRITICAL_IMAGE_SOURCES = [
+        "img/Assets/background.png",
+        "img/Assets/taptospin.png",
+        "img/Assets/instructions.png",
+        "img/Assets/blue-balloon.png",
+        "img/Assets/bottle.png",
+        "img/Assets/boy.png",
+        "img/Assets/girl.png",
+      ];
+
+      const imageCache = new Map();
+
+      function loadImage(src, priority = "auto") {
+        const cached = imageCache.get(src);
+        if (cached) {
+          if (
+            priority === "high" &&
+            cached.img &&
+            "fetchPriority" in cached.img
+          ) {
+            cached.img.fetchPriority = "high";
+          }
+          return cached.promise;
+        }
+        const img = new Image();
+        if ("decoding" in img) {
+          img.decoding = "async";
+        }
+        if ("fetchPriority" in img) {
+          img.fetchPriority = priority;
+        }
+        const loadPromise = new Promise((resolve) => {
+          img.addEventListener("load", resolve, { once: true });
+          img.addEventListener("error", resolve, { once: true });
+        });
+        img.src = src;
+        let promise = loadPromise;
+        if (typeof img.decode === "function") {
+          promise = img.decode().catch(() => loadPromise);
+        }
+        const finalPromise = promise.then(() => {});
+        imageCache.set(src, { img, promise: finalPromise });
+        return finalPromise;
+      }
+
+      function preloadImages(urls, priority = "auto") {
+        return Promise.all(urls.map((url) => loadImage(url, priority)));
+      }
+
+      function createIconElement(
+        src,
+        { alt = "Slot Icon", priority = "auto" } = {},
+      ) {
+        const img = document.createElement("img");
+        const cached = imageCache.get(src);
+        img.src = cached && cached.img ? cached.img.currentSrc || src : src;
+        img.alt = alt;
+        if ("decoding" in img) {
+          img.decoding = "async";
+        }
+        if ("loading" in img) {
+          img.loading = priority === "high" ? "eager" : "lazy";
+        }
+        if ("fetchPriority" in img) {
+          img.fetchPriority = priority;
+        }
+        return img;
+      }
+
+      preloadImages(CRITICAL_IMAGE_SOURCES, "high").catch(() => {});
+
+      const warmIconCache = () => preloadImages(ICON_SOURCES, "low");
+      if (typeof window !== "undefined") {
+        if ("requestIdleCallback" in window) {
+          requestIdleCallback(warmIconCache);
+        } else {
+          window.addEventListener("load", () => {
+            setTimeout(warmIconCache, 0);
+          });
+        }
+      }
+
       // -------------- URL Params Logic -------------
       function getParams() {
         const url = new URL(window.location.href);
@@ -561,38 +691,21 @@
           locale.revealDefaults || translations.en.revealDefaults;
         const genderTranslations = locale.gender || translations.en.gender;
 
-        const icons = [
-          "img/Assets/blue-balloon.png",
-          "img/Assets/bottle.png",
-          "img/Assets/boy.png",
-          "img/Assets/confetti.png",
-          "img/Assets/elephant.png",
-          "img/Assets/girl.png",
-          "img/Assets/pink-balloon.png",
-          "img/Assets/rainbow.png",
-          "img/Assets/teddy-bear.png",
-        ];
-
-        function preloadImages(urls) {
-          urls.forEach((url) => {
-            const img = new Image();
-            img.src = url;
-          });
-        }
-
-        preloadImages([
-          ...icons,
-          "img/Assets/background.png",
-          "img/Assets/taptospin.png",
-          "img/Assets/instructions.png",
-        ]);
+        const icons = ICON_SOURCES;
+        preloadImages(icons).catch(() => {});
 
         function getRandomIcon() {
           return icons[Math.floor(Math.random() * icons.length)];
         }
 
         function createSingleIcon(reel, icon) {
-          reel.innerHTML = `<div class="reel-inner"><img src="${icon}" alt="Slot Icon"></div>`;
+          reel.innerHTML = "";
+          const inner = document.createElement("div");
+          inner.className = "reel-inner";
+          inner.appendChild(
+            createIconElement(icon, { alt: "Slot Icon", priority: "high" }),
+          );
+          reel.appendChild(inner);
         }
 
         function createReelStrip(reel) {
@@ -602,9 +715,10 @@
           for (let i = 0; i < 10; i++) {
             const item = document.createElement("div");
             item.className = "reel-item";
-            const img = document.createElement("img");
-            img.src = getRandomIcon();
-            img.alt = "Slot Icon";
+            const img = createIconElement(getRandomIcon(), {
+              alt: "Slot Icon",
+              priority: "low",
+            });
             item.appendChild(img);
             strip.appendChild(item);
           }
