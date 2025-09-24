@@ -1,6 +1,6 @@
 # The Big Reveal
 
-This project contains a single HTML file that displays an interactive slot machine-style reveal. Spinning the reels a few times eventually triggers a personalized message overlay with optional confetti effects. It's designed for fun occasions like pregnancy announcements, graduations, or other surprises.
+This project contains a single HTML file that displays an interactive slot machine-style reveal. Spinning the reels a few times eventually triggers a celebratory message overlay with optional confetti effects. It's designed for fun occasions like pregnancy announcements or any other big surprise moments.
 
 ## Opening the page
 
@@ -14,69 +14,28 @@ xdg-open index.html        # Linux
 
 ## Customizing via URL parameters
 
-`index.html` supports several query parameters so you can customize the reveal text and appearance. Parameters are optional and can be combined:
+`index.html` now recognizes just two optional query parameters so you can keep the experience simple:
 
-- `main` – main headline (default: "We are expecting!")
-- `sub` – secondary line of text
-- `date` – additional date or detail line
-- `photo` – URL to an image shown as a circular avatar
-- `from` – a closing signature line
-- `color` – overlay color when the message appears. Allowed values: `beige` (default), `pink`, `blue`, `yellow`, `green`, `purple`, `gold`, `white`, `none`. You can also supply any valid hex or CSS color value for a custom overlay.
-- `textColor` – color for the message text (any valid CSS color value)
-- `outlineColor` – color for the outline around the message text
-- `mainTextColor` – text color for the main headline
-- `mainOutlineColor` – outline color for the main headline
-- `subTextColor` – text color for the secondary line
-- `subOutlineColor` – outline color for the secondary line
-- `dateTextColor` – text color for the date line
-- `dateOutlineColor` – outline color for the date line
-- `fromTextColor` – text color for the closing signature
-- `fromOutlineColor` – outline color for the closing signature
-- `font` – Google Fonts family name to use for all text (e.g. `font=Playfair+Display`)
-- `fontMain` – font family for the main headline
-- `fontSub` – font family for the secondary line
-- `fontDate` – font family for the date line
-- `fontFrom` – font family for the closing signature
-- `s` – optional surprise code. Set `s=1` for a blue "IT'S A BOY!" reveal or `s=2` for a pink "IT'S A GIRL!" reveal, each with matching icons and confetti.
-- `lang` – optional locale code for built-in translations of the default reveal headline and gender message. Supported values include `en`, `es`, `fr`, `de`, `pt`, `it`, `nl`, `sv`, and `ar`. You can also use region-specific variants like `pt-BR`. Unknown values fall back to English. The alias `language` works as well.
+- `gender` – set to `boy` or `girl` to trigger the matching celebratory overlay on the fourth spin. When omitted, the slot machine simply reveals the neutral surprise message.
+- `lang` – choose the language used for the default messaging. The values `en`, `es`, `fr`, `de`, `pt`, `it`, `nl`, `sv`, and `ar` are supported, and region-specific variants such as `pt-BR` will fall back to their base language. The alias `language` is also accepted.
 
-Font parameters expect Google Fonts family names just like `font`, using `+` instead of spaces.
-
-Line-specific color parameters fall back to `textColor` and `outlineColor` if omitted.
-
-`color` only affects the overlay background, whereas `textColor` and `outlineColor` control the message text and its outline.
+All other URL parameters are ignored.
 
 ### Example links
 
 ```
-index.html?main=We%27re%20Engaged!&sub=Save%20the%20Date&date=June%202024
+index.html?gender=girl
 ```
 
 ```
-index.html?main=We%E2%80%99re%20expecting&font=Playfair+Display
+index.html?gender=boy&lang=es
 ```
 
 ```
-index.html?s=2
+index.html?lang=fr
 ```
 
-```
-index.html?s=1
-```
-
-```
-index.html?main=Congrats!&sub=You%20Did%20It&fontMain=Playfair+Display&fontSub=Roboto+Slab
-```
-
-```
-index.html?main=It%27s%20a%20Boy%21&photo=https%3A%2F%2Fexample.com%2Fbaby.jpg&from=Love%2C%20Alice%20and%20Bob&color=coral
-```
-
-```
-index.html?main=We%27re%20expecting%21&sub=Baby%20Miller%20%233&date=Arriving%20January%202026&photo=<url>&from=Love%2C%20Geoffrey%20and%20Kristina&color=beige&textColor=%23000000&outlineColor=%23888888
-```
-
-Open one of these URLs in your browser to see the customized reveal.
+Open one of these URLs in your browser to see the reveal tailored to your chosen gender and language.
 
 ## How the reel spinning works
 
@@ -90,6 +49,6 @@ removed and `createSingleIcon()` displays the final symbol for that reel.
 
 During the first three spins the grid stops on random symbols that never match
 across all three reels. On the fourth spin all reels are forced to stop on the
-bottle icon and `showReveal()` is triggered, revealing the personalized message
-overlay. Any spins after the reveal go back to being completely random, so
-matches can happen naturally.
+bottle icon and `showReveal()` is triggered, revealing the celebratory message
+overlay (and the gender announcement if you enabled it). Any spins after the
+reveal go back to being completely random, so matches can happen naturally.
