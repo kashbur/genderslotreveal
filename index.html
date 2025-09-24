@@ -427,15 +427,37 @@
         transition: opacity 0.4s;
       }
       .gender-text {
+        --gender-text-color: #ffa98e;
+        --gender-outline-color: rgba(255, 255, 255, 0.95);
         font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
         font-weight: bold;
-        color: #ffa98e;
-        text-shadow: -3px -3px 0 #ffffff, 3px -3px 0 #ffffff,
-          -3px 3px 0 #ffffff, 3px 3px 0 #ffffff;
-        font-size: 80px;
+        color: var(--gender-text-color);
+        text-shadow: -0.08em -0.08em 0 var(--gender-outline-color),
+          0.08em -0.08em 0 var(--gender-outline-color),
+          -0.08em 0.08em 0 var(--gender-outline-color),
+          0.08em 0.08em 0 var(--gender-outline-color);
+        -webkit-text-stroke: 0.04em var(--gender-outline-color);
+        font-size: clamp(32px, 8vw, 80px);
         width: 100%;
+        max-width: 100%;
         text-align: center;
         animation: gender-bounce 0.6s ease-in-out 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-wrap: balance;
+        word-break: break-word;
+        line-height: 1.05;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      .gender-overlay[data-gender='boy'] .gender-text {
+        --gender-text-color: #7dc7ff;
+        --gender-outline-color: rgba(37, 110, 187, 0.88);
+      }
+      .gender-overlay[data-gender='girl'] .gender-text {
+        --gender-text-color: #ffa98e;
+        --gender-outline-color: rgba(255, 255, 255, 0.95);
       }
       @keyframes gender-bounce {
         0%, 100% {
@@ -443,16 +465,6 @@
         }
         50% {
           transform: scale(1.1);
-        }
-      }
-      @media (max-width: 500px) {
-        .gender-text {
-          font-size: 60px;
-        }
-      }
-      @media (max-width: 350px) {
-        .gender-text {
-          font-size: 40px;
         }
       }
       /* Instructions Overlay */
@@ -951,13 +963,19 @@
         const genderText = genderOverlay.querySelector(".gender-text");
         const isGirl = params.gender === "2";
         const isBoy = params.gender === "1";
-        if (isBoy) {
-          genderText.textContent = genderTranslations.boy;
-        } else if (isGirl) {
-          genderText.textContent = genderTranslations.girl;
-        } else {
-          genderText.textContent = "";
+        function setGenderState() {
+          if (isBoy) {
+            genderText.textContent = genderTranslations.boy;
+            genderOverlay.setAttribute("data-gender", "boy");
+          } else if (isGirl) {
+            genderText.textContent = genderTranslations.girl;
+            genderOverlay.setAttribute("data-gender", "girl");
+          } else {
+            genderText.textContent = "";
+            genderOverlay.removeAttribute("data-gender");
+          }
         }
+        setGenderState();
         const safeTextColor = "#ffffff";
         const safeOutlineColor = "#7e5e4f";
 
@@ -1240,18 +1258,11 @@
         function showGenderReveal() {
           genderOverlay.style.opacity = "1";
           genderOverlay.style.pointerEvents = "auto";
+          setGenderState();
           if (isBoy) {
-            genderText.textContent = genderTranslations.boy;
-            genderText.style.color = "#ffffff";
-            genderText.style.textShadow =
-              "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
             genderOverlay.style.background = "rgba(203, 226, 207, 0.6)";
             createConfetti(["#cbe2cf", "#ffffff", "#ffd700"]);
           } else {
-            genderText.textContent = genderTranslations.girl;
-            genderText.style.color = "#ffa98e";
-            genderText.style.textShadow =
-              "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
             genderOverlay.style.background = "rgba(255, 255, 255, 0.6)";
             createConfetti([
               "#ffa98e",
