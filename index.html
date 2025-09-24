@@ -6,7 +6,7 @@
     <title>The Big Reveal</title>
     <meta
       name="description"
-      content="A fun, personalized surprise reveal experience. Play and discover your message!"
+      content="A fun surprise reveal with optional gender and language selection."
     />
     <link
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
@@ -226,12 +226,6 @@
         margin: 0;
         line-height: 1.15;
       }
-      .reveal-photo {
-        max-width: 90%;
-        max-height: 30vh;
-        object-fit: contain;
-        margin: 2vh 0;
-      }
       .reveal-line.main {
         line-height: 1.1;
         font-weight: 900;
@@ -417,77 +411,30 @@
       // -------------- URL Params Logic -------------
       function getParams() {
         const url = new URL(window.location.href);
-        const params = {};
-        for (const [k, v] of url.searchParams.entries()) {
-          // Normalize keys to lower case
-          const key = k.toLowerCase();
-          const value = v.replace(/\+/g, " ");
-          params[key] = value;
-          // Preserve original casing for backward compatibility
-          if (key !== k) params[k] = value;
-        }
-        return params;
+        const langParam = (
+          url.searchParams.get("lang") || url.searchParams.get("language") || ""
+        ).toLowerCase();
+        const genderParam = (url.searchParams.get("gender") || "").toLowerCase();
+        return { lang: langParam, gender: genderParam };
       }
 
-      const isValidHex = (str) => /^#([0-9A-F]{3}){1,2}$/i.test(str);
-
-      function sanitizeColor(value, fallback) {
-        if (!value) return fallback;
-        value = value.trim();
-        if (isValidHex(value)) return value;
-        const test = new Option().style;
-        test.color = value;
-        return test.color ? value : fallback;
-      }
-
-      function getRevealLinesFromParams(params, defaults = {}) {
-        // Defaults
+      function buildRevealLines(defaults = {}) {
         const lines = [];
-        let photo = params.photo ? decodeURIComponent(params.photo) : "";
-        // Only allow http:, https: or data:image/ URLs for images
-        if (photo && !/^(https?:|data:image\/)/i.test(photo)) {
-          photo = "";
-        }
-        const main = params.main || defaults.main || "We are expecting!";
-        const sub = params.sub || defaults.sub || "";
-        const date = params.date || defaults.date || "";
-        const from = params.from || defaults.from || "";
+        const main = defaults.main || "We are expecting!";
+        const sub = defaults.sub || "";
+        const date = defaults.date || "";
+        const from = defaults.from || "";
         if (main) lines.push({ type: "main", content: main });
         if (sub) lines.push({ type: "sub", content: sub });
         if (date) lines.push({ type: "date", content: date });
-        if (photo) lines.push({ type: "photo", content: photo });
         if (from) lines.push({ type: "from", content: from });
         return lines;
-      }
-      function getColorOverlay(params) {
-        // Pink, blue, yellow, green, purple, gold, white, none
-        const input = params.color ? params.color.trim() : "";
-        // Allow custom CSS colors
-        if (isValidHex(input)) return input;
-        const test = new Option().style;
-        test.color = input;
-        if (test.color) return input;
-
-        const color = (input || "beige").toLowerCase();
-        const overlays = {
-          beige: "#f3ddbb",
-          pink: "#fcc0c5",
-          blue: "#add4fd",
-          yellow: "#fef3c7",
-          green: "#cbf7d0",
-          purple: "#d2c5fc",
-          gold: "#ffdf9a",
-          white: "#ffffff",
-          none: "transparent",
-        };
-        return overlays[color] || overlays.beige;
       }
 
       document.addEventListener("DOMContentLoaded", function () {
         const params = getParams();
 
-        const languageParam = (params.lang || params.language || "").toLowerCase();
-        const normalizedLanguage = languageParam.split(/[-_]/)[0];
+        const normalizedLanguage = params.lang.split(/[-_]/)[0];
         const translations = {
           en: {
             htmlLang: "en",
@@ -616,7 +563,8 @@
         } else {
           document.documentElement.removeAttribute("dir");
         }
-        const revealDefaults = locale.revealDefaults || translations.en.revealDefaults;
+        const revealDefaults =
+          locale.revealDefaults || translations.en.revealDefaults;
         const genderTranslations = locale.gender || translations.en.gender;
 
         const icons = [
@@ -643,7 +591,6 @@
           "img/background.png",
           "img/tap to spin.png",
           "img/directions.png",
-          ...(params.photo ? [params.photo] : []),
         ]);
 
         function getRandomIcon() {
@@ -690,100 +637,49 @@
         );
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
-        const surpriseCode = params.s;
-        const isGirl = surpriseCode === "2" || (params.gender || "").toLowerCase() === "girl";
-        const isBoy = surpriseCode === "1" || (params.gender || "").toLowerCase() === "boy";
-        genderText.textContent = isBoy
-          ? genderTranslations.boy
-          : genderTranslations.girl;
-        const safeTextColor = sanitizeColor(params.textcolor, "#ffffff");
-        const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
+        const isGirl = params.gender === "girl";
+        const isBoy = params.gender === "boy";
+        if (isBoy) {
+          genderText.textContent = genderTranslations.boy;
+        } else if (isGirl) {
+          genderText.textContent = genderTranslations.girl;
+        } else {
+          genderText.textContent = "";
+        }
+        const safeTextColor = "#ffffff";
+        const safeOutlineColor = "#7e5e4f";
 
         const lineColors = {
           main: {
-            text: sanitizeColor(params.maintextcolor, safeTextColor),
-            outline: sanitizeColor(params.mainoutlinecolor, safeOutlineColor),
+            text: safeTextColor,
+            outline: safeOutlineColor,
           },
           sub: {
-            text: sanitizeColor(params.subtextcolor, safeTextColor),
-            outline: sanitizeColor(params.suboutlinecolor, safeOutlineColor),
+            text: safeTextColor,
+            outline: safeOutlineColor,
           },
           date: {
-            text: sanitizeColor(params.datetextcolor, safeTextColor),
-            outline: sanitizeColor(params.dateoutlinecolor, safeOutlineColor),
+            text: safeTextColor,
+            outline: safeOutlineColor,
           },
           from: {
-            text: sanitizeColor(params.fromtextcolor, safeTextColor),
-            outline: sanitizeColor(params.fromoutlinecolor, safeOutlineColor),
+            text: safeTextColor,
+            outline: safeOutlineColor,
           },
+        };
+        const fonts = {
+          main: "'Poppins'",
+          sub: "'Poppins'",
+          date: "'Poppins'",
+          from: "'Poppins'",
         };
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
 
-        // --------- Font loading logic ---------
-        function loadGoogleFont(familyParam) {
-          if (!familyParam) return Promise.resolve(null);
-          const familyName = familyParam.replace(/\+/g, " ");
-          const link = document.createElement("link");
-          link.href = `https://fonts.googleapis.com/css2?family=${familyParam}&display=swap`;
-          link.rel = "stylesheet";
-          document.head.appendChild(link);
-          return document.fonts
-            .load(`1em '${familyName}'`)
-            .then(() => `'${familyName}'`)
-            .catch(() => `'${familyName}'`);
-        }
-
-        const fonts = {
-          main: null,
-          sub: null,
-          date: null,
-          from: null,
-        };
-        const fontPromises = [];
-
-        // Global font applied via CSS variable
-        if (params.font) {
-          fontPromises.push(
-            loadGoogleFont(params.font).then((ff) => {
-              if (ff) {
-                document.documentElement.style.setProperty("--font-family", ff);
-                fonts.main = fonts.sub = fonts.date = fonts.from = ff;
-              }
-            })
-          );
-        }
-
-        fontPromises.push(
-          loadGoogleFont(params.fontmain).then((ff) => {
-            if (ff) fonts.main = ff;
-          })
-        );
-        fontPromises.push(
-          loadGoogleFont(params.fontsub).then((ff) => {
-            if (ff) fonts.sub = ff;
-          })
-        );
-        fontPromises.push(
-          loadGoogleFont(params.fontdate).then((ff) => {
-            if (ff) fonts.date = ff;
-          })
-        );
-        fontPromises.push(
-          loadGoogleFont(params.fontfrom).then((ff) => {
-            if (ff) fonts.from = ff;
-          })
-        );
-
-        Promise.all(fontPromises).then(() =>
-          document.fonts.ready.then(refitAllLines)
-        );
-
-
-
         // Set overlay color on reveal
-        colorOverlay.style.background = getColorOverlay(params);
-        introColorOverlay.style.background = getColorOverlay(params);
+        const overlayColor = "#f3ddbb";
+        colorOverlay.style.background = overlayColor;
+        introColorOverlay.style.background = overlayColor;
 
         // Hide instructions overlay
         function hideInstructionsOverlay() {
@@ -923,7 +819,6 @@
         }
 
         function fitRevealLine(el, type) {
-          if (type === "photo") return;
           textFit(el, {
             alignVert: true,
             alignHoriz: true,
@@ -939,6 +834,10 @@
             const type = Array.from(el.classList).find((c) => c !== "reveal-line");
             fitRevealLine(el, type);
           });
+        }
+
+        if (document.fonts && document.fonts.ready) {
+          document.fonts.ready.then(refitAllLines);
         }
 
         function applyTextStyles(el, color, outlineColor, fontFamily) {
@@ -957,7 +856,7 @@
 
         // ------------- REVEAL LOGIC -----------------
         function showReveal() {
-          const allLines = getRevealLinesFromParams(params, revealDefaults);
+          const allLines = buildRevealLines(revealDefaults);
           const mainLine = allLines.find((l) => l.type === "main");
           const otherLines = allLines.filter((l) => l.type !== "main");
           let confettiShown = false;
@@ -968,19 +867,8 @@
             function addLine(line) {
               const div = document.createElement("div");
               div.className = "reveal-line " + line.type;
-              if (line.type === "photo") {
-                const img = document.createElement("img");
-                img.src = line.content;
-                img.alt = "photo";
-                img.onerror = () => {
-                  div.style.display = "none";
-                };
-                img.className = "reveal-photo";
-                div.appendChild(img);
-              } else {
-                div.textContent =
-                  line.type === "sub" ? line.content.toUpperCase() : line.content;
-              }
+              div.textContent =
+                line.type === "sub" ? line.content.toUpperCase() : line.content;
               const colors = lineColors[line.type] || { text: safeTextColor, outline: safeOutlineColor };
               applyTextStyles(div, colors.text, colors.outline, fonts[line.type]);
               div.style.margin = "0";
@@ -989,9 +877,8 @@
             }
             const subLine = otherLines.find((l) => l.type === "sub");
             const dateLine = otherLines.find((l) => l.type === "date");
-            const photoLine = otherLines.find((l) => l.type === "photo");
             const fromLine = otherLines.find((l) => l.type === "from");
-            [subLine, dateLine, photoLine, fromLine]
+            [subLine, dateLine, fromLine]
               .filter(Boolean)
               .forEach(addLine);
             const hideDelay = 30000;
