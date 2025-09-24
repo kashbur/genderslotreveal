@@ -296,8 +296,10 @@
         height: 100%;
         background: rgba(255, 255, 255, 0.6);
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
+        text-align: center;
         z-index: 12;
         pointer-events: none;
         opacity: 0;
@@ -311,6 +313,13 @@
           -3px 3px 0 #ffffff, 3px 3px 0 #ffffff;
         font-size: 80px;
         animation: gender-bounce 0.6s ease-in-out 3;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+        padding: 0 1rem;
+        box-sizing: border-box;
       }
       @keyframes gender-bounce {
         0%, 100% {
@@ -542,6 +551,11 @@
         let currentSymbols = [];
         const slotMachine = document.getElementById("slotMachine");
         const spinButton = document.getElementById("spinButton");
+        const aspectContainer = document.querySelector(".aspect-container");
+        const defaultBodyBackground = getComputedStyle(document.body).backgroundColor;
+        const defaultAspectBackground = aspectContainer
+          ? getComputedStyle(aspectContainer).backgroundColor
+          : "";
         const reels = [];
         for (let i = 1; i <= 3; i++) {
           reels.push(document.getElementById(`reel${i}`));
@@ -558,8 +572,15 @@
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
         const surpriseCode = params.s;
-        const isGirl = surpriseCode === "2" || (params.gender || "").toLowerCase() === "girl";
-        const isBoy = surpriseCode === "1" || (params.gender || "").toLowerCase() === "boy";
+        const textOutcome = (params.text || "").trim();
+        const hasTextOutcome = textOutcome === "1" || textOutcome === "2";
+        const normalizedGender = (params.gender || "").toLowerCase();
+        const isGirl = hasTextOutcome
+          ? textOutcome === "2"
+          : surpriseCode === "2" || normalizedGender === "girl";
+        const isBoy = hasTextOutcome
+          ? textOutcome === "1"
+          : surpriseCode === "1" || normalizedGender === "boy";
         const safeTextColor = sanitizeColor(params.textcolor, "#ffffff");
         const safeOutlineColor = sanitizeColor(params.outlinecolor, "#7e5e4f");
 
@@ -583,6 +604,18 @@
         };
         const audioContext = new (window.AudioContext ||
           window.webkitAudioContext)();
+
+        function setOutcomeBackground(color) {
+          if (color) {
+            document.body.style.background = color;
+            if (aspectContainer) aspectContainer.style.background = color;
+          }
+        }
+
+        function resetOutcomeBackground() {
+          document.body.style.background = defaultBodyBackground;
+          if (aspectContainer) aspectContainer.style.background = defaultAspectBackground;
+        }
 
         // --------- Font loading logic ---------
         function loadGoogleFont(familyParam) {
@@ -905,32 +938,41 @@
         function showGenderReveal() {
           genderOverlay.style.opacity = "1";
           genderOverlay.style.pointerEvents = "auto";
+          const hideDelay = 8000;
           if (isBoy) {
             genderText.textContent = "IT'S A BOY!";
-            genderText.style.color = "#ffffff";
+            genderText.style.color = "#1d4ed8";
             genderText.style.textShadow =
               "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
-            genderOverlay.style.background = "rgba(203, 226, 207, 0.6)";
-            createConfetti(["#cbe2cf", "#ffffff", "#ffd700"]);
-          } else {
-            genderText.textContent = "IT'S A GIRL!";
-            genderText.style.color = "#ffa98e";
-            genderText.style.textShadow =
-              "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
-            genderOverlay.style.background = "rgba(255, 255, 255, 0.6)";
+            genderOverlay.style.background = "rgba(163, 216, 255, 0.85)";
+            setOutcomeBackground("#a3d8ff");
             createConfetti([
-              "#ffa98e",
-              "#FFB6C1",
-              "#FFC0CB",
-              "#FFFFFF",
-              "#FF1493",
-              "#DB7093",
+              "#e0f2ff",
+              "#93c5fd",
+              "#60a5fa",
+              "#3b82f6",
+              "#1d4ed8",
+            ]);
+          } else if (isGirl) {
+            genderText.textContent = "IT'S A GIRL!";
+            genderText.style.color = "#db2777";
+            genderText.style.textShadow =
+              "-3px -3px 0 #ffffff, 3px -3px 0 #ffffff, -3px 3px 0 #ffffff, 3px 3px 0 #ffffff";
+            genderOverlay.style.background = "rgba(255, 193, 217, 0.85)";
+            setOutcomeBackground("#ffc1d9");
+            createConfetti([
+              "#ffe4f3",
+              "#f9a8d4",
+              "#f472b6",
+              "#ec4899",
+              "#db2777",
             ]);
           }
           setTimeout(() => {
             genderOverlay.style.opacity = "0";
             genderOverlay.style.pointerEvents = "none";
-          }, 8000);
+            resetOutcomeBackground();
+          }, hideDelay);
         }
         // -------- Confetti logic (unchanged) ----------
         function createConfetti(customColors) {
