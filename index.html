@@ -1197,15 +1197,27 @@
         const genderText = genderOverlay.querySelector(".gender-text");
         const isGirl = params.gender === "2";
         const isBoy = params.gender === "1";
+        const defaultOverlayColor = "#f3ddbb";
         function setGenderState() {
           if (isBoy) {
             genderText.textContent = genderTranslations.boy;
+            genderText.style.color = "#ffffff";
+            genderText.style.textShadow =
+              "-2px -2px 0 #5c928c, 2px -2px 0 #5c928c, -2px 2px 0 #5c928c, 2px 2px 0 #5c928c";
+            colorOverlay.style.backgroundColor = "#a4c9c4";
             genderOverlay.setAttribute("data-gender", "boy");
           } else if (isGirl) {
             genderText.textContent = genderTranslations.girl;
+            genderText.style.color = "#ffffff";
+            genderText.style.textShadow =
+              "-2px -2px 0 #ef8d6d, 2px -2px 0 #ef8d6d, -2px 2px 0 #ef8d6d, 2px 2px 0 #ef8d6d";
+            colorOverlay.style.backgroundColor = "#f7c4b4";
             genderOverlay.setAttribute("data-gender", "girl");
           } else {
             genderText.textContent = "";
+            genderText.style.color = "";
+            genderText.style.textShadow = "";
+            colorOverlay.style.backgroundColor = defaultOverlayColor;
             genderOverlay.removeAttribute("data-gender");
           }
         }
@@ -1241,9 +1253,10 @@
           window.webkitAudioContext)();
 
         // Set overlay color on reveal
-        const overlayColor = "#f3ddbb";
-        colorOverlay.style.background = overlayColor;
-        introColorOverlay.style.background = overlayColor;
+        introColorOverlay.style.backgroundColor = defaultOverlayColor;
+        if (!isBoy && !isGirl) {
+          colorOverlay.style.backgroundColor = defaultOverlayColor;
+        }
 
         // Hide instructions overlay
         function hideInstructionsOverlay() {
