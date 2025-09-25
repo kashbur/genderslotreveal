@@ -84,23 +84,37 @@
         left: 8.34%;
         top: 22.95%;
         width: 82.64%;
-        height: 58.60%;
+        height: 58.6%;
         display: flex;
         align-items: center;
         justify-content: center;
-        text-align: center;
-        padding: 0.5rem;
         overflow: hidden;
         pointer-events: none;
         z-index: 21;
       }
       #landingTextBox .intro-text {
         width: 100%;
-        line-height: 1.12;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6% 7%;
+        box-sizing: border-box;
+        max-width: 100%;
+        max-height: 100%;
+      }
+      #landingTextBox .intro-text-content {
+        display: inline-block;
+        width: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        line-height: 1.08;
         word-break: normal;
-        overflow-wrap: break-word;
+        overflow-wrap: normal;
         hyphens: manual;
         white-space: normal;
+        text-align: center;
       }
       #landingTextBox.hidden {
         display: none;
@@ -514,6 +528,56 @@
       };
 
       let introTextResizeHandler = null;
+      let introTextResizeObserver = null;
+
+      function fitIntroTextToContainer(landingTextBox) {
+        if (!landingTextBox) {
+          return;
+        }
+        const textContainer = landingTextBox.querySelector(".intro-text");
+        const textElement = landingTextBox.querySelector(
+          ".intro-text-content",
+        );
+        if (!textContainer || !textElement) {
+          return;
+        }
+        const availableWidth = textContainer.clientWidth;
+        const availableHeight = textContainer.clientHeight;
+        if (!availableWidth || !availableHeight) {
+          return;
+        }
+
+        const minFontSize = 8;
+        const maxFontSize = Math.min(
+          900,
+          Math.max(minFontSize, availableHeight * 1.8),
+        );
+        let low = minFontSize;
+        let high = maxFontSize;
+        let best = minFontSize;
+        const tolerance = 0.5;
+
+        textElement.style.fontSize = `${minFontSize}px`;
+
+        while (low <= high) {
+          const mid = (low + high) / 2;
+          textElement.style.fontSize = `${mid}px`;
+          const fitsWithinWidth =
+            textElement.scrollWidth <= availableWidth + tolerance;
+          const fitsWithinHeight =
+            textElement.scrollHeight <= availableHeight + tolerance;
+          if (fitsWithinWidth && fitsWithinHeight) {
+            best = mid;
+            low = mid + tolerance;
+          } else {
+            high = mid - tolerance;
+          }
+        }
+
+        textElement.style.fontSize = `${best}px`;
+        textElement.style.lineHeight = "1.08";
+      }
+
       function applyIntroTextFromURL() {
         const landingTextBox = document.getElementById("landingTextBox");
         if (!landingTextBox) {
@@ -524,8 +588,15 @@
           window.removeEventListener("orientationchange", introTextResizeHandler);
           introTextResizeHandler = null;
         }
+        if (introTextResizeObserver) {
+          introTextResizeObserver.disconnect();
+          introTextResizeObserver = null;
+        }
         const params = new URLSearchParams(window.location.search || "");
         let introParam = params.get("intro");
+        if (introParam == null) {
+          introParam = params.get("message");
+        }
         if (introParam == null) {
           landingTextBox.classList.add("hidden");
           landingTextBox.innerHTML = "";
@@ -547,38 +618,39 @@
           char === "<" ? "&lt;" : "&gt;",
         );
         const html = sanitized.replace(/\r?\n/g, "<br/>");
-        landingTextBox.innerHTML = `<div class="intro-text">${html}</div>`;
+        landingTextBox.innerHTML = `<div class="intro-text"><span class="intro-text-content">${html}</span></div>`;
         landingTextBox.classList.remove("hidden");
 
         const reFit = () => {
-          const introElement = landingTextBox.querySelector(".intro-text");
-          if (!introElement) {
-            return;
-          }
-          if (typeof textFit === "function") {
-            try {
-              textFit(introElement, {
-                multiLine: true,
-                alignHoriz: true,
-                alignVert: true,
-                minFontSize: 14,
-                maxFontSize: 120,
-                reProcess: true,
-              });
-            } catch (error) {
-              // ignore fitting errors
-            }
-          }
+          fitIntroTextToContainer(landingTextBox);
         };
 
         reFit();
         requestAnimationFrame(reFit);
+        setTimeout(reFit, 150);
+        if (document.fonts && typeof document.fonts.ready?.then === "function") {
+          document.fonts.ready
+            .then(() => {
+              reFit();
+            })
+            .catch(() => {});
+        }
 
         introTextResizeHandler = () => {
           reFit();
         };
         window.addEventListener("resize", introTextResizeHandler);
         window.addEventListener("orientationchange", introTextResizeHandler);
+        if ("ResizeObserver" in window) {
+          introTextResizeObserver = new ResizeObserver(() => {
+            reFit();
+          });
+          introTextResizeObserver.observe(landingTextBox);
+          const textContainer = landingTextBox.querySelector(".intro-text");
+          if (textContainer) {
+            introTextResizeObserver.observe(textContainer);
+          }
+        }
         return reFit;
       }
 
