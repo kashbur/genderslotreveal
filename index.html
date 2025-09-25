@@ -19,6 +19,13 @@
       defer
     ></script>
     <style>
+      @font-face {
+        font-family: 'SparkyStones';
+        src: url('./sparkystones.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
+      }
       :root {
         --font-family: 'Poppins';
         --icon-w: 112px;
@@ -116,6 +123,13 @@
         hyphens: manual;
         white-space: normal;
         text-align: center;
+      }
+      #customMessage {
+        font-family: 'SparkyStones', sans-serif;
+        font-size: clamp(20px, 6vw, 70px);
+        text-align: center;
+        line-height: 1.2;
+        color: #5c3b1e;
       }
       #landingTextBox.hidden {
         display: none;
@@ -399,38 +413,23 @@
         opacity: 0;
         transition: opacity 0.4s;
       }
-      .gender-text {
-        --gender-text-color: #ffa98e;
-        --gender-outline-color: rgba(255, 255, 255, 0.95);
-        font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
-        font-weight: bold;
-        color: var(--gender-text-color);
-        text-shadow: -0.08em -0.08em 0 var(--gender-outline-color),
-          0.08em -0.08em 0 var(--gender-outline-color),
-          -0.08em 0.08em 0 var(--gender-outline-color),
-          0.08em 0.08em 0 var(--gender-outline-color);
-        -webkit-text-stroke: 0.04em var(--gender-outline-color);
-        font-size: clamp(32px, 8vw, 80px);
+      #genderOverlay .gender-text {
+        font-family: 'SparkyStones', sans-serif;
+        font-size: clamp(30px, 7vw, 80px);
+        text-align: center;
+        line-height: 1.2;
+        color: #5c3b1e;
+        text-shadow: 2px 2px 0 #fff;
         width: 100%;
         max-width: 100%;
-        text-align: center;
         animation: gender-bounce 0.6s ease-in-out 3;
         display: flex;
         align-items: center;
         justify-content: center;
         text-wrap: balance;
         word-break: break-word;
-        line-height: 1.05;
         margin: 0;
         box-sizing: border-box;
-      }
-      .gender-overlay[data-gender='boy'] .gender-text {
-        --gender-text-color: #7dc7ff;
-        --gender-outline-color: rgba(37, 110, 187, 0.88);
-      }
-      .gender-overlay[data-gender='girl'] .gender-text {
-        --gender-text-color: #ffa98e;
-        --gender-outline-color: rgba(255, 255, 255, 0.95);
       }
       @keyframes gender-bounce {
         0%, 100% {
@@ -619,7 +618,8 @@
           char === "<" ? "&lt;" : "&gt;",
         );
         const html = sanitized.replace(/\r?\n/g, "<br/>");
-        landingTextBox.innerHTML = `<div class="intro-text"><span class="intro-text-content">${html}</span></div>`;
+        landingTextBox.innerHTML =
+          `<div class="intro-text"><span id="customMessage" class="intro-text-content">${html}</span></div>`;
         landingTextBox.classList.remove("hidden");
 
         const reFit = () => {
