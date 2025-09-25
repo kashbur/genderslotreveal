@@ -79,6 +79,33 @@
         cursor: pointer;
       }
 
+      #landingTextBox {
+        position: absolute;
+        left: 8.34%;
+        top: 22.95%;
+        width: 82.64%;
+        height: 58.60%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 0.5rem;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: 21;
+      }
+      #landingTextBox .intro-text {
+        width: 100%;
+        line-height: 1.12;
+        word-break: normal;
+        overflow-wrap: break-word;
+        hyphens: manual;
+        white-space: normal;
+      }
+      #landingTextBox.hidden {
+        display: none;
+      }
+
       .slot-machine {
         position: absolute;
         width: 100%;
@@ -431,7 +458,9 @@
   </head>
   <body>
     <div class="aspect-container">
-      <div id="landing-screen"></div>
+      <div id="landing-screen">
+        <div id="landingTextBox" class="hidden"></div>
+      </div>
       <div class="slot-machine-container">
         <div class="slot-machine blur-background" id="slotMachine"></div>
         <div id="reel1" class="reel blur-background"></div>
@@ -483,6 +512,75 @@
         width: 112,
         height: 112,
       };
+
+      let introTextResizeHandler = null;
+      function applyIntroTextFromURL() {
+        const landingTextBox = document.getElementById("landingTextBox");
+        if (!landingTextBox) {
+          return null;
+        }
+        if (introTextResizeHandler) {
+          window.removeEventListener("resize", introTextResizeHandler);
+          window.removeEventListener("orientationchange", introTextResizeHandler);
+          introTextResizeHandler = null;
+        }
+        const params = new URLSearchParams(window.location.search || "");
+        let introParam = params.get("intro");
+        if (introParam == null) {
+          landingTextBox.classList.add("hidden");
+          landingTextBox.innerHTML = "";
+          return null;
+        }
+        try {
+          introParam = decodeURIComponent(introParam);
+        } catch (error) {
+          // ignore decoding errors and use the original value
+        }
+        const trimmed = introParam.trim();
+        if (!trimmed) {
+          landingTextBox.classList.add("hidden");
+          landingTextBox.innerHTML = "";
+          return null;
+        }
+        const withNewlines = trimmed.replace(/\\n/g, "\n");
+        const sanitized = withNewlines.replace(/[<>]/g, (char) =>
+          char === "<" ? "&lt;" : "&gt;",
+        );
+        const html = sanitized.replace(/\r?\n/g, "<br/>");
+        landingTextBox.innerHTML = `<div class="intro-text">${html}</div>`;
+        landingTextBox.classList.remove("hidden");
+
+        const reFit = () => {
+          const introElement = landingTextBox.querySelector(".intro-text");
+          if (!introElement) {
+            return;
+          }
+          if (typeof textFit === "function") {
+            try {
+              textFit(introElement, {
+                multiLine: true,
+                alignHoriz: true,
+                alignVert: true,
+                minFontSize: 14,
+                maxFontSize: 120,
+                reProcess: true,
+              });
+            } catch (error) {
+              // ignore fitting errors
+            }
+          }
+        };
+
+        reFit();
+        requestAnimationFrame(reFit);
+
+        introTextResizeHandler = () => {
+          reFit();
+        };
+        window.addEventListener("resize", introTextResizeHandler);
+        window.addEventListener("orientationchange", introTextResizeHandler);
+        return reFit;
+      }
 
       function syncIconDimensionsWithCSS() {
         if (!window.getComputedStyle) return;
@@ -906,11 +1004,20 @@
           de: "img/assets/german/babyjackpot-german.png",
         };
         const landingScreen = document.getElementById("landing-screen");
+        let refitIntroText = null;
         if (landingScreen) {
           const landingImage =
             landingBackgrounds[normalizedLanguage] ||
             "img/Assets/babyjackpot.png";
           landingScreen.style.backgroundImage = `url("${landingImage}")`;
+          refitIntroText = applyIntroTextFromURL();
+          const landingBgImage = new Image();
+          landingBgImage.addEventListener("load", () => {
+            if (typeof refitIntroText === "function") {
+              refitIntroText();
+            }
+          });
+          landingBgImage.src = landingImage;
           const dismissLanding = (event) => {
             if (event) {
               event.preventDefault();
