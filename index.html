@@ -138,11 +138,15 @@
         width: 82.64%;
         height: 58.6%;
         display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
         align-items: center;
-        justify-content: center;
+        text-align: center;
+        padding-top: min(2vh, 2%);
         overflow: hidden;
         pointer-events: none;
         z-index: 21;
+        color: #986f17;
       }
       #landingTextBox .intro-text {
         width: 100%;
@@ -156,6 +160,7 @@
         box-sizing: border-box;
         max-width: 100%;
         max-height: 100%;
+        color: #986f17;
       }
       #landingTextBox .intro-text-content {
         display: inline-block;
@@ -174,7 +179,7 @@
         font-size: clamp(20px, 6vw, 70px);
         text-align: center;
         line-height: 1.2;
-        color: #5c3b1e;
+        color: #986f17;
       }
       #landingTextBox.hidden {
         display: none;
@@ -1378,13 +1383,18 @@
         }
 
         function fitRevealLine(el, type) {
+          if (!el) {
+            return;
+          }
+          el.style.height = "auto";
+          el.style.display = "block";
           textFit(el, {
-            alignVert: true,
-            alignHoriz: true,
             multiLine: true,
-            detectMultiLine: true,
-            minFontSize: 12,
-            maxFontSize: 50,
+            alignHoriz: true,
+            alignVert: false,
+            minFontSize: 16,
+            maxFontSize: 200,
+            reProcess: true,
           });
         }
 
