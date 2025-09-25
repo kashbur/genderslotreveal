@@ -86,6 +86,51 @@
         cursor: pointer;
       }
 
+      .landing-hint {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 7.5%;
+        padding: 0.4rem 0.8rem;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.85);
+        color: #5c3b1e;
+        font-family: 'SparkyStones', sans-serif;
+        font-size: clamp(14px, 2.6vw, 20px);
+        line-height: 1.2;
+        text-align: center;
+        letter-spacing: 0.3px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .landing-hint.show {
+        animation:
+          hint-fade-in 400ms ease-out forwards,
+          hint-pulse 1200ms ease-in-out 400ms infinite alternate;
+      }
+
+      @keyframes hint-fade-in {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+
+      @keyframes hint-pulse {
+        from {
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+        }
+        to {
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+        }
+      }
+
       #landingTextBox {
         position: absolute;
         left: 8.34%;
@@ -474,6 +519,7 @@
     <div class="aspect-container">
       <div id="landing-screen">
         <div id="landingTextBox" class="hidden"></div>
+        <div id="landingHint" class="landing-hint" aria-live="polite" hidden></div>
       </div>
       <div class="slot-machine-container">
         <div class="slot-machine blur-background" id="slotMachine"></div>
@@ -739,6 +785,18 @@
 
       const params = getParams();
       const normalizedLanguage = params.lang.split(/[-_]/)[0] || "";
+
+      const hintTranslations = {
+        en: "Click anywhere to begin",
+        es: "Haz clic en cualquier lugar para empezar",
+        fr: "Cliquez n’importe où pour commencer",
+        de: "Klicken Sie irgendwo, um zu starten",
+      };
+
+      function getHintText(lang) {
+        const key = (lang || "en").toLowerCase().split(/[-_]/)[0];
+        return hintTranslations[key] || hintTranslations.en;
+      }
 
       const LANGUAGE_ASSET_MAP = {
         en: {
@@ -1077,6 +1135,8 @@
           de: "img/assets/german/babyjackpot-german.png",
         };
         const landingScreen = document.getElementById("landing-screen");
+        const landingHint = document.getElementById("landingHint");
+        let landingHintTimeout = null;
         let refitIntroText = null;
         if (landingScreen) {
           const landingImage =
@@ -1084,6 +1144,16 @@
             "img/Assets/babyjackpot.png";
           landingScreen.style.backgroundImage = `url("${landingImage}")`;
           refitIntroText = applyIntroTextFromURL();
+          if (landingHint) {
+            landingHint.textContent = getHintText(normalizedLanguage);
+            landingHintTimeout = window.setTimeout(() => {
+              if (landingScreen.style.display === "none") {
+                return;
+              }
+              landingHint.hidden = false;
+              landingHint.classList.add("show");
+            }, 1000);
+          }
           const landingBgImage = new Image();
           landingBgImage.addEventListener("load", () => {
             if (typeof refitIntroText === "function") {
@@ -1097,6 +1167,14 @@
             }
             if (landingScreen.style.display === "none") {
               return;
+            }
+            if (landingHintTimeout !== null) {
+              window.clearTimeout(landingHintTimeout);
+              landingHintTimeout = null;
+            }
+            if (landingHint) {
+              landingHint.classList.remove("show");
+              landingHint.hidden = true;
             }
             landingScreen.style.display = "none";
             startGameAssetPreload();
