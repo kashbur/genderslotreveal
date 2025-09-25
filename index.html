@@ -14,88 +14,6 @@
       href="https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap"
       rel="stylesheet"
     />
-    <link rel="preload" as="image" href="img/Assets/background.png" />
-    <link rel="preload" as="image" href="img/Assets/taptospin.png" />
-    <link rel="preload" as="image" href="img/Assets/instructions.png" />
-    <link rel="preload" as="image" href="img/Assets/blue-balloon.png" />
-    <link rel="preload" as="image" href="img/Assets/bottle.png" />
-    <link rel="preload" as="image" href="img/Assets/boy.png" />
-    <link rel="preload" as="image" href="img/Assets/girl.png" />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/Spanish/background-spanish.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/Spanish/taptospin-spanish.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/Spanish/instructions-spanish.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/Spanish/boy-spanish.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/Spanish/girl-spanish.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/French/background-french.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/French/taptospin-french.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/French/instructions-french.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/French/boy-french.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/French/girl-french.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/German/background-german.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/German/taptospin-german.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/German/instructions-german.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/German/boy-german.png"
-    />
-    <link
-      rel="preload"
-      as="image"
-      href="img/Assets/German/girl-german.png"
-    />
     <script
       src="https://cdnjs.cloudflare.com/ajax/libs/textfit/2.4.0/textFit.min.js"
       defer
@@ -148,6 +66,19 @@
         align-items: center;
         overflow: visible;
       }
+      #landing-screen {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url("img/Assets/babyjackpot.png");
+        background-size: cover;
+        background-position: center;
+        z-index: 20;
+        cursor: pointer;
+      }
+
       .slot-machine {
         position: absolute;
         width: 100%;
@@ -478,7 +409,7 @@
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 20;
+        z-index: 18;
         cursor: pointer;
         transition: opacity 0.4s;
       }
@@ -500,6 +431,7 @@
   </head>
   <body>
     <div class="aspect-container">
+      <div id="landing-screen"></div>
       <div class="slot-machine-container">
         <div class="slot-machine blur-background" id="slotMachine"></div>
         <div id="reel1" class="reel blur-background"></div>
@@ -719,9 +651,8 @@
           ...ENGLISH_CRITICAL_IMAGE_SOURCES,
         ]),
       );
-      const assetPreloadPromise = preloadImages(ALL_IMAGE_SOURCES, "high").catch(
-        () => {},
-      );
+      let assetPreloadPromise = null;
+      let assetsInitialized = false;
 
       function buildRevealLines(defaults = {}) {
         const lines = [];
@@ -871,7 +802,6 @@
         const genderTranslations = locale.gender || translations.en.gender;
 
         const icons = ICON_SOURCES;
-        preloadImages(icons).catch(() => {});
 
         function getRandomIcon() {
           return icons[Math.floor(Math.random() * icons.length)];
@@ -958,7 +888,48 @@
           }
           populateInitialReels();
         }
-        assetPreloadPromise.then(applyLocalizedAssets);
+        function startGameAssetPreload() {
+          if (!assetsInitialized) {
+            assetsInitialized = true;
+            applyLocalizedAssets();
+          }
+          if (!assetPreloadPromise) {
+            assetPreloadPromise = preloadImages(ALL_IMAGE_SOURCES, "high").catch(
+              () => {},
+            );
+          }
+          return assetPreloadPromise;
+        }
+        const landingBackgrounds = {
+          es: "img/Assets/babyjackpot-spanish.png",
+          fr: "img/Assets/babyjackpot-french.png",
+          de: "img/Assets/babyjackpot-german.png",
+        };
+        const landingScreen = document.getElementById("landing-screen");
+        if (landingScreen) {
+          const landingImage =
+            landingBackgrounds[normalizedLanguage] ||
+            "img/Assets/babyjackpot.png";
+          landingScreen.style.backgroundImage = `url("${landingImage}")`;
+          const dismissLanding = (event) => {
+            if (event) {
+              event.preventDefault();
+            }
+            if (landingScreen.style.display === "none") {
+              return;
+            }
+            landingScreen.style.display = "none";
+            startGameAssetPreload();
+          };
+          landingScreen.addEventListener("click", dismissLanding);
+          landingScreen.addEventListener(
+            "touchstart",
+            dismissLanding,
+            { passive: false },
+          );
+        } else {
+          startGameAssetPreload();
+        }
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
         const isGirl = params.gender === "2";
