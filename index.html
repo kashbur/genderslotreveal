@@ -752,15 +752,50 @@
           img.fetchPriority = priority;
         }
         const loadPromise = new Promise((resolve) => {
-          img.addEventListener("load", resolve, { once: true });
-          img.addEventListener("error", resolve, { once: true });
+          img.addEventListener(
+            "load",
+            () => {
+              resolve(true);
+            },
+            { once: true },
+          );
+          img.addEventListener(
+            "error",
+            () => {
+              resolve(false);
+            },
+            { once: true },
+          );
         });
         img.src = src;
-        let promise = loadPromise;
-        if (typeof img.decode === "function") {
-          promise = img.decode().catch(() => loadPromise);
-        }
-        const finalPromise = promise.then(() => {});
+        const promise = loadPromise.then((loaded) => {
+          if (!loaded) {
+            return false;
+          }
+          if (typeof img.decode === "function") {
+            return img
+              .decode()
+              .then(
+                () => true,
+                () => true,
+              );
+          }
+          return true;
+        });
+        const finalPromise = promise.then((loaded) => {
+          if (loaded) {
+            return;
+          }
+          const fallbackSrc = FALLBACK_IMAGE_MAP.get(src);
+          if (fallbackSrc && fallbackSrc !== src) {
+            return loadImage(fallbackSrc, priority).then(() => {
+              const fallbackCached = imageCache.get(fallbackSrc);
+              if (fallbackCached) {
+                imageCache.set(src, fallbackCached);
+              }
+            });
+          }
+        });
         imageCache.set(src, { img, promise: finalPromise });
         return finalPromise;
       }
@@ -875,7 +910,6 @@
       const languageAssets = resolveLanguageAssets(normalizedLanguage);
       const englishAssets = LANGUAGE_ASSET_MAP.en;
       const ICON_SOURCES = buildIconSources(languageAssets);
-      const ENGLISH_ICON_SOURCES = buildIconSources(englishAssets);
       const CRITICAL_IMAGE_SOURCES = [
         languageAssets.background,
         languageAssets.tapToSpin,
@@ -883,21 +917,23 @@
         languageAssets.boyIcon,
         languageAssets.girlIcon,
       ];
-      const ENGLISH_CRITICAL_IMAGE_SOURCES = [
-        englishAssets.background,
-        englishAssets.tapToSpin,
-        englishAssets.instructions,
-        englishAssets.boyIcon,
-        englishAssets.girlIcon,
-      ];
       const ALL_IMAGE_SOURCES = Array.from(
-        new Set([
-          ...ICON_SOURCES,
-          ...ENGLISH_ICON_SOURCES,
-          ...CRITICAL_IMAGE_SOURCES,
-          ...ENGLISH_CRITICAL_IMAGE_SOURCES,
-        ]),
+        new Set([...ICON_SOURCES, ...CRITICAL_IMAGE_SOURCES]),
       );
+      const FALLBACK_IMAGE_MAP = new Map();
+      [
+        "background",
+        "tapToSpin",
+        "instructions",
+        "boyIcon",
+        "girlIcon",
+      ].forEach((key) => {
+        const localizedSrc = languageAssets[key];
+        const englishSrc = englishAssets[key];
+        if (localizedSrc && englishSrc && localizedSrc !== englishSrc) {
+          FALLBACK_IMAGE_MAP.set(localizedSrc, englishSrc);
+        }
+      });
       let assetPreloadPromise = null;
       let assetsInitialized = false;
 
