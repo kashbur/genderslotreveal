@@ -89,7 +89,7 @@
       .landing-hint {
         position: absolute;
         left: 50%;
-        transform: translateX(-50%);
+        transform: translateX(-50%) scale(0.75);
         bottom: 7.5%;
         display: inline-flex;
         align-items: center;
@@ -123,22 +123,22 @@
       @keyframes hint-fade-in {
         from {
           opacity: 0;
-          transform: translateX(-50%) translateY(4px);
+          transform: translateX(-50%) translateY(4px) scale(0.75);
         }
         to {
           opacity: 1;
-          transform: translateX(-50%) translateY(0);
+          transform: translateX(-50%) translateY(0) scale(0.75);
         }
       }
 
       @keyframes hint-pulse {
         from {
-          transform: translateX(-50%) translateY(0) scale(1);
+          transform: translateX(-50%) translateY(0) scale(0.75);
           box-shadow: 0 6px 0 rgba(159, 83, 36, 0.55),
             0 10px 16px rgba(0, 0, 0, 0.16);
         }
         to {
-          transform: translateX(-50%) translateY(0) scale(1.04);
+          transform: translateX(-50%) translateY(0) scale(0.77);
           box-shadow: 0 8px 0 rgba(159, 83, 36, 0.6),
             0 14px 22px rgba(0, 0, 0, 0.2);
         }
