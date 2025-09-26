@@ -1141,9 +1141,19 @@
             applyLocalizedAssets();
           }
           if (!assetPreloadPromise) {
-            assetPreloadPromise = preloadImages(ALL_IMAGE_SOURCES, "high").catch(
-              () => {},
+            const essentialSources = [
+              languageAssets.background,
+              languageAssets.tapToSpin,
+              languageAssets.instructions,
+            ].filter(Boolean);
+            const essentialSet = new Set(essentialSources);
+            const secondarySources = ALL_IMAGE_SOURCES.filter(
+              (src) => !essentialSet.has(src),
             );
+            assetPreloadPromise = Promise.all([
+              preloadImages(essentialSources, "high"),
+              preloadImages(secondarySources),
+            ]).catch(() => {});
           }
           return assetPreloadPromise;
         }
