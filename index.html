@@ -594,6 +594,61 @@
         height: 112,
       };
 
+      // Unicode-safe base64 helpers
+      function b64EncodeUnicode(str) {
+        return btoa(
+          encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+            String.fromCharCode("0x" + p1),
+          ),
+        );
+      }
+      function b64DecodeUnicode(str) {
+        return decodeURIComponent(
+          Array.prototype.map
+            .call(atob(str), (c) =>
+              "%" + c.charCodeAt(0).toString(16).padStart(2, "0"),
+            )
+            .join(""),
+        );
+      }
+
+      function getParams() {
+        const raw = new URLSearchParams(window.location.search || "");
+        const d = raw.get("d");
+        if (d) {
+          try {
+            const decoded = b64DecodeUnicode(decodeURIComponent(d));
+            return Object.fromEntries(new URLSearchParams(decoded));
+          } catch (e) {
+            // fall back to plain params on failure
+          }
+        }
+        return Object.fromEntries(raw);
+      }
+
+      function escapeHTML(s) {
+        return s.replace(/[&<>"']/g, (m) =>
+          ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          })[m],
+        );
+      }
+
+      function buildObfuscatedUrl(base, obj) {
+        const p = new URLSearchParams();
+        Object.entries(obj).forEach(([key, value]) => {
+          if (value != null && value !== "") {
+            p.set(key, value);
+          }
+        });
+        const encoded = encodeURIComponent(b64EncodeUnicode(p.toString()));
+        return `${base}?d=${encoded}`;
+      }
+
       let introTextResizeHandler = null;
       let introTextResizeObserver = null;
 
@@ -659,32 +714,26 @@
           introTextResizeObserver.disconnect();
           introTextResizeObserver = null;
         }
-        const params = new URLSearchParams(window.location.search || "");
-        let introParam = params.get("intro");
+        const params = getParams();
+        let introParam = params.intro;
         if (introParam == null) {
-          introParam = params.get("message");
+          introParam = params.message;
         }
         if (introParam == null) {
           landingTextBox.classList.add("hidden");
           landingTextBox.innerHTML = "";
           return null;
         }
-        try {
-          introParam = decodeURIComponent(introParam);
-        } catch (error) {
-          // ignore decoding errors and use the original value
-        }
-        const trimmed = introParam.trim();
-        if (!trimmed) {
+        const rawMessage = introParam;
+        const message = String(rawMessage).replace(/\r\n/g, "\n").trim();
+        if (!message) {
           landingTextBox.classList.add("hidden");
           landingTextBox.innerHTML = "";
           return null;
         }
-        const withNewlines = trimmed.replace(/\\n/g, "\n");
-        const sanitized = withNewlines.replace(/[<>]/g, (char) =>
-          char === "<" ? "&lt;" : "&gt;",
-        );
-        const html = sanitized.replace(/\r?\n/g, "<br/>");
+        const normalized = message.replace(/\\n/g, "\n");
+        const safeMessage = escapeHTML(normalized);
+        const html = safeMessage.replace(/\n/g, "<br/>");
         landingTextBox.innerHTML =
           `<div class="intro-text"><span id="customMessage" class="intro-text-content">${html}</span></div>`;
         landingTextBox.classList.remove("hidden");
