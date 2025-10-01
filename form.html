@@ -47,6 +47,7 @@
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
+        position: relative;
       }
       label {
         display: block;
@@ -103,6 +104,11 @@
         box-shadow: 0 0 0 4px rgba(90, 93, 240, 0.15);
         outline: none;
       }
+      .language-controls {
+        display: flex;
+        justify-content: flex-end;
+      }
+
       .actions {
         display: flex;
         gap: 1rem;
@@ -170,6 +176,70 @@
         font-weight: 600;
         color: #1f2345;
       }
+
+      .language-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 18, 45, 0.55);
+        backdrop-filter: blur(6px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: clamp(1.5rem, 5vw, 3rem);
+        z-index: 999;
+      }
+
+      .language-overlay[hidden] {
+        display: none;
+      }
+
+      .language-dialog {
+        width: min(520px, 100%);
+        background: white;
+        border-radius: 24px;
+        padding: clamp(1.75rem, 4vw, 2.75rem);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        box-shadow: 0 28px 56px rgba(31, 35, 69, 0.25);
+      }
+
+      .language-dialog h2 {
+        margin: 0;
+        font-size: clamp(1.45rem, 4vw, 1.85rem);
+        font-weight: 600;
+        color: #1f2345;
+        text-align: center;
+      }
+
+      .language-dialog p {
+        margin: 0;
+        color: rgba(31, 35, 69, 0.78);
+        text-align: center;
+        font-size: 0.95rem;
+      }
+
+      .language-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 0.75rem;
+      }
+
+      .language-overlay .radio-option {
+        justify-content: center;
+      }
+
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+      }
       .preview-frame {
         aspect-ratio: 9 / 16;
         width: 100%;
@@ -196,14 +266,24 @@
     <main>
       <h1 id="formTitle">Customize Your Reveal Link</h1>
       <form id="revealForm">
+        <div class="language-controls">
+          <button
+            type="button"
+            class="secondary"
+            id="changeLanguageButton"
+            aria-haspopup="dialog"
+          >
+            Change Language
+          </button>
+        </div>
         <fieldset>
           <legend id="genderLabel">Boy or Girl?</legend>
           <div class="radio-group" role="radiogroup" aria-labelledby="genderLabel">
-            <label class="radio-option active">
+            <label class="radio-option gender-option active">
               <input type="radio" name="gender" value="boy" checked />
               <span data-gender-option="boy">Boy</span>
             </label>
-            <label class="radio-option">
+            <label class="radio-option gender-option">
               <input type="radio" name="gender" value="girl" />
               <span data-gender-option="girl">Girl</span>
             </label>
@@ -243,6 +323,46 @@
         ></iframe>
       </section>
     </main>
+    <div
+      class="language-overlay"
+      id="languageOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="languageHeading"
+      aria-describedby="languageDescription"
+      hidden
+    >
+      <div class="language-dialog">
+        <h2 id="languageHeading">Select a language</h2>
+        <p id="languageDescription">Choose the language for this reveal experience.</p>
+        <form id="languageForm">
+          <fieldset>
+            <legend class="visually-hidden">Available languages</legend>
+            <div class="language-options">
+              <label class="radio-option">
+                <input type="radio" name="language" value="en" checked />
+                <span data-language-name="en">English</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="language" value="es" />
+                <span data-language-name="es">Español</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="language" value="fr" />
+                <span data-language-name="fr">Français</span>
+              </label>
+              <label class="radio-option">
+                <input type="radio" name="language" value="de" />
+                <span data-language-name="de">Deutsch</span>
+              </label>
+            </div>
+          </fieldset>
+          <button type="submit" class="primary" id="languageConfirm">
+            Continue
+          </button>
+        </form>
+      </div>
+    </div>
     <script>
       const translations = {
         en: {
@@ -253,6 +373,17 @@
           copy: 'Copy to Clipboard',
           boy: 'Boy',
           girl: 'Girl',
+          preview: 'Live Preview',
+          changeLanguage: 'Change Language',
+          selectLanguageTitle: 'Select a language',
+          selectLanguageDescription: 'Choose the language for this reveal experience.',
+          confirmLanguage: 'Continue',
+          languageNames: {
+            en: 'English',
+            es: 'Español',
+            fr: 'Français',
+            de: 'Deutsch',
+          },
         },
         es: {
           title: 'Personaliza tu enlace',
@@ -262,15 +393,37 @@
           copy: 'Copiar',
           boy: 'Niño',
           girl: 'Niña',
+          preview: 'Vista previa en vivo',
+          changeLanguage: 'Cambiar idioma',
+          selectLanguageTitle: 'Selecciona un idioma',
+          selectLanguageDescription: 'Elige el idioma para esta revelación.',
+          confirmLanguage: 'Continuar',
+          languageNames: {
+            en: 'English',
+            es: 'Español',
+            fr: 'Français',
+            de: 'Deutsch',
+          },
         },
         fr: {
           title: 'Personnalisez votre lien',
-          gender: 'Garçon ou fille ?',
+          gender: 'Garçon ou fille ?',
           message: 'Message de révélation',
           generate: 'Générer le lien',
           copy: 'Copier',
           boy: 'Garçon',
           girl: 'Fille',
+          preview: 'Aperçu en direct',
+          changeLanguage: 'Changer de langue',
+          selectLanguageTitle: 'Sélectionnez une langue',
+          selectLanguageDescription: 'Choisissez la langue de cette révélation.',
+          confirmLanguage: 'Continuer',
+          languageNames: {
+            en: 'English',
+            es: 'Español',
+            fr: 'Français',
+            de: 'Deutsch',
+          },
         },
         de: {
           title: 'Passen Sie Ihren Link an',
@@ -280,16 +433,25 @@
           copy: 'Kopieren',
           boy: 'Junge',
           girl: 'Mädchen',
+          preview: 'Live-Vorschau',
+          changeLanguage: 'Sprache ändern',
+          selectLanguageTitle: 'Sprache auswählen',
+          selectLanguageDescription: 'Wähle die Sprache für diese Enthüllung.',
+          confirmLanguage: 'Weiter',
+          languageNames: {
+            en: 'English',
+            es: 'Español',
+            fr: 'Français',
+            de: 'Deutsch',
+          },
         },
       };
 
       const params = new URLSearchParams(window.location.search);
-      const langParam = params.get('lang') || 'en';
-      const lang = translations[langParam] ? langParam : 'en';
-      const t = translations[lang];
-
-      document.documentElement.lang = lang;
-      document.title = t.title;
+      const langParam = params.get('lang');
+      let currentLang = translations[langParam] ? langParam : 'en';
+      const shouldPromptForLanguage = !translations[langParam];
+      const fallbackLanguageNames = translations.en.languageNames;
 
       const formTitle = document.getElementById('formTitle');
       const genderLabel = document.getElementById('genderLabel');
@@ -299,16 +461,45 @@
       const copyButton = document.getElementById('copyButton');
       const resultUrl = document.getElementById('resultUrl');
       const previewFrame = document.getElementById('previewFrame');
-      const genderOptions = document.querySelectorAll('.radio-option');
+      const previewHeading = document.getElementById('previewHeading');
+      const genderOptions = document.querySelectorAll('.gender-option');
+      const boyLabel = document.querySelector('[data-gender-option="boy"]');
+      const girlLabel = document.querySelector('[data-gender-option="girl"]');
+      const changeLanguageButton = document.getElementById('changeLanguageButton');
+      const languageOverlay = document.getElementById('languageOverlay');
+      const languageForm = document.getElementById('languageForm');
+      const languageInputs = languageForm.querySelectorAll('input[name="language"]');
+      const languageNameElements = document.querySelectorAll('[data-language-name]');
+      const languageHeading = document.getElementById('languageHeading');
+      const languageDescription = document.getElementById('languageDescription');
+      const languageConfirm = document.getElementById('languageConfirm');
 
-      formTitle.textContent = t.title;
-      genderLabel.textContent = t.gender;
-      messageLabel.textContent = t.message;
-      messageField.placeholder = t.message;
-      generateButton.textContent = t.generate;
-      copyButton.textContent = t.copy;
-      document.querySelector('[data-gender-option="boy"]').textContent = t.boy;
-      document.querySelector('[data-gender-option="girl"]').textContent = t.girl;
+      function applyTranslations() {
+        const t = translations[currentLang] || translations.en;
+        document.documentElement.lang = currentLang;
+        document.title = t.title;
+        formTitle.textContent = t.title;
+        genderLabel.textContent = t.gender;
+        messageLabel.textContent = t.message;
+        messageField.placeholder = t.message;
+        generateButton.textContent = t.generate;
+        copyButton.textContent = t.copy;
+        copyButton.dataset.originalText = t.copy;
+        boyLabel.textContent = t.boy;
+        girlLabel.textContent = t.girl;
+        previewHeading.textContent = t.preview;
+        changeLanguageButton.textContent = t.changeLanguage;
+        languageHeading.textContent = t.selectLanguageTitle;
+        languageDescription.textContent = t.selectLanguageDescription;
+        languageConfirm.textContent = t.confirmLanguage;
+
+        languageNameElements.forEach((element) => {
+          const code = element.dataset.languageName;
+          const names = t.languageNames || {};
+          element.textContent =
+            names[code] || fallbackLanguageNames[code] || element.textContent;
+        });
+      }
 
       function b64EncodeUnicode(str) {
         return btoa(
@@ -325,7 +516,7 @@
         const messageValue = messageField.value || '';
 
         const innerParams = new URLSearchParams();
-        innerParams.set('lang', lang);
+        innerParams.set('lang', currentLang);
         innerParams.set('gender', genderValue);
         innerParams.set('message', messageValue);
 
@@ -349,6 +540,95 @@
         });
       }
 
+      function syncLanguageSelection() {
+        languageInputs.forEach((input) => {
+          const label = input.closest('.radio-option');
+          if (label) {
+            label.classList.toggle('active', input.checked);
+          }
+        });
+      }
+
+      function updateLanguageInUrl() {
+        const nextParams = new URLSearchParams(window.location.search);
+        nextParams.set('lang', currentLang);
+        const queryString = nextParams.toString();
+        const newUrl = `${window.location.pathname}${queryString ? `?${queryString}` : ''}`;
+        history.replaceState({}, '', newUrl);
+      }
+
+      function openLanguageOverlay() {
+        languageInputs.forEach((input) => {
+          input.checked = input.value === currentLang;
+        });
+        syncLanguageSelection();
+        languageOverlay.hidden = false;
+        const checked = languageForm.querySelector('input[name="language"]:checked');
+        if (checked) {
+          checked.focus();
+        }
+        document.body.style.overflow = 'hidden';
+      }
+
+      function closeLanguageOverlay() {
+        if (languageOverlay.hidden) {
+          return;
+        }
+        languageOverlay.hidden = true;
+        document.body.style.overflow = '';
+        changeLanguageButton.focus();
+      }
+
+      languageOverlay.addEventListener('click', (event) => {
+        if (event.target === languageOverlay) {
+          closeLanguageOverlay();
+        }
+      });
+
+      function getOverlayFocusableElements() {
+        return Array.from(
+          languageOverlay.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+          )
+        ).filter((element) => !element.hasAttribute('disabled'));
+      }
+
+      languageOverlay.addEventListener('keydown', (event) => {
+        if (event.key !== 'Tab') {
+          return;
+        }
+        const focusableElements = getOverlayFocusableElements();
+        if (!focusableElements.length) {
+          return;
+        }
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+        if (event.shiftKey) {
+          if (document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          }
+        } else if (document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+
+      document.addEventListener('focusin', (event) => {
+        if (languageOverlay.hidden) {
+          return;
+        }
+        if (!languageOverlay.contains(event.target)) {
+          const focusTarget =
+            languageForm.querySelector('input[name="language"]:checked') ||
+            languageInputs[0] ||
+            languageConfirm;
+          if (focusTarget) {
+            focusTarget.focus();
+          }
+        }
+      });
+
       genderOptions.forEach((label) => {
         const input = label.querySelector('input[type="radio"]');
         input.addEventListener('change', () => {
@@ -356,6 +636,12 @@
             setActiveRadio(label);
             updatePreview();
           }
+        });
+      });
+
+      languageInputs.forEach((input) => {
+        input.addEventListener('change', () => {
+          syncLanguageSelection();
         });
       });
 
@@ -381,7 +667,40 @@
         }
       });
 
+      changeLanguageButton.addEventListener('click', () => {
+        openLanguageOverlay();
+      });
+
+      languageForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const selected = languageForm.querySelector('input[name="language"]:checked');
+        if (!selected) {
+          return;
+        }
+        const chosenLang = selected.value;
+        if (!translations[chosenLang]) {
+          return;
+        }
+        currentLang = chosenLang;
+        applyTranslations();
+        updatePreview();
+        updateLanguageInUrl();
+        closeLanguageOverlay();
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !languageOverlay.hidden) {
+          event.preventDefault();
+          closeLanguageOverlay();
+        }
+      });
+
+      applyTranslations();
       updatePreview();
+
+      if (shouldPromptForLanguage) {
+        openLanguageOverlay();
+      }
     </script>
   </body>
 </html>
