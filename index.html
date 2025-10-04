@@ -594,6 +594,38 @@
         height: 112,
       };
 
+      const rawSearch = window.location.search || "";
+      const dParamMatch = rawSearch.match(/(?:[?&])d=([^&]*)/i);
+      let decodedSearchParams = null;
+
+      if (dParamMatch && typeof dParamMatch[1] === "string") {
+        try {
+          const decodedComponent = decodeURIComponent(dParamMatch[1]);
+          let normalizedBase64 = decodedComponent.replace(/-/g, "+").replace(/_/g, "/");
+          const paddingNeeded = normalizedBase64.length % 4;
+          if (paddingNeeded) {
+            normalizedBase64 += "=".repeat(4 - paddingNeeded);
+          }
+          const decodedQueryString = atob(normalizedBase64);
+          const queryString = decodedQueryString.startsWith("?")
+            ? decodedQueryString.slice(1)
+            : decodedQueryString;
+          decodedSearchParams = new URLSearchParams(queryString);
+        } catch (error) {
+          decodedSearchParams = null;
+        }
+      }
+
+      const MERGED_SEARCH_PARAMS = (() => {
+        const params = new URLSearchParams(rawSearch || "");
+        if (decodedSearchParams) {
+          decodedSearchParams.forEach((value, key) => {
+            params.set(key, value);
+          });
+        }
+        return params;
+      })();
+
       let introTextResizeHandler = null;
       let introTextResizeObserver = null;
 
@@ -659,7 +691,7 @@
           introTextResizeObserver.disconnect();
           introTextResizeObserver = null;
         }
-        const params = new URLSearchParams(window.location.search || "");
+        const params = MERGED_SEARCH_PARAMS;
         let introParam = params.get("intro");
         if (introParam == null) {
           introParam = params.get("message");
@@ -831,11 +863,15 @@
       }
 
       function getParams() {
-        const url = new URL(window.location.href);
         const langParam = (
-          url.searchParams.get("lang") || url.searchParams.get("language") || ""
+          MERGED_SEARCH_PARAMS.get("lang") ||
+          MERGED_SEARCH_PARAMS.get("language") ||
+          ""
         ).toLowerCase();
-        const genderParam = (url.searchParams.get("gender") || "").toLowerCase();
+        const genderParam = (
+          MERGED_SEARCH_PARAMS.get("gender") ||
+          ""
+        ).toLowerCase();
         return { lang: langParam, gender: genderParam };
       }
 
