@@ -165,6 +165,11 @@
         transform: translateY(-1px);
         outline: none;
       }
+      button.secondary[disabled] {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+      }
       section.preview {
         display: flex;
         flex-direction: column;
@@ -280,11 +285,11 @@
           <legend id="genderLabel">Boy or Girl?</legend>
           <div class="radio-group" role="radiogroup" aria-labelledby="genderLabel">
             <label class="radio-option gender-option active">
-              <input type="radio" name="gender" value="boy" checked />
+              <input type="radio" name="gender" value="1" checked />
               <span data-gender-option="boy">Boy</span>
             </label>
             <label class="radio-option gender-option">
-              <input type="radio" name="gender" value="girl" />
+              <input type="radio" name="gender" value="2" />
               <span data-gender-option="girl">Girl</span>
             </label>
           </div>
@@ -307,7 +312,13 @@
             value="https://genderslotreveal.netlify.app/"
           />
           <div class="output-controls">
-            <button type="button" class="secondary" id="copyButton">
+            <button
+              type="button"
+              class="secondary"
+              id="copyButton"
+              disabled
+              aria-disabled="true"
+            >
               Copy to Clipboard
             </button>
           </div>
@@ -474,6 +485,21 @@
       const languageDescription = document.getElementById('languageDescription');
       const languageConfirm = document.getElementById('languageConfirm');
 
+      function setCopyAvailability(isEnabled) {
+        copyButton.disabled = !isEnabled;
+        copyButton.setAttribute('aria-disabled', String(!isEnabled));
+        if (!isEnabled) {
+          const locale = translations[currentLang] || translations.en || {};
+          const originalText =
+            copyButton.dataset.originalText || locale.copy || 'Copy to Clipboard';
+          copyButton.textContent = originalText;
+        }
+      }
+
+      function markNeedsGeneration() {
+        setCopyAvailability(false);
+      }
+
       function applyTranslations() {
         const t = translations[currentLang] || translations.en;
         document.documentElement.lang = currentLang;
@@ -634,6 +660,7 @@
         input.addEventListener('change', () => {
           if (input.checked) {
             setActiveRadio(label);
+            markNeedsGeneration();
             updatePreview();
           }
         });
@@ -646,11 +673,15 @@
       });
 
       messageField.addEventListener('input', () => {
+        markNeedsGeneration();
         updatePreview();
       });
 
       generateButton.addEventListener('click', () => {
         updatePreview();
+        setCopyAvailability(true);
+        resultUrl.focus();
+        resultUrl.select();
       });
 
       copyButton.addEventListener('click', async () => {
@@ -683,6 +714,7 @@
         }
         currentLang = chosenLang;
         applyTranslations();
+        markNeedsGeneration();
         updatePreview();
         updateLanguageInUrl();
         closeLanguageOverlay();
@@ -696,6 +728,7 @@
       });
 
       applyTranslations();
+      setCopyAvailability(false);
       updatePreview();
 
       if (shouldPromptForLanguage) {
