@@ -303,13 +303,12 @@
             Generate URL
           </button>
         </div>
-        <div class="output">
+        <div class="output" id="resultContainer" hidden>
           <input
             type="text"
             id="resultUrl"
             readonly
             aria-live="polite"
-            value="https://genderslotreveal.netlify.app/"
           />
           <div class="output-controls">
             <button
@@ -470,6 +469,7 @@
       const messageField = document.getElementById('message');
       const generateButton = document.getElementById('generateButton');
       const copyButton = document.getElementById('copyButton');
+      const resultContainer = document.getElementById('resultContainer');
       const resultUrl = document.getElementById('resultUrl');
       const previewFrame = document.getElementById('previewFrame');
       const previewHeading = document.getElementById('previewHeading');
@@ -488,11 +488,13 @@
       function setCopyAvailability(isEnabled) {
         copyButton.disabled = !isEnabled;
         copyButton.setAttribute('aria-disabled', String(!isEnabled));
+        resultContainer.hidden = !isEnabled;
         if (!isEnabled) {
           const locale = translations[currentLang] || translations.en || {};
           const originalText =
             copyButton.dataset.originalText || locale.copy || 'Copy to Clipboard';
           copyButton.textContent = originalText;
+          resultUrl.value = '';
         }
       }
 
@@ -550,9 +552,11 @@
         return `https://genderslotreveal.netlify.app/?d=${encodeURIComponent(encoded)}`;
       }
 
-      function updatePreview() {
+      function updatePreview({ updateResultInput = false } = {}) {
         const url = buildObfuscatedUrl();
-        resultUrl.value = url;
+        if (updateResultInput) {
+          resultUrl.value = url;
+        }
         previewFrame.src = url;
       }
 
@@ -678,7 +682,7 @@
       });
 
       generateButton.addEventListener('click', () => {
-        updatePreview();
+        updatePreview({ updateResultInput: true });
         setCopyAvailability(true);
         resultUrl.focus();
         resultUrl.select();
