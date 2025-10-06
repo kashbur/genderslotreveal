@@ -640,16 +640,27 @@
         if (!textContainer || !textElement) {
           return;
         }
-        const availableWidth = textContainer.clientWidth;
-        const availableHeight = textContainer.clientHeight;
-        if (!availableWidth || !availableHeight) {
+        const computedStyles = window.getComputedStyle(textContainer);
+        const paddingLeft = parseFloat(computedStyles.paddingLeft) || 0;
+        const paddingRight = parseFloat(computedStyles.paddingRight) || 0;
+        const paddingTop = parseFloat(computedStyles.paddingTop) || 0;
+        const paddingBottom = parseFloat(computedStyles.paddingBottom) || 0;
+
+        const availableWidth = Math.max(
+          0,
+          textContainer.clientWidth - paddingLeft - paddingRight,
+        );
+        const availableHeight = Math.max(
+          0,
+          textContainer.clientHeight - paddingTop - paddingBottom,
+        );
+
+        if (availableWidth === 0 || availableHeight === 0) {
           return;
         }
 
-        const widthPadding = Math.max(8, availableWidth * 0.02);
-        const widthLimit = Math.max(0, availableWidth - widthPadding);
-        const heightPadding = Math.max(8, availableHeight * 0.04);
-        const heightLimit = Math.max(0, availableHeight - heightPadding);
+        const widthLimit = availableWidth;
+        const heightLimit = availableHeight;
         const minFontSize = 8;
         const maxFontSize = Math.min(
           900,
