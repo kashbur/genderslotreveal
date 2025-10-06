@@ -648,6 +648,8 @@
 
         const widthPadding = Math.max(8, availableWidth * 0.02);
         const widthLimit = Math.max(0, availableWidth - widthPadding);
+        const heightPadding = Math.max(8, availableHeight * 0.04);
+        const heightLimit = Math.max(0, availableHeight - heightPadding);
         const minFontSize = 8;
         const maxFontSize = Math.min(
           900,
@@ -666,7 +668,7 @@
           const fitsWithinWidth =
             textElement.scrollWidth <= widthLimit + tolerance;
           const fitsWithinHeight =
-            textElement.scrollHeight <= availableHeight + tolerance;
+            textElement.scrollHeight <= heightLimit + tolerance;
           if (fitsWithinWidth && fitsWithinHeight) {
             best = mid;
             low = mid + tolerance;
@@ -675,7 +677,10 @@
           }
         }
 
-        textElement.style.fontSize = `${best}px`;
+        textElement.style.fontSize = `${Math.max(
+          minFontSize,
+          best - tolerance,
+        )}px`;
         textElement.style.lineHeight = "1.08";
       }
 
