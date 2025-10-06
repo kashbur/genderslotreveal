@@ -86,6 +86,12 @@
         cursor: pointer;
       }
 
+      #landing-screen:focus-visible,
+      .spin-button:focus-visible {
+        outline: 3px solid rgba(255, 255, 255, 0.85);
+        outline-offset: 4px;
+      }
+
       .landing-hint {
         position: absolute;
         left: 50%;
@@ -538,7 +544,12 @@
   </head>
   <body>
     <div class="aspect-container">
-      <div id="landing-screen">
+      <div
+        id="landing-screen"
+        role="button"
+        tabindex="0"
+        aria-label="Start the reveal"
+      >
         <div id="landingTextBox" class="hidden"></div>
         <div id="landingHint" class="landing-hint" aria-live="polite" hidden></div>
       </div>
@@ -547,7 +558,13 @@
         <div id="reel1" class="reel blur-background"></div>
         <div id="reel2" class="reel blur-background"></div>
         <div id="reel3" class="reel blur-background"></div>
-        <div class="spin-button blur-background" id="spinButton">
+        <div
+          class="spin-button blur-background"
+          id="spinButton"
+          role="button"
+          tabindex="0"
+          aria-label="Spin to reveal"
+        >
           <img
             src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
             alt="Spin"
@@ -593,6 +610,9 @@
         width: 112,
         height: 112,
       };
+      const SUPPORTS_VIBRATION =
+        typeof navigator !== "undefined" &&
+        typeof navigator.vibrate === "function";
 
       const rawSearch = window.location.search || "";
       const dParamMatch = rawSearch.match(/(?:[?&])d=([^&]*)/i);
@@ -628,6 +648,8 @@
 
       let introTextResizeHandler = null;
       let introTextResizeObserver = null;
+      let activeConfettiFrameId = null;
+      let activeConfettiTimeoutId = null;
 
       function fitIntroTextToContainer(landingTextBox) {
         if (!landingTextBox) {
@@ -901,6 +923,11 @@
         es: "Haz clic en cualquier lugar para empezar",
         fr: "Cliquez n’importe où pour commencer",
         de: "Klicken Sie irgendwo, um zu starten",
+        pt: "Toque em qualquer lugar para começar",
+        it: "Tocca in qualsiasi punto per iniziare",
+        nl: "Klik ergens om te beginnen",
+        sv: "Tryck var som helst för att starta",
+        ar: "اضغط في أي مكان للبدء",
       };
 
       function getHintText(lang) {
@@ -1183,6 +1210,9 @@
         for (let i = 1; i <= 3; i++) {
           reels.push(document.getElementById(`reel${i}`));
         }
+        if (!spinButton) {
+          console.error("Spin button element not found; reveal interactions disabled.");
+        }
         const introOverlay = document.getElementById("introOverlay");
         const introLinesDiv = document.getElementById("introLines");
         const introColorOverlay = introOverlay.querySelector(".color-overlay");
@@ -1306,6 +1336,12 @@
             dismissLanding,
             { passive: false },
           );
+          landingScreen.addEventListener("keydown", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              dismissLanding();
+            }
+          });
         } else {
           startGameAssetPreload();
         }
@@ -1369,8 +1405,25 @@
           date: "'Poppins'",
           from: "'Poppins'",
         };
-        const audioContext = new (window.AudioContext ||
-          window.webkitAudioContext)();
+        let audioContext = null;
+
+        function getAudioContext() {
+          if (audioContext) {
+            return audioContext;
+          }
+          const AudioContextConstructor =
+            window.AudioContext || window.webkitAudioContext;
+          if (!AudioContextConstructor) {
+            return null;
+          }
+          try {
+            audioContext = new AudioContextConstructor();
+          } catch (error) {
+            audioContext = null;
+            return null;
+          }
+          return audioContext;
+        }
 
         // Set overlay color on reveal
         introColorOverlay.style.backgroundColor = defaultOverlayColor;
@@ -1380,80 +1433,129 @@
 
         // Hide instructions overlay
         function hideInstructionsOverlay() {
+          if (!instructionsOverlay) {
+            return;
+          }
           instructionsOverlay.style.opacity = "0";
-          slotMachine.classList.remove("blur-background");
-          reels.forEach((r) => r.classList.remove("blur-background"));
-          spinButton.classList.remove("blur-background");
+          if (slotMachine) {
+            slotMachine.classList.remove("blur-background");
+          }
+          reels.forEach((r) => r && r.classList.remove("blur-background"));
+          if (spinButton) {
+            spinButton.classList.remove("blur-background");
+          }
           instructionsOverlay.style.pointerEvents = "none";
           setTimeout(() => {
-            if (instructionsOverlay.parentNode)
+            if (instructionsOverlay && instructionsOverlay.parentNode) {
               instructionsOverlay.parentNode.removeChild(instructionsOverlay);
+            }
           }, 400);
         }
-        instructionsOverlay.addEventListener("click", hideInstructionsOverlay);
-        instructionsOverlay.addEventListener(
-          "touchstart",
-          function (e) {
-            e.preventDefault();
-            hideInstructionsOverlay();
-          },
-          { passive: false },
-        );
+        if (instructionsOverlay) {
+          instructionsOverlay.addEventListener("click", hideInstructionsOverlay);
+          instructionsOverlay.addEventListener(
+            "touchstart",
+            function (e) {
+              e.preventDefault();
+              hideInstructionsOverlay();
+            },
+            { passive: false },
+          );
+        }
 
         // Spin button interactions
         function playClickSound() {
+          const context = getAudioContext();
+          if (!context) {
+            return;
+          }
           try {
-            if (audioContext.state === "suspended") {
-              audioContext.resume();
+            if (context.state === "suspended") {
+              context.resume().catch(() => {});
             }
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+            const oscillator = context.createOscillator();
+            const gainNode = context.createGain();
+            const now = context.currentTime;
             oscillator.type = "sine";
-            oscillator.frequency.setValueAtTime(210, audioContext.currentTime);
-            gainNode.gain.setValueAtTime(0.14, audioContext.currentTime);
-            gainNode.gain.exponentialRampToValueAtTime(
-              0.001,
-              audioContext.currentTime + 0.14,
-            );
+            oscillator.frequency.setValueAtTime(210, now);
+            gainNode.gain.setValueAtTime(0.14, now);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
             oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
+            gainNode.connect(context.destination);
             oscillator.start();
-            oscillator.stop(audioContext.currentTime + 0.14);
+            oscillator.stop(now + 0.14);
           } catch (e) {}
         }
-        spinButton.addEventListener("mousedown", function () {
-          this.classList.add("pressed");
-          if (navigator.vibrate) navigator.vibrate(24);
+
+        function startPressFeedback() {
+          if (!spinButton) {
+            return;
+          }
+          spinButton.classList.add("pressed");
+          if (SUPPORTS_VIBRATION) {
+            navigator.vibrate(24);
+          }
           playClickSound();
-        });
-        spinButton.addEventListener("mouseup", function () {
-          this.classList.remove("pressed");
-        });
-        spinButton.addEventListener("mouseleave", function () {
-          this.classList.remove("pressed");
-        });
-        spinButton.addEventListener(
-          "touchstart",
-          function (e) {
-            e.preventDefault();
-            this.classList.add("pressed");
-            if (navigator.vibrate) navigator.vibrate(24);
-            playClickSound();
-          },
-          { passive: false },
-        );
-        spinButton.addEventListener(
-          "touchend",
-          function (e) {
-            e.preventDefault();
-            this.classList.remove("pressed");
+        }
+
+        function stopPressFeedback() {
+          if (!spinButton) {
+            return;
+          }
+          spinButton.classList.remove("pressed");
+        }
+
+        if (spinButton) {
+          spinButton.addEventListener("mousedown", () => {
+            startPressFeedback();
+          });
+          spinButton.addEventListener("mouseup", () => {
+            stopPressFeedback();
+          });
+          spinButton.addEventListener("mouseleave", () => {
+            stopPressFeedback();
+          });
+          spinButton.addEventListener(
+            "touchstart",
+            (e) => {
+              e.preventDefault();
+              startPressFeedback();
+            },
+            { passive: false },
+          );
+          spinButton.addEventListener(
+            "touchend",
+            (e) => {
+              e.preventDefault();
+              stopPressFeedback();
+              handleSpin();
+            },
+            { passive: false },
+          );
+          spinButton.addEventListener("click", handleSpin);
+          spinButton.addEventListener("keydown", (event) => {
+            if (event.key !== "Enter" && event.key !== " ") {
+              return;
+            }
+            event.preventDefault();
+            if (spinButton.style.pointerEvents === "none") {
+              return;
+            }
+            startPressFeedback();
             handleSpin();
-          },
-          { passive: false },
-        );
-        spinButton.addEventListener("click", handleSpin);
+          });
+          spinButton.addEventListener("keyup", (event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              stopPressFeedback();
+            }
+          });
+        }
 
         function handleSpin() {
+          if (!spinButton) {
+            return;
+          }
           spinCount++;
           spinButton.style.pointerEvents = "none";
           const spinDuration = 900;
@@ -1651,10 +1753,28 @@
           }, 8000);
         }
         // -------- Confetti logic (unchanged) ----------
-        function createConfetti(customColors) {
+        function removeConfettiElements() {
           document.querySelectorAll(".confetti").forEach((el) => {
-            if (el.parentNode) el.parentNode.removeChild(el);
+            if (el.parentNode) {
+              el.parentNode.removeChild(el);
+            }
           });
+        }
+
+        function cancelActiveConfetti() {
+          if (activeConfettiFrameId !== null) {
+            cancelAnimationFrame(activeConfettiFrameId);
+            activeConfettiFrameId = null;
+          }
+          if (activeConfettiTimeoutId !== null) {
+            clearTimeout(activeConfettiTimeoutId);
+            activeConfettiTimeoutId = null;
+          }
+          removeConfettiElements();
+        }
+
+        function createConfetti(customColors) {
+          cancelActiveConfetti();
           const colors = customColors || [
             "#FFD700",
             "#FFC125",
@@ -1678,6 +1798,9 @@
             "#CCCCCC",
           ];
           const container = document.querySelector(".slot-machine-container");
+          if (!container) {
+            return;
+          }
           const confettiElements = [];
           const viewportWidth = container.offsetWidth,
             viewportHeight = container.offsetHeight;
@@ -1729,8 +1852,7 @@
               airResistance: 0.97 + Math.random() * 0.02,
             });
           }
-          let lastTime = performance.now(),
-            animationFrameId;
+          let lastTime = performance.now();
           function animateAllConfetti(currentTime) {
             const deltaTime = Math.min((currentTime - lastTime) / 16.67, 2);
             lastTime = currentTime;
@@ -1763,24 +1885,18 @@
                 }
               } else if (confetti.element.parentNode) {
                 confetti.element.parentNode.removeChild(confetti.element);
-          }
-        });
-            if (activeConfetti)
-              animationFrameId = requestAnimationFrame(animateAllConfetti);
-            else
-              confettiElements.forEach((confetti) => {
-                if (confetti.element.parentNode)
-                  confetti.element.parentNode.removeChild(confetti.element);
-              });
-          }
-          animationFrameId = requestAnimationFrame(animateAllConfetti);
-          setTimeout(() => {
-            if (animationFrameId) {
-              cancelAnimationFrame(animationFrameId);
-              document.querySelectorAll(".confetti").forEach((el) => {
-                if (el.parentNode) el.parentNode.removeChild(el);
-              });
+              }
+            });
+            if (activeConfetti) {
+              activeConfettiFrameId = requestAnimationFrame(animateAllConfetti);
+            } else {
+              activeConfettiFrameId = null;
+              removeConfettiElements();
             }
+          }
+          activeConfettiFrameId = requestAnimationFrame(animateAllConfetti);
+          activeConfettiTimeoutId = window.setTimeout(() => {
+            cancelActiveConfetti();
           }, 8000);
         }
         window.addEventListener("resize", refitAllLines);
