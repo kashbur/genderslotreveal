@@ -79,7 +79,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url("img/Assets/babyjackpot.png");
+        background-color: #f4efe8;
         background-size: cover;
         background-position: center;
         z-index: 20;
@@ -937,6 +937,7 @@
 
       const LANGUAGE_ASSET_MAP = {
         en: {
+          landing: "img/Assets/babyjackpot.png",
           background: "img/Assets/background.png",
           tapToSpin: "img/Assets/taptospin.png",
           instructions: "img/Assets/instructions.png",
@@ -944,6 +945,7 @@
           girlIcon: "img/Assets/girl.png",
         },
         es: {
+          landing: "img/Assets/Spanish/babyjackpot-spanish.png",
           background: "img/Assets/Spanish/background-spanish.png",
           tapToSpin: "img/Assets/Spanish/taptospin-spanish.png",
           instructions: "img/Assets/Spanish/instructions-spanish.png",
@@ -951,6 +953,7 @@
           girlIcon: "img/Assets/Spanish/girl-spanish.png",
         },
         fr: {
+          landing: "img/Assets/French/babyjackpot-french.png",
           background: "img/Assets/French/background-french.png",
           tapToSpin: "img/Assets/French/taptospin-french.png",
           instructions: "img/Assets/French/instructions-french.png",
@@ -958,6 +961,7 @@
           girlIcon: "img/Assets/French/girl-french.png",
         },
         de: {
+          landing: "img/Assets/German/babyjackpot-german.png",
           background: "img/Assets/German/background-german.png",
           tapToSpin: "img/Assets/German/taptospin-german.png",
           instructions: "img/Assets/German/instructions-german.png",
@@ -995,6 +999,7 @@
       const englishAssets = LANGUAGE_ASSET_MAP.en;
       const ICON_SOURCES = buildIconSources(languageAssets);
       const CRITICAL_IMAGE_SOURCES = [
+        languageAssets.landing,
         languageAssets.background,
         languageAssets.tapToSpin,
         languageAssets.instructions,
@@ -1006,6 +1011,7 @@
       );
       const FALLBACK_IMAGE_MAP = new Map();
       [
+        "landing",
         "background",
         "tapToSpin",
         "instructions",
@@ -1265,6 +1271,7 @@
           }
           if (!assetPreloadPromise) {
             const essentialSources = [
+              languageAssets.landing,
               languageAssets.background,
               languageAssets.tapToSpin,
               languageAssets.instructions,
@@ -1280,20 +1287,24 @@
           }
           return assetPreloadPromise;
         }
-        const landingBackgrounds = {
-          es: "img/Assets/Spanish/babyjackpot-spanish.png",
-          fr: "img/Assets/French/babyjackpot-french.png",
-          de: "img/Assets/German/babyjackpot-german.png",
-        };
         const landingScreen = document.getElementById("landing-screen");
         const landingHint = document.getElementById("landingHint");
         let landingHintTimeout = null;
         let refitIntroText = null;
         if (landingScreen) {
-          const landingImage =
-            landingBackgrounds[normalizedLanguage] ||
-            "img/Assets/babyjackpot.png";
-          landingScreen.style.backgroundImage = `url("${landingImage}")`;
+          const landingImage = languageAssets.landing || englishAssets.landing;
+          const applyLandingBackground = () => {
+            if (!landingImage) {
+              return;
+            }
+            const cached = imageCache.get(landingImage);
+            const finalSrc =
+              cached && cached.img
+                ? cached.img.currentSrc || cached.img.src || landingImage
+                : landingImage;
+            landingScreen.style.backgroundImage = `url("${finalSrc}")`;
+          };
+          applyLandingBackground();
           refitIntroText = applyIntroTextFromURL();
           if (landingHint) {
             landingHint.textContent = getHintText(normalizedLanguage);
@@ -1305,13 +1316,16 @@
               landingHint.classList.add("show");
             }, 1000);
           }
-          const landingBgImage = new Image();
-          landingBgImage.addEventListener("load", () => {
-            if (typeof refitIntroText === "function") {
-              refitIntroText();
-            }
-          });
-          landingBgImage.src = landingImage;
+          if (landingImage) {
+            loadImage(landingImage, "high")
+              .then(() => {
+                applyLandingBackground();
+                if (typeof refitIntroText === "function") {
+                  refitIntroText();
+                }
+              })
+              .catch(() => {});
+          }
           const dismissLanding = (event) => {
             if (event) {
               event.preventDefault();
