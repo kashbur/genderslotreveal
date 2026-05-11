@@ -372,6 +372,11 @@
               <span class="color-swatch" style="background: #2f2a24"></span>
               <span data-color-option="charcoal">Charcoal</span>
             </label>
+            <label class="radio-option color-option">
+              <input type="radio" name="introColor" value="custom" />
+              <span class="color-swatch" id="customIntroColorSwatch" style="background: #986f17"></span>
+              <span data-color-option="custom">Custom</span>
+            </label>
           </div>
           <div class="custom-color-control">
             <input type="color" id="customIntroColor" value="#986f17" aria-label="Custom intro text color" />
@@ -477,6 +482,7 @@
             rose: 'Rose',
             teal: 'Teal',
             charcoal: 'Charcoal',
+            custom: 'Custom',
           },
           preview: 'Live Preview',
           changeLanguage: 'Change Language',
@@ -506,6 +512,7 @@
             rose: 'Rosa',
             teal: 'Verde azulado',
             charcoal: 'Carbón',
+            custom: 'Personalizado',
           },
           preview: 'Vista previa en vivo',
           changeLanguage: 'Cambiar idioma',
@@ -535,6 +542,7 @@
             rose: 'Rose',
             teal: 'Sarcelle',
             charcoal: 'Anthracite',
+            custom: 'Personnalisé',
           },
           preview: 'Aperçu en direct',
           changeLanguage: 'Changer de langue',
@@ -564,6 +572,7 @@
             rose: 'Rosa',
             teal: 'Petrol',
             charcoal: 'Anthrazit',
+            custom: 'Eigene Farbe',
           },
           preview: 'Live-Vorschau',
           changeLanguage: 'Sprache ändern',
@@ -601,6 +610,9 @@
       const boyLabel = document.querySelector('[data-gender-option="boy"]');
       const girlLabel = document.querySelector('[data-gender-option="girl"]');
       const colorLabels = document.querySelectorAll('[data-color-option]');
+      const customIntroColor = document.getElementById('customIntroColor');
+      const customIntroColorText = document.getElementById('customIntroColorText');
+      const customIntroColorSwatch = document.getElementById('customIntroColorSwatch');
       const changeLanguageButton = document.getElementById('changeLanguageButton');
       const languageOverlay = document.getElementById('languageOverlay');
       const languageForm = document.getElementById('languageForm');
@@ -672,9 +684,11 @@
           document.querySelector('input[name="gender"]:checked') || { value: '' }
         ).value;
         const messageValue = messageField.value || '';
-        const introColorValue = (
-          document.querySelector('input[name="introColor"]:checked') || { value: 'honey' }
-        ).value;
+        const checkedIntroColor =
+          document.querySelector('input[name="introColor"]:checked') || { value: 'honey' };
+        const customColorValue = customIntroColor.value || '#986f17';
+        const introColorValue =
+          checkedIntroColor.value === 'custom' ? customColorValue : checkedIntroColor.value;
 
         const innerParams = new URLSearchParams();
         innerParams.set('lang', currentLang);
@@ -813,6 +827,61 @@
             updatePreview();
           }
         });
+      });
+
+      function selectCustomIntroColor() {
+        const customInput = document.querySelector('input[name="introColor"][value="custom"]');
+        if (!customInput) {
+          return;
+        }
+        customInput.checked = true;
+        const customLabel = customInput.closest('.color-option');
+        if (customLabel) {
+          setActiveRadio(customLabel, colorOptions);
+        }
+      }
+
+      function normalizeHexColor(value) {
+        const trimmed = (value || '').trim();
+        if (/^#[0-9a-f]{6}$/i.test(trimmed)) {
+          return trimmed.toUpperCase();
+        }
+        return null;
+      }
+
+      function syncCustomIntroColor(value, { updatePicker = true, updateText = true } = {}) {
+        const normalized = normalizeHexColor(value);
+        if (!normalized) {
+          return false;
+        }
+        if (updatePicker) {
+          customIntroColor.value = normalized.toLowerCase();
+        }
+        if (updateText) {
+          customIntroColorText.value = normalized;
+        }
+        customIntroColorSwatch.style.background = normalized;
+        selectCustomIntroColor();
+        markNeedsGeneration();
+        updatePreview();
+        return true;
+      }
+
+      customIntroColor.addEventListener('input', () => {
+        syncCustomIntroColor(customIntroColor.value, { updatePicker: false });
+      });
+
+      customIntroColorText.addEventListener('input', () => {
+        const value = customIntroColorText.value;
+        if (normalizeHexColor(value)) {
+          syncCustomIntroColor(value, { updateText: false });
+        }
+      });
+
+      customIntroColorText.addEventListener('blur', () => {
+        if (!syncCustomIntroColor(customIntroColorText.value)) {
+          customIntroColorText.value = customIntroColor.value.toUpperCase();
+        }
       });
 
       languageInputs.forEach((input) => {
