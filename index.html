@@ -871,6 +871,9 @@
 
         textElement.style.fontSize = `${minFontSize}px`;
         textElement.style.lineHeight = "1.08";
+        textElement.style.display = "block";
+        textElement.style.width = `${widthLimit}px`;
+        textElement.style.maxWidth = `${widthLimit}px`;
 
         while (low <= high) {
           const mid = (low + high) / 2;
@@ -893,6 +896,9 @@
           best - tolerance,
         )}px`;
         textElement.style.lineHeight = "1.08";
+        textElement.style.display = "block";
+        textElement.style.width = "100%";
+        textElement.style.maxWidth = "100%";
       }
 
       function applyIntroTextFromURL() {
@@ -915,7 +921,7 @@
           introParam = params.get("message");
         }
         if (introParam == null) {
-          introParam = "Spin to see\nwhat baby\nwill be!";
+          introParam = "Spin to see what baby will be!";
         }
         try {
           introParam = decodeURIComponent(introParam);
