@@ -104,6 +104,23 @@
         box-shadow: 0 0 0 4px rgba(90, 93, 240, 0.15);
         outline: none;
       }
+      .color-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.75rem;
+      }
+      .color-option {
+        align-items: center;
+        gap: 0.65rem;
+      }
+      .color-swatch {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid rgba(255, 255, 255, 0.9);
+        box-shadow: 0 0 0 1px rgba(31, 35, 69, 0.18);
+        flex: 0 0 auto;
+      }
       .language-controls {
         display: flex;
         justify-content: flex-end;
@@ -298,6 +315,41 @@
           <label for="message" id="messageLabel">Reveal Message</label>
           <textarea id="message" placeholder="Reveal Message"></textarea>
         </div>
+        <fieldset>
+          <legend id="textColorLabel">Intro Text Color</legend>
+          <div class="radio-group color-grid" role="radiogroup" aria-labelledby="textColorLabel">
+            <label class="radio-option color-option active">
+              <input type="radio" name="introColor" value="honey" checked />
+              <span class="color-swatch" style="background: #986f17"></span>
+              <span data-color-option="honey">Honey</span>
+            </label>
+            <label class="radio-option color-option">
+              <input type="radio" name="introColor" value="cocoa" />
+              <span class="color-swatch" style="background: #7e5e4f"></span>
+              <span data-color-option="cocoa">Cocoa</span>
+            </label>
+            <label class="radio-option color-option">
+              <input type="radio" name="introColor" value="coral" />
+              <span class="color-swatch" style="background: #c77752"></span>
+              <span data-color-option="coral">Coral</span>
+            </label>
+            <label class="radio-option color-option">
+              <input type="radio" name="introColor" value="rose" />
+              <span class="color-swatch" style="background: #b65f78"></span>
+              <span data-color-option="rose">Rose</span>
+            </label>
+            <label class="radio-option color-option">
+              <input type="radio" name="introColor" value="teal" />
+              <span class="color-swatch" style="background: #2f776f"></span>
+              <span data-color-option="teal">Teal</span>
+            </label>
+            <label class="radio-option color-option">
+              <input type="radio" name="introColor" value="cream" />
+              <span class="color-swatch" style="background: #fff4d6"></span>
+              <span data-color-option="cream">Cream</span>
+            </label>
+          </div>
+        </fieldset>
         <div class="actions">
           <button type="button" class="primary" id="generateButton">
             Generate URL
@@ -379,10 +431,19 @@
           title: 'Customize Your Reveal Link',
           gender: 'Boy or Girl?',
           message: 'Reveal Message',
+          textColor: 'Intro Text Color',
           generate: 'Generate URL',
           copy: 'Copy to Clipboard',
           boy: 'Boy',
           girl: 'Girl',
+          colors: {
+            honey: 'Honey',
+            cocoa: 'Cocoa',
+            coral: 'Coral',
+            rose: 'Rose',
+            teal: 'Teal',
+            cream: 'Cream',
+          },
           preview: 'Live Preview',
           changeLanguage: 'Change Language',
           selectLanguageTitle: 'Select a language',
@@ -399,10 +460,19 @@
           title: 'Personaliza tu enlace',
           gender: '¿Niño o niña?',
           message: 'Mensaje de revelación',
+          textColor: 'Color del texto inicial',
           generate: 'Generar enlace',
           copy: 'Copiar',
           boy: 'Niño',
           girl: 'Niña',
+          colors: {
+            honey: 'Miel',
+            cocoa: 'Cacao',
+            coral: 'Coral',
+            rose: 'Rosa',
+            teal: 'Verde azulado',
+            cream: 'Crema',
+          },
           preview: 'Vista previa en vivo',
           changeLanguage: 'Cambiar idioma',
           selectLanguageTitle: 'Selecciona un idioma',
@@ -419,10 +489,19 @@
           title: 'Personnalisez votre lien',
           gender: 'Garçon ou fille ?',
           message: 'Message de révélation',
+          textColor: 'Couleur du texte initial',
           generate: 'Générer le lien',
           copy: 'Copier',
           boy: 'Garçon',
           girl: 'Fille',
+          colors: {
+            honey: 'Miel',
+            cocoa: 'Cacao',
+            coral: 'Corail',
+            rose: 'Rose',
+            teal: 'Sarcelle',
+            cream: 'Crème',
+          },
           preview: 'Aperçu en direct',
           changeLanguage: 'Changer de langue',
           selectLanguageTitle: 'Sélectionnez une langue',
@@ -439,10 +518,19 @@
           title: 'Passen Sie Ihren Link an',
           gender: 'Junge oder Mädchen?',
           message: 'Enthüllungsnachricht',
+          textColor: 'Intro-Textfarbe',
           generate: 'Link erstellen',
           copy: 'Kopieren',
           boy: 'Junge',
           girl: 'Mädchen',
+          colors: {
+            honey: 'Honig',
+            cocoa: 'Kakao',
+            coral: 'Koralle',
+            rose: 'Rosa',
+            teal: 'Petrol',
+            cream: 'Creme',
+          },
           preview: 'Live-Vorschau',
           changeLanguage: 'Sprache ändern',
           selectLanguageTitle: 'Sprache auswählen',
@@ -467,6 +555,7 @@
       const genderLabel = document.getElementById('genderLabel');
       const messageLabel = document.getElementById('messageLabel');
       const messageField = document.getElementById('message');
+      const textColorLabel = document.getElementById('textColorLabel');
       const generateButton = document.getElementById('generateButton');
       const copyButton = document.getElementById('copyButton');
       const resultContainer = document.getElementById('resultContainer');
@@ -474,8 +563,10 @@
       const previewFrame = document.getElementById('previewFrame');
       const previewHeading = document.getElementById('previewHeading');
       const genderOptions = document.querySelectorAll('.gender-option');
+      const colorOptions = document.querySelectorAll('.color-option');
       const boyLabel = document.querySelector('[data-gender-option="boy"]');
       const girlLabel = document.querySelector('[data-gender-option="girl"]');
+      const colorLabels = document.querySelectorAll('[data-color-option]');
       const changeLanguageButton = document.getElementById('changeLanguageButton');
       const languageOverlay = document.getElementById('languageOverlay');
       const languageForm = document.getElementById('languageForm');
@@ -510,11 +601,16 @@
         genderLabel.textContent = t.gender;
         messageLabel.textContent = t.message;
         messageField.placeholder = t.message;
+        textColorLabel.textContent = t.textColor;
         generateButton.textContent = t.generate;
         copyButton.textContent = t.copy;
         copyButton.dataset.originalText = t.copy;
         boyLabel.textContent = t.boy;
         girlLabel.textContent = t.girl;
+        colorLabels.forEach((element) => {
+          const key = element.dataset.colorOption;
+          element.textContent = t.colors?.[key] || translations.en.colors[key];
+        });
         previewHeading.textContent = t.preview;
         changeLanguageButton.textContent = t.changeLanguage;
         languageHeading.textContent = t.selectLanguageTitle;
@@ -542,11 +638,15 @@
           document.querySelector('input[name="gender"]:checked') || { value: '' }
         ).value;
         const messageValue = messageField.value || '';
+        const introColorValue = (
+          document.querySelector('input[name="introColor"]:checked') || { value: 'honey' }
+        ).value;
 
         const innerParams = new URLSearchParams();
         innerParams.set('lang', currentLang);
         innerParams.set('reveal', genderValue);
         innerParams.set('message', messageValue);
+        innerParams.set('introColor', introColorValue);
 
         const encoded = b64EncodeUnicode(innerParams.toString());
         return `https://genderslotreveal.netlify.app/?d=${encodeURIComponent(encoded)}`;
@@ -560,8 +660,8 @@
         previewFrame.src = url;
       }
 
-      function setActiveRadio(targetLabel) {
-        genderOptions.forEach((option) => {
+      function setActiveRadio(targetLabel, options) {
+        options.forEach((option) => {
           if (option === targetLabel) {
             option.classList.add('active');
           } else {
@@ -663,7 +763,18 @@
         const input = label.querySelector('input[type="radio"]');
         input.addEventListener('change', () => {
           if (input.checked) {
-            setActiveRadio(label);
+            setActiveRadio(label, genderOptions);
+            markNeedsGeneration();
+            updatePreview();
+          }
+        });
+      });
+
+      colorOptions.forEach((label) => {
+        const input = label.querySelector('input[type="radio"]');
+        input.addEventListener('change', () => {
+          if (input.checked) {
+            setActiveRadio(label, colorOptions);
             markNeedsGeneration();
             updatePreview();
           }

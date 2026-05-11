@@ -34,6 +34,7 @@
         --spin-button-max-width: 204px;
         --spin-button-aspect: 2019 / 657;
         --instructions-max-width: 580px;
+        --intro-text-color: #986f17;
       }
       html,
       body {
@@ -152,8 +153,8 @@
 
       #landingTextBox {
         position: absolute;
-        left: 8.34%;
-        top: 22.95%;
+        left: 8%;
+        top: 21.7%;
         width: 82.64%;
         height: 58.6%;
         display: flex;
@@ -165,7 +166,7 @@
         overflow: hidden;
         pointer-events: none;
         z-index: 21;
-        color: #986f17;
+        color: var(--intro-text-color);
       }
       #landingTextBox .intro-text {
         width: 100%;
@@ -179,7 +180,7 @@
         box-sizing: border-box;
         max-width: 100%;
         max-height: 100%;
-        color: #986f17;
+        color: var(--intro-text-color);
       }
       #landingTextBox .intro-text-content {
         display: inline-block;
@@ -191,6 +192,7 @@
         overflow-wrap: normal;
         hyphens: manual;
         white-space: normal;
+        text-wrap: balance;
         text-align: center;
       }
       #customMessage {
@@ -198,11 +200,107 @@
         font-size: clamp(20px, 6vw, 70px);
         text-align: center;
         line-height: 1.2;
-        color: #986f17;
+        color: var(--intro-text-color);
         text-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
       }
       #landingTextBox.hidden {
         display: none;
+      }
+      #landingTextBox.text-box-debug-active {
+        outline: 2px dashed rgba(152, 111, 23, 0.85);
+        outline-offset: 2px;
+        pointer-events: auto;
+      }
+      .text-box-debug-handle {
+        position: absolute;
+        width: 18px;
+        height: 18px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        background: #986f17;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        pointer-events: auto;
+        z-index: 2;
+      }
+      .text-box-debug-handle[data-corner="nw"] {
+        left: -9px;
+        top: -9px;
+        cursor: nwse-resize;
+      }
+      .text-box-debug-handle[data-corner="ne"] {
+        right: -9px;
+        top: -9px;
+        cursor: nesw-resize;
+      }
+      .text-box-debug-handle[data-corner="sw"] {
+        left: -9px;
+        bottom: -9px;
+        cursor: nesw-resize;
+      }
+      .text-box-debug-handle[data-corner="se"] {
+        right: -9px;
+        bottom: -9px;
+        cursor: nwse-resize;
+      }
+      .text-box-debug-panel {
+        position: fixed;
+        right: 12px;
+        bottom: 12px;
+        width: min(320px, calc(100vw - 24px));
+        padding: 12px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+        color: #2a2a2a;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        z-index: 1000;
+      }
+      .text-box-debug-panel[hidden] {
+        display: none;
+      }
+      .text-box-debug-panel h2 {
+        margin: 0 0 8px;
+        font-size: 14px;
+        line-height: 1.2;
+      }
+      .text-box-debug-row {
+        display: grid;
+        grid-template-columns: 48px 1fr 50px;
+        gap: 8px;
+        align-items: center;
+        margin: 7px 0;
+      }
+      .text-box-debug-row input {
+        width: 100%;
+      }
+      .text-box-debug-value {
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+      }
+      .text-box-debug-output {
+        margin-top: 10px;
+        padding: 8px;
+        border-radius: 6px;
+        background: rgba(0, 0, 0, 0.08);
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        line-height: 1.35;
+        white-space: pre-wrap;
+      }
+      .text-box-debug-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 10px;
+      }
+      .text-box-debug-actions button {
+        border: 0;
+        border-radius: 6px;
+        padding: 6px 10px;
+        background: #986f17;
+        color: #fff;
+        font: inherit;
+        cursor: pointer;
       }
 
       .slot-machine {
@@ -646,6 +744,39 @@
         return params;
       })();
 
+      const INTRO_TEXT_COLORS = {
+        honey: "#986f17",
+        cocoa: "#7e5e4f",
+        coral: "#c77752",
+        rose: "#b65f78",
+        teal: "#2f776f",
+        cream: "#fff4d6",
+      };
+      const DEFAULT_INTRO_TEXT_COLOR = INTRO_TEXT_COLORS.honey;
+
+      function resolveIntroTextColor(value) {
+        const colorValue = (value || "").trim().toLowerCase();
+        if (!colorValue) {
+          return DEFAULT_INTRO_TEXT_COLOR;
+        }
+        if (INTRO_TEXT_COLORS[colorValue]) {
+          return INTRO_TEXT_COLORS[colorValue];
+        }
+        if (/^#[0-9a-f]{6}$/i.test(colorValue)) {
+          return colorValue;
+        }
+        return DEFAULT_INTRO_TEXT_COLOR;
+      }
+
+      const introTextColor = resolveIntroTextColor(
+        MERGED_SEARCH_PARAMS.get("introColor") ||
+          MERGED_SEARCH_PARAMS.get("textColor"),
+      );
+      document.documentElement.style.setProperty(
+        "--intro-text-color",
+        introTextColor,
+      );
+
       let introTextResizeHandler = null;
       let introTextResizeObserver = null;
       let activeConfettiFrameId = null;
@@ -685,8 +816,8 @@
         const heightLimit = availableHeight;
         const minFontSize = 8;
         const maxFontSize = Math.min(
-          900,
-          Math.max(minFontSize, availableHeight * 1.8),
+          1200,
+          Math.max(minFontSize, availableHeight * 3, availableWidth * 1.25),
         );
         let low = minFontSize;
         let high = maxFontSize;
@@ -694,10 +825,12 @@
         const tolerance = 0.5;
 
         textElement.style.fontSize = `${minFontSize}px`;
+        textElement.style.lineHeight = "1.08";
 
         while (low <= high) {
           const mid = (low + high) / 2;
           textElement.style.fontSize = `${mid}px`;
+          textElement.style.lineHeight = "1.08";
           const fitsWithinWidth =
             textElement.scrollWidth <= widthLimit + tolerance;
           const fitsWithinHeight =
@@ -765,7 +898,9 @@
 
         reFit();
         requestAnimationFrame(reFit);
-        setTimeout(reFit, 150);
+        [150, 350, 700].forEach((delay) => {
+          setTimeout(reFit, delay);
+        });
         if (document.fonts && typeof document.fonts.ready?.then === "function") {
           document.fonts.ready
             .then(() => {
@@ -790,6 +925,262 @@
           }
         }
         return reFit;
+      }
+
+      function setupTextBoxDebug() {
+        const landingTextBox = document.getElementById("landingTextBox");
+        if (!landingTextBox) {
+          return;
+        }
+        const settings = [
+          { key: "left", label: "Left", min: 0, max: 100 },
+          { key: "top", label: "Top", min: 0, max: 100 },
+          { key: "width", label: "Width", min: 10, max: 100 },
+          { key: "height", label: "Height", min: 10, max: 100 },
+        ];
+        const panel = document.createElement("div");
+        panel.className = "text-box-debug-panel";
+        panel.hidden = true;
+        panel.innerHTML = `
+          <h2>Text Box Debug</h2>
+          ${settings
+            .map(
+              (setting) => `
+                <label class="text-box-debug-row">
+                  <span>${setting.label}</span>
+                  <input
+                    type="range"
+                    data-text-box-setting="${setting.key}"
+                    min="${setting.min}"
+                    max="${setting.max}"
+                    step="0.1"
+                  />
+                  <span class="text-box-debug-value" data-text-box-value="${setting.key}"></span>
+                </label>
+              `,
+            )
+            .join("")}
+          <div class="text-box-debug-output" aria-live="polite"></div>
+          <div class="text-box-debug-actions">
+            <button type="button" data-text-box-reset>Reset</button>
+            <button type="button" data-text-box-close>Close</button>
+          </div>
+        `;
+        document.body.appendChild(panel);
+
+        const output = panel.querySelector(".text-box-debug-output");
+        const sliders = Array.from(
+          panel.querySelectorAll("[data-text-box-setting]"),
+        );
+        const initialValues = {
+          left: 8,
+          top: 21.7,
+          width: 82.64,
+          height: 58.6,
+        };
+        const handles = ["nw", "ne", "sw", "se"].map((corner) => {
+          const handle = document.createElement("div");
+          handle.className = "text-box-debug-handle";
+          handle.dataset.corner = corner;
+          handle.hidden = true;
+          landingTextBox.appendChild(handle);
+          return handle;
+        });
+
+        function setDebugActive(isActive) {
+          landingTextBox.classList.toggle("text-box-debug-active", isActive);
+          handles.forEach((handle) => {
+            handle.hidden = !isActive;
+          });
+        }
+
+        function getCurrentValue(key) {
+          const inlineValue = parseFloat(landingTextBox.style[key]);
+          if (!Number.isNaN(inlineValue)) {
+            return inlineValue;
+          }
+          const computedValue = parseFloat(getComputedStyle(landingTextBox)[key]);
+          const parentRect = landingTextBox.parentElement.getBoundingClientRect();
+          const basis = key === "left" || key === "width"
+            ? parentRect.width
+            : parentRect.height;
+          if (!Number.isNaN(computedValue) && basis > 0) {
+            return (computedValue / basis) * 100;
+          }
+          return initialValues[key];
+        }
+
+        function getValues() {
+          return settings.reduce((values, setting) => {
+            values[setting.key] = getCurrentValue(setting.key);
+            return values;
+          }, {});
+        }
+
+        function formatPercent(value) {
+          return `${Number(value).toFixed(2).replace(/\.?0+$/, "")}%`;
+        }
+
+        function refitDebugText() {
+          fitIntroTextToContainer(landingTextBox);
+          requestAnimationFrame(() => fitIntroTextToContainer(landingTextBox));
+        }
+
+        function renderControls() {
+          const values = getValues();
+          sliders.forEach((slider) => {
+            const key = slider.dataset.textBoxSetting;
+            const value = values[key];
+            slider.value = value;
+            const valueEl = panel.querySelector(`[data-text-box-value="${key}"]`);
+            if (valueEl) {
+              valueEl.textContent = formatPercent(value);
+            }
+          });
+          output.textContent = [
+            `left: ${formatPercent(values.left)};`,
+            `top: ${formatPercent(values.top)};`,
+            `width: ${formatPercent(values.width)};`,
+            `height: ${formatPercent(values.height)};`,
+          ].join("\n");
+        }
+
+        function applyValue(key, value) {
+          landingTextBox.style[key] = formatPercent(value);
+          const valueEl = panel.querySelector(`[data-text-box-value="${key}"]`);
+          if (valueEl) {
+            valueEl.textContent = formatPercent(value);
+          }
+          renderControls();
+          refitDebugText();
+        }
+
+        function applyValues(values) {
+          Object.entries(values).forEach(([key, value]) => {
+            landingTextBox.style[key] = formatPercent(value);
+          });
+          renderControls();
+          refitDebugText();
+        }
+
+        function stopDebugClickThrough(event) {
+          if (panel.hidden) {
+            return;
+          }
+          event.preventDefault();
+          event.stopPropagation();
+        }
+
+        landingTextBox.addEventListener("click", stopDebugClickThrough);
+        landingTextBox.addEventListener("touchstart", stopDebugClickThrough, {
+          passive: false,
+        });
+
+        sliders.forEach((slider) => {
+          slider.addEventListener("input", () => {
+            applyValue(slider.dataset.textBoxSetting, slider.value);
+          });
+        });
+
+        handles.forEach((handle) => {
+          handle.addEventListener("pointerdown", (event) => {
+            if (panel.hidden) {
+              return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            handle.setPointerCapture(event.pointerId);
+            const corner = handle.dataset.corner;
+            const startX = event.clientX;
+            const startY = event.clientY;
+            const startValues = getValues();
+            const parentRect = landingTextBox.parentElement.getBoundingClientRect();
+            const minWidth = 10;
+            const minHeight = 10;
+
+            function onPointerMove(moveEvent) {
+              moveEvent.preventDefault();
+              moveEvent.stopPropagation();
+              const deltaX = ((moveEvent.clientX - startX) / parentRect.width) * 100;
+              const deltaY = ((moveEvent.clientY - startY) / parentRect.height) * 100;
+              const nextValues = { ...startValues };
+
+              if (corner.includes("w")) {
+                const maxLeft = startValues.left + startValues.width - minWidth;
+                nextValues.left = Math.min(
+                  Math.max(0, startValues.left + deltaX),
+                  maxLeft,
+                );
+                nextValues.width = startValues.width + startValues.left - nextValues.left;
+              } else {
+                nextValues.width = Math.min(
+                  Math.max(minWidth, startValues.width + deltaX),
+                  100 - startValues.left,
+                );
+              }
+
+              if (corner.includes("n")) {
+                const maxTop = startValues.top + startValues.height - minHeight;
+                nextValues.top = Math.min(
+                  Math.max(0, startValues.top + deltaY),
+                  maxTop,
+                );
+                nextValues.height = startValues.height + startValues.top - nextValues.top;
+              } else {
+                nextValues.height = Math.min(
+                  Math.max(minHeight, startValues.height + deltaY),
+                  100 - startValues.top,
+                );
+              }
+
+              applyValues(nextValues);
+            }
+
+            function onPointerUp(upEvent) {
+              upEvent.preventDefault();
+              upEvent.stopPropagation();
+              handle.releasePointerCapture(event.pointerId);
+              handle.removeEventListener("pointermove", onPointerMove);
+              handle.removeEventListener("pointerup", onPointerUp);
+              handle.removeEventListener("pointercancel", onPointerUp);
+            }
+
+            handle.addEventListener("pointermove", onPointerMove);
+            handle.addEventListener("pointerup", onPointerUp);
+            handle.addEventListener("pointercancel", onPointerUp);
+          });
+        });
+
+        panel.querySelector("[data-text-box-reset]").addEventListener("click", () => {
+          applyValues(initialValues);
+        });
+
+        panel.querySelector("[data-text-box-close]").addEventListener("click", () => {
+          panel.hidden = true;
+          setDebugActive(false);
+        });
+
+        document.addEventListener("keydown", (event) => {
+          const target = event.target;
+          const isTyping =
+            target instanceof HTMLElement &&
+            (target.isContentEditable ||
+              ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
+          if (isTyping || event.key.toLowerCase() !== "d") {
+            return;
+          }
+          event.preventDefault();
+          panel.hidden = !panel.hidden;
+          setDebugActive(!panel.hidden);
+          if (!panel.hidden) {
+            renderControls();
+            refitDebugText();
+          }
+        });
+
+        renderControls();
+        setDebugActive(false);
+        refitDebugText();
       }
 
       function syncIconDimensionsWithCSS() {
@@ -1318,6 +1709,10 @@
             if (landingScreen.style.display === "none") {
               return;
             }
+            const debugTextBox = document.getElementById("landingTextBox");
+            if (debugTextBox?.classList.contains("text-box-debug-active")) {
+              return;
+            }
             if (landingHintTimeout !== null) {
               window.clearTimeout(landingHintTimeout);
               landingHintTimeout = null;
@@ -1344,6 +1739,7 @@
         } else {
           startGameAssetPreload();
         }
+        setupTextBoxDebug();
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
         const isBoy = params.reveal === "1" || params.reveal === "boy";
