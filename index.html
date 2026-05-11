@@ -737,9 +737,7 @@
           introParam = params.get("message");
         }
         if (introParam == null) {
-          landingTextBox.classList.add("hidden");
-          landingTextBox.innerHTML = "";
-          return null;
+          introParam = "Spin to see what Baby will be!";
         }
         try {
           introParam = decodeURIComponent(introParam);
@@ -1578,6 +1576,12 @@
               spinReel(reel, timing.delay, timing.duration, finalIcon, callback);
             });
             currentSymbols = reels.map(() => finalIcon);
+          } else if (spinCount === 3) {
+            generateTeaserSymbols();
+            reels.forEach((reel, i) => {
+              const timing = reelTimings[i] || reelTimings[reelTimings.length - 1];
+              spinReel(reel, timing.delay, timing.duration, currentSymbols[i]);
+            });
           } else {
             generateRandomNonMatchingSymbols();
             reels.forEach((reel, i) => {
@@ -1604,6 +1608,18 @@
             symbols = reels.map(() => getRandomIcon());
           }
           currentSymbols = symbols;
+        }
+        function getRandomIconExcluding(excludedIcon) {
+          const options = icons.filter((icon) => icon !== excludedIcon);
+          return options[Math.floor(Math.random() * options.length)] || getRandomIcon();
+        }
+        function generateTeaserSymbols() {
+          const teaserIcon = isBoy ? icons[5] : icons[2];
+          currentSymbols = [
+            teaserIcon,
+            teaserIcon,
+            getRandomIconExcluding(teaserIcon),
+          ];
         }
         function spinReel(reel, delay, duration, finalIcon, callback) {
           setTimeout(() => {
