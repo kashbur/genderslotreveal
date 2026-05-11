@@ -121,6 +121,30 @@
         box-shadow: 0 0 0 1px rgba(31, 35, 69, 0.18);
         flex: 0 0 auto;
       }
+      .custom-color-control {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.75rem;
+        align-items: center;
+        margin-top: 0.75rem;
+      }
+      .custom-color-control input[type='color'] {
+        width: 48px;
+        height: 40px;
+        padding: 2px;
+        border: 1px solid rgba(31, 35, 69, 0.16);
+        border-radius: 10px;
+        background: #fff;
+        cursor: pointer;
+      }
+      .custom-color-control input[type='text'] {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(31, 35, 69, 0.16);
+        padding: 0.75rem 0.9rem;
+        font: inherit;
+        text-transform: uppercase;
+      }
       .language-controls {
         display: flex;
         justify-content: flex-end;
@@ -344,10 +368,20 @@
               <span data-color-option="teal">Teal</span>
             </label>
             <label class="radio-option color-option">
-              <input type="radio" name="introColor" value="cream" />
-              <span class="color-swatch" style="background: #fff4d6"></span>
-              <span data-color-option="cream">Cream</span>
+              <input type="radio" name="introColor" value="charcoal" />
+              <span class="color-swatch" style="background: #2f2a24"></span>
+              <span data-color-option="charcoal">Charcoal</span>
             </label>
+          </div>
+          <div class="custom-color-control">
+            <input type="color" id="customIntroColor" value="#986f17" aria-label="Custom intro text color" />
+            <input
+              type="text"
+              id="customIntroColorText"
+              value="#986F17"
+              maxlength="7"
+              aria-label="Custom intro text hex color"
+            />
           </div>
         </fieldset>
         <div class="actions">
@@ -442,7 +476,7 @@
             coral: 'Coral',
             rose: 'Rose',
             teal: 'Teal',
-            cream: 'Cream',
+            charcoal: 'Charcoal',
           },
           preview: 'Live Preview',
           changeLanguage: 'Change Language',
@@ -471,7 +505,7 @@
             coral: 'Coral',
             rose: 'Rosa',
             teal: 'Verde azulado',
-            cream: 'Crema',
+            charcoal: 'Carbón',
           },
           preview: 'Vista previa en vivo',
           changeLanguage: 'Cambiar idioma',
@@ -500,7 +534,7 @@
             coral: 'Corail',
             rose: 'Rose',
             teal: 'Sarcelle',
-            cream: 'Crème',
+            charcoal: 'Anthracite',
           },
           preview: 'Aperçu en direct',
           changeLanguage: 'Changer de langue',
@@ -529,7 +563,7 @@
             coral: 'Koralle',
             rose: 'Rosa',
             teal: 'Petrol',
-            cream: 'Creme',
+            charcoal: 'Anthrazit',
           },
           preview: 'Live-Vorschau',
           changeLanguage: 'Sprache ändern',
