@@ -7,9 +7,27 @@
     <style>
       :root {
         color-scheme: light;
-        font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont,
-          'Segoe UI', sans-serif;
-        --accent: #5a5df0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --cream: #fff7df;
+        --paper: #fffdf2;
+        --gold: #f7c74d;
+        --gold-dark: #c89119;
+        --peach: #eba06c;
+        --rose: #b65f78;
+        --teal: #2f776f;
+        --charcoal: #2f2a24;
+        --brown: #986f17;
+        --line: rgba(152, 111, 23, 0.2);
+        --shadow: rgba(89, 55, 15, 0.18);
+        --accent: var(--gold-dark);
+      }
+      @font-face {
+        font-family: 'SparkyStones';
+        src: url('./sparkystones.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+        font-display: swap;
       }
       *,
       *::before,
@@ -19,47 +37,71 @@
       body {
         margin: 0;
         min-height: 100vh;
-        background: #f6f7fb;
+        background: #f8ecd0;
         display: flex;
         justify-content: center;
         align-items: center;
         padding: clamp(1.5rem, 4vw, 3.5rem);
+        color: var(--charcoal);
       }
       main {
-        width: min(1080px, 100%);
+        position: relative;
+        width: min(1120px, 100%);
         display: grid;
-        gap: clamp(1.75rem, 4vw, 3rem);
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        background: white;
-        padding: clamp(1.75rem, 5vw, 3.5rem);
-        border-radius: 24px;
-        box-shadow: 0 18px 48px rgba(40, 52, 98, 0.12);
+        gap: clamp(1.25rem, 3vw, 2.25rem);
+        grid-template-columns: minmax(320px, 0.92fr) minmax(300px, 1fr);
+        background:
+          linear-gradient(180deg, rgba(255, 255, 255, 0.5), transparent 42%),
+          var(--paper);
+        padding: clamp(1.4rem, 4vw, 2.6rem);
+        border: 1px solid rgba(200, 145, 25, 0.18);
+        border-radius: 18px;
+        box-shadow: 0 22px 54px rgba(89, 55, 15, 0.12);
+        overflow: hidden;
       }
       h1 {
         grid-column: 1 / -1;
-        margin: 0;
-        font-size: clamp(1.85rem, 4vw, 2.75rem);
-        font-weight: 600;
-        color: #1f2345;
+        position: relative;
+        margin: 0 0 0.25rem;
+        padding: 0.35rem 1rem 0.15rem;
+        font-family: 'SparkyStones', Georgia, serif;
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        font-weight: 400;
+        letter-spacing: 0;
+        line-height: 0.95;
+        color: var(--brown);
+        text-shadow:
+          0 2px 0 rgba(255, 255, 255, 0.85),
+          0 8px 18px rgba(126, 94, 79, 0.14);
         text-align: center;
       }
       form {
+        position: relative;
         display: flex;
         flex-direction: column;
-        gap: 1.5rem;
-        position: relative;
+        gap: 1.1rem;
+        padding: clamp(0.9rem, 2vw, 1.2rem);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.42);
       }
-      label {
+      label,
+      legend {
         display: block;
-        font-weight: 600;
-        font-size: 1rem;
-        color: #1f2345;
+        font-weight: 800;
+        font-size: 0.86rem;
+        color: var(--brown);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
         margin-bottom: 0.5rem;
       }
       fieldset {
         border: none;
         padding: 0;
         margin: 0;
+      }
+      fieldset > legend {
+        padding: 0;
       }
       .radio-group {
         display: grid;
@@ -70,38 +112,46 @@
         display: flex;
         align-items: center;
         gap: 0.65rem;
-        padding: 0.8rem 1rem;
-        border-radius: 12px;
-        border: 1px solid rgba(31, 35, 69, 0.12);
-        background: #f9f9ff;
+        min-height: 48px;
+        padding: 0.78rem 0.9rem;
+        border-radius: 10px;
+        border: 1px solid rgba(200, 145, 25, 0.22);
+        background: rgba(255, 253, 242, 0.9);
+        color: var(--charcoal);
         cursor: pointer;
         transition: border-color 120ms ease, background 120ms ease,
-          box-shadow 120ms ease;
+          box-shadow 120ms ease, transform 120ms ease;
       }
       .radio-option input[type='radio'] {
         width: 18px;
         height: 18px;
-        accent-color: var(--accent);
+        accent-color: var(--gold-dark);
+      }
+      .radio-option:hover {
+        transform: translateY(-1px);
+        border-color: rgba(200, 145, 25, 0.5);
       }
       .radio-option.active {
-        border-color: rgba(90, 93, 240, 0.65);
-        background: rgba(90, 93, 240, 0.08);
-        box-shadow: 0 10px 24px rgba(90, 93, 240, 0.18);
+        border-color: var(--gold-dark);
+        background: #fff4c2;
+        box-shadow: 0 6px 14px rgba(200, 145, 25, 0.12);
       }
       textarea {
         width: 100%;
         min-height: 140px;
-        border-radius: 16px;
-        border: 1px solid rgba(31, 35, 69, 0.16);
+        border-radius: 12px;
+        border: 1px solid rgba(200, 145, 25, 0.26);
+        background: #fffdf2;
         padding: 1rem 1.15rem;
         font-family: inherit;
         font-size: 1rem;
+        color: var(--charcoal);
         resize: vertical;
         transition: border-color 120ms ease, box-shadow 120ms ease;
       }
       textarea:focus {
-        border-color: rgba(90, 93, 240, 0.7);
-        box-shadow: 0 0 0 4px rgba(90, 93, 240, 0.15);
+        border-color: var(--gold-dark);
+        box-shadow: 0 0 0 3px rgba(247, 199, 77, 0.22);
         outline: none;
       }
       .color-grid {
@@ -113,12 +163,19 @@
         align-items: center;
         gap: 0.65rem;
       }
+      .color-option input[type='radio'] {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
       .color-swatch {
         width: 24px;
         height: 24px;
         border-radius: 50%;
         border: 2px solid rgba(255, 255, 255, 0.9);
-        box-shadow: 0 0 0 1px rgba(31, 35, 69, 0.18);
+        box-shadow:
+          0 0 0 1px rgba(47, 42, 36, 0.22),
+          0 2px 5px rgba(47, 42, 36, 0.16);
         flex: 0 0 auto;
       }
       .custom-color-control {
@@ -132,18 +189,22 @@
         width: 48px;
         height: 40px;
         padding: 2px;
-        border: 1px solid rgba(31, 35, 69, 0.16);
+        border: 1px solid rgba(200, 145, 25, 0.28);
         border-radius: 10px;
-        background: #fff;
+        background: var(--paper);
         cursor: pointer;
       }
       .custom-color-control input[type='text'] {
         width: 100%;
         border-radius: 12px;
-        border: 1px solid rgba(31, 35, 69, 0.16);
+        border: 1px solid rgba(200, 145, 25, 0.28);
+        background: var(--paper);
         padding: 0.75rem 0.9rem;
         font: inherit;
         text-transform: uppercase;
+      }
+      .custom-color-control[hidden] {
+        display: none;
       }
       .language-controls {
         display: flex;
@@ -157,32 +218,48 @@
       }
       button.primary {
         border: none;
-        border-radius: 999px;
-        padding: 0.85rem 1.75rem;
+        border-radius: 12px;
+        padding: 0.9rem 1.75rem;
         font-size: 1rem;
-        font-weight: 600;
-        background: var(--accent);
-        color: white;
+        font-weight: 800;
+        background: var(--gold);
+        color: #5b3f09;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
         cursor: pointer;
+        box-shadow: 0 8px 18px rgba(200, 145, 25, 0.22);
         transition: transform 120ms ease, box-shadow 120ms ease;
       }
       button.primary:hover,
       button.primary:focus-visible {
         transform: translateY(-2px);
-        box-shadow: 0 14px 24px rgba(90, 93, 240, 0.3);
+        box-shadow: 0 12px 22px rgba(200, 145, 25, 0.26);
         outline: none;
+      }
+      button.primary:active {
+        transform: translateY(2px);
+        box-shadow: 0 6px 14px rgba(200, 145, 25, 0.18);
       }
       .output {
         display: flex;
         flex-direction: column;
         gap: 0.75rem;
+        padding: 0.85rem;
+        border: 1px solid rgba(200, 145, 25, 0.24);
+        border-radius: 12px;
+        background: rgba(255, 244, 194, 0.36);
+      }
+      .output[hidden] {
+        display: none;
       }
       .output input[type='text'] {
         width: 100%;
         border-radius: 12px;
-        border: 1px solid rgba(31, 35, 69, 0.16);
+        border: 1px solid rgba(200, 145, 25, 0.24);
+        background: #fffdf2;
         padding: 0.85rem 1.15rem;
         font-size: 0.95rem;
+        color: var(--charcoal);
       }
       .output-controls {
         display: flex;
@@ -191,18 +268,18 @@
       }
       button.secondary {
         border: none;
-        border-radius: 999px;
+        border-radius: 12px;
         padding: 0.75rem 1.5rem;
         font-size: 0.95rem;
-        font-weight: 600;
-        background: rgba(31, 35, 69, 0.08);
-        color: #1f2345;
+        font-weight: 800;
+        background: rgba(47, 119, 111, 0.12);
+        color: var(--teal);
         cursor: pointer;
         transition: background 120ms ease, transform 120ms ease;
       }
       button.secondary:hover,
       button.secondary:focus-visible {
-        background: rgba(31, 35, 69, 0.16);
+        background: rgba(47, 119, 111, 0.2);
         transform: translateY(-1px);
         outline: none;
       }
@@ -212,21 +289,28 @@
         transform: none;
       }
       section.preview {
+        position: relative;
         display: flex;
         flex-direction: column;
         gap: 1rem;
+        padding: clamp(0.9rem, 2vw, 1.25rem);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.32);
       }
       section.preview h2 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #1f2345;
+        font-size: 0.86rem;
+        font-weight: 900;
+        color: var(--brown);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
       }
 
       .language-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(15, 18, 45, 0.55);
+        background: rgba(47, 42, 36, 0.6);
         backdrop-filter: blur(6px);
         display: flex;
         align-items: center;
@@ -241,26 +325,29 @@
 
       .language-dialog {
         width: min(520px, 100%);
-        background: white;
-        border-radius: 24px;
+        background: var(--paper);
+        border: 1px solid rgba(200, 145, 25, 0.24);
+        border-radius: 18px;
         padding: clamp(1.75rem, 4vw, 2.75rem);
         display: flex;
         flex-direction: column;
         gap: 1.5rem;
-        box-shadow: 0 28px 56px rgba(31, 35, 69, 0.25);
+        box-shadow: 0 24px 52px rgba(47, 42, 36, 0.22);
       }
 
       .language-dialog h2 {
         margin: 0;
-        font-size: clamp(1.45rem, 4vw, 1.85rem);
-        font-weight: 600;
-        color: #1f2345;
+        font-family: 'SparkyStones', Georgia, serif;
+        font-size: clamp(2rem, 6vw, 3.2rem);
+        font-weight: 400;
+        line-height: 0.95;
+        color: var(--brown);
         text-align: center;
       }
 
       .language-dialog p {
         margin: 0;
-        color: rgba(31, 35, 69, 0.78);
+        color: rgba(47, 42, 36, 0.78);
         text-align: center;
         font-size: 0.95rem;
       }
@@ -289,13 +376,26 @@
       .preview-frame {
         aspect-ratio: 9 / 16;
         width: 100%;
-        border-radius: 18px;
-        border: 1px solid rgba(31, 35, 69, 0.12);
-        box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
+        border-radius: 14px;
+        border: 1px solid rgba(200, 145, 25, 0.24);
+        background: #fff;
+        box-shadow: 0 14px 30px rgba(89, 55, 15, 0.12);
       }
       @media (max-width: 760px) {
+        body {
+          align-items: flex-start;
+          padding: 1rem;
+        }
         main {
           grid-template-columns: 1fr;
+          border-width: 4px;
+          padding: 1rem;
+        }
+        h1 {
+          font-size: clamp(2.05rem, 12vw, 3.25rem);
+        }
+        .color-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .actions {
           flex-direction: column;
@@ -304,6 +404,18 @@
         .actions button {
           width: 100%;
           text-align: center;
+        }
+      }
+      @media (max-width: 440px) {
+        .radio-group,
+        .color-grid {
+          grid-template-columns: 1fr;
+        }
+        .custom-color-control {
+          grid-template-columns: 1fr;
+        }
+        .custom-color-control input[type='color'] {
+          width: 100%;
         }
       }
     </style>
@@ -374,11 +486,10 @@
             </label>
             <label class="radio-option color-option">
               <input type="radio" name="introColor" value="custom" />
-              <span class="color-swatch" id="customIntroColorSwatch" style="background: #986f17"></span>
               <span data-color-option="custom">Custom</span>
             </label>
           </div>
-          <div class="custom-color-control">
+          <div class="custom-color-control" id="customIntroColorControl" hidden>
             <input type="color" id="customIntroColor" value="#986f17" aria-label="Custom intro text color" />
             <input
               type="text"
@@ -610,9 +721,9 @@
       const boyLabel = document.querySelector('[data-gender-option="boy"]');
       const girlLabel = document.querySelector('[data-gender-option="girl"]');
       const colorLabels = document.querySelectorAll('[data-color-option]');
+      const customIntroColorControl = document.getElementById('customIntroColorControl');
       const customIntroColor = document.getElementById('customIntroColor');
       const customIntroColorText = document.getElementById('customIntroColorText');
-      const customIntroColorSwatch = document.getElementById('customIntroColorSwatch');
       const changeLanguageButton = document.getElementById('changeLanguageButton');
       const languageOverlay = document.getElementById('languageOverlay');
       const languageForm = document.getElementById('languageForm');
@@ -716,6 +827,11 @@
             option.classList.remove('active');
           }
         });
+      }
+
+      function updateCustomColorVisibility() {
+        const checkedIntroColor = document.querySelector('input[name="introColor"]:checked');
+        customIntroColorControl.hidden = checkedIntroColor?.value !== 'custom';
       }
 
       function syncLanguageSelection() {
@@ -823,6 +939,7 @@
         input.addEventListener('change', () => {
           if (input.checked) {
             setActiveRadio(label, colorOptions);
+            updateCustomColorVisibility();
             markNeedsGeneration();
             updatePreview();
           }
@@ -839,6 +956,7 @@
         if (customLabel) {
           setActiveRadio(customLabel, colorOptions);
         }
+        updateCustomColorVisibility();
       }
 
       function normalizeHexColor(value) {
@@ -860,7 +978,6 @@
         if (updateText) {
           customIntroColorText.value = normalized;
         }
-        customIntroColorSwatch.style.background = normalized;
         selectCustomIntroColor();
         markNeedsGeneration();
         updatePreview();
@@ -947,6 +1064,7 @@
 
       applyTranslations();
       setCopyAvailability(false);
+      updateCustomColorVisibility();
       updatePreview();
 
       if (shouldPromptForLanguage) {
