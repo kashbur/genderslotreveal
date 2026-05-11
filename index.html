@@ -615,7 +615,8 @@
         align-items: center;
         justify-content: center;
         text-wrap: balance;
-        word-break: break-word;
+        white-space: normal;
+        word-break: normal;
         margin: 0;
         box-sizing: border-box;
       }
@@ -914,7 +915,7 @@
           introParam = params.get("message");
         }
         if (introParam == null) {
-          introParam = "Spin to see what Baby will be!";
+          introParam = "Spin to see\nwhat baby\nwill be!";
         }
         try {
           introParam = decodeURIComponent(introParam);
