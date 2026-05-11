@@ -545,7 +545,7 @@
 
         const innerParams = new URLSearchParams();
         innerParams.set('lang', currentLang);
-        innerParams.set('gender', genderValue);
+        innerParams.set('reveal', genderValue);
         innerParams.set('message', messageValue);
 
         const encoded = b64EncodeUnicode(innerParams.toString());

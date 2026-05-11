@@ -908,11 +908,12 @@
           MERGED_SEARCH_PARAMS.get("language") ||
           ""
         ).toLowerCase();
-        const genderParam = (
+        const revealParam = (
+          MERGED_SEARCH_PARAMS.get("reveal") ||
           MERGED_SEARCH_PARAMS.get("gender") ||
           ""
         ).toLowerCase();
-        return { lang: langParam, gender: genderParam };
+        return { lang: langParam, reveal: revealParam };
       }
 
       const params = getParams();
@@ -1347,8 +1348,8 @@
         }
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
-        const isGirl = params.gender === "2";
-        const isBoy = params.gender === "1";
+        const isBoy = params.reveal === "1" || params.reveal === "boy";
+        const isGirl = !isBoy;
         const defaultOverlayColor = "#f3ddbb";
         const defaultGenderOverlayBg = "rgba(255, 255, 255, 0.6)";
         function setGenderState() {
@@ -1356,9 +1357,9 @@
             genderText.textContent = genderTranslations.boy;
             genderText.style.color = "#ffffff";
             genderText.style.textShadow =
-              "-2px -2px 0 #5c928c, 2px -2px 0 #5c928c, -2px 2px 0 #5c928c, 2px 2px 0 #5c928c";
-            colorOverlay.style.backgroundColor = "#a4c9c4";
-            genderOverlay.style.background = "rgba(164, 201, 196, 0.75)";
+              "-2px -2px 0 #2f6fb3, 2px -2px 0 #2f6fb3, -2px 2px 0 #2f6fb3, 2px 2px 0 #2f6fb3";
+            colorOverlay.style.backgroundColor = "#92c9ff";
+            genderOverlay.style.background = "rgba(82, 165, 238, 0.75)";
             genderOverlay.setAttribute("data-gender", "boy");
           } else if (isGirl) {
             genderText.textContent = genderTranslations.girl;
@@ -1740,7 +1741,7 @@
           genderOverlay.style.pointerEvents = "auto";
           setGenderState();
           if (isBoy) {
-            genderOverlay.style.background = "rgba(203, 226, 207, 0.6)";
+            genderOverlay.style.background = "rgba(82, 165, 238, 0.75)";
             createConfetti(["#cbe2cf", "#ffffff", "#ffd700"]);
           } else {
             genderOverlay.style.background = "rgba(247, 196, 180, 0.75)";
