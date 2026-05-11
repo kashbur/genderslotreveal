@@ -245,7 +245,7 @@
       }
       @keyframes slot-spin-down {
         0% {
-          transform: translateY(-20%);
+          transform: translateY(-33.333%);
         }
         100% {
           transform: translateY(0);
@@ -1558,8 +1558,11 @@
           }
           spinCount++;
           spinButton.style.pointerEvents = "none";
-          const spinDuration = 900;
-          const delayStep = 600;
+          const reelTimings = [
+            { delay: 0, duration: 850 },
+            { delay: 80, duration: 1150 },
+            { delay: 160, duration: 1450 },
+          ];
           if (spinCount === 4) {
             let finalIcon = icons[1];
             if (isGirl) finalIcon = icons[5];
@@ -1569,20 +1572,23 @@
                 ? () => setTimeout(showGenderReveal, 500)
                 : () => setTimeout(showReveal, 500);
             reels.forEach((reel, i) => {
-              const delay = i * delayStep;
+              const timing = reelTimings[i] || reelTimings[reelTimings.length - 1];
               const callback = i === reels.length - 1 ? endCallback : null;
-              spinReel(reel, delay, spinDuration, finalIcon, callback);
+              spinReel(reel, timing.delay, timing.duration, finalIcon, callback);
             });
             currentSymbols = reels.map(() => finalIcon);
           } else {
             generateRandomNonMatchingSymbols();
             reels.forEach((reel, i) => {
-              const delay = i * delayStep;
-              spinReel(reel, delay, spinDuration, currentSymbols[i]);
+              const timing = reelTimings[i] || reelTimings[reelTimings.length - 1];
+              spinReel(reel, timing.delay, timing.duration, currentSymbols[i]);
             });
           }
           const pointerDelay =
-            delayStep * (reels.length - 1) + spinDuration + (spinCount === 4 ? 500 : 0);
+            reelTimings.reduce(
+              (maxTime, timing) => Math.max(maxTime, timing.delay + timing.duration),
+              0,
+            ) + (spinCount === 4 ? 500 : 0);
           setTimeout(() => {
             spinButton.style.pointerEvents = "auto";
           }, pointerDelay);
