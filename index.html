@@ -869,20 +869,36 @@
         let best = minFontSize;
         const tolerance = 0.5;
 
-        textElement.style.fontSize = `${minFontSize}px`;
-        textElement.style.lineHeight = "1.08";
-        textElement.style.display = "block";
-        textElement.style.width = `${widthLimit}px`;
-        textElement.style.maxWidth = `${widthLimit}px`;
+        const measuringElement = textElement.cloneNode(true);
+        const textStyles = window.getComputedStyle(textElement);
+        Object.assign(measuringElement.style, {
+          position: "absolute",
+          visibility: "hidden",
+          pointerEvents: "none",
+          left: "0",
+          top: "0",
+          display: "block",
+          width: `${widthLimit}px`,
+          maxWidth: `${widthLimit}px`,
+          maxHeight: "none",
+          fontFamily: textStyles.fontFamily,
+          fontWeight: textStyles.fontWeight,
+          letterSpacing: textStyles.letterSpacing,
+          lineHeight: "1.08",
+          textAlign: "center",
+          whiteSpace: "normal",
+          wordBreak: "normal",
+          overflowWrap: "break-word",
+        });
+        textContainer.appendChild(measuringElement);
 
         while (low <= high) {
           const mid = (low + high) / 2;
-          textElement.style.fontSize = `${mid}px`;
-          textElement.style.lineHeight = "1.08";
+          measuringElement.style.fontSize = `${mid}px`;
           const fitsWithinWidth =
-            textElement.scrollWidth <= widthLimit + tolerance;
+            measuringElement.scrollWidth <= widthLimit + tolerance;
           const fitsWithinHeight =
-            textElement.scrollHeight <= heightLimit + tolerance;
+            measuringElement.scrollHeight <= heightLimit + tolerance;
           if (fitsWithinWidth && fitsWithinHeight) {
             best = mid;
             low = mid + tolerance;
@@ -890,6 +906,7 @@
             high = mid - tolerance;
           }
         }
+        measuringElement.remove();
 
         textElement.style.fontSize = `${Math.max(
           minFontSize,
@@ -899,6 +916,9 @@
         textElement.style.display = "block";
         textElement.style.width = "100%";
         textElement.style.maxWidth = "100%";
+        textElement.style.whiteSpace = "normal";
+        textElement.style.wordBreak = "normal";
+        textElement.style.overflowWrap = "break-word";
       }
 
       function applyIntroTextFromURL() {
