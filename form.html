@@ -74,6 +74,15 @@
           0 2px 0 rgba(255, 255, 255, 0.85),
           0 8px 18px rgba(126, 94, 79, 0.14);
         text-align: center;
+        text-wrap: balance;
+        overflow-wrap: break-word;
+      }
+      form,
+      section.preview,
+      .radio-option,
+      .output,
+      .preview-frame {
+        min-width: 0;
       }
       form {
         position: relative;
@@ -385,17 +394,25 @@
         body {
           align-items: flex-start;
           padding: 1rem;
+          overflow-x: hidden;
         }
         main {
           grid-template-columns: 1fr;
-          border-width: 4px;
           padding: 1rem;
+          width: min(100%, 390px);
         }
         h1 {
-          font-size: clamp(2.05rem, 12vw, 3.25rem);
+          font-size: clamp(1.9rem, 10vw, 2.75rem);
         }
+        .language-controls {
+          justify-content: stretch;
+        }
+        .language-controls button {
+          width: 100%;
+        }
+        .radio-group,
         .color-grid {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: 1fr;
         }
         .actions {
           flex-direction: column;
@@ -407,10 +424,6 @@
         }
       }
       @media (max-width: 440px) {
-        .radio-group,
-        .color-grid {
-          grid-template-columns: 1fr;
-        }
         .custom-color-control {
           grid-template-columns: 1fr;
         }
