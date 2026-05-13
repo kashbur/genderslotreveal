@@ -469,7 +469,7 @@
           <div class="radio-group color-grid" role="radiogroup" aria-labelledby="textColorLabel">
             <label class="radio-option color-option active">
               <input type="radio" name="introColor" value="honey" checked />
-              <span class="color-swatch" style="background: #986f17"></span>
+              <span class="color-swatch" style="background: #d9a637"></span>
               <span data-color-option="honey">Honey</span>
             </label>
             <label class="radio-option color-option">
@@ -503,11 +503,11 @@
             </label>
           </div>
           <div class="custom-color-control" id="customIntroColorControl" hidden>
-            <input type="color" id="customIntroColor" value="#986f17" aria-label="Custom intro text color" />
+            <input type="color" id="customIntroColor" value="#d9a637" aria-label="Custom intro text color" />
             <input
               type="text"
               id="customIntroColorText"
-              value="#986F17"
+              value="#D9A637"
               maxlength="7"
               aria-label="Custom intro text hex color"
             />
@@ -810,7 +810,7 @@
         const messageValue = messageField.value || '';
         const checkedIntroColor =
           document.querySelector('input[name="introColor"]:checked') || { value: 'honey' };
-        const customColorValue = customIntroColor.value || '#986f17';
+        const customColorValue = customIntroColor.value || '#d9a637';
         const introColorValue =
           checkedIntroColor.value === 'custom' ? customColorValue : checkedIntroColor.value;
 
