@@ -1030,6 +1030,19 @@
         return reFit;
       }
 
+      function getCustomRevealMessage() {
+        const value =
+          MERGED_SEARCH_PARAMS.get("revealMessage") ||
+          MERGED_SEARCH_PARAMS.get("finalMessage") ||
+          MERGED_SEARCH_PARAMS.get("resultMessage") ||
+          "";
+        try {
+          return decodeURIComponent(value).trim();
+        } catch (error) {
+          return value.trim();
+        }
+      }
+
       function setupTextBoxDebug() {
         const landingTextBox = document.getElementById("landingTextBox");
         if (!landingTextBox) {
@@ -1673,6 +1686,10 @@
         const revealDefaults =
           locale.revealDefaults || translations.en.revealDefaults;
         const genderTranslations = locale.gender || translations.en.gender;
+        const customRevealMessage = getCustomRevealMessage();
+        if (customRevealMessage) {
+          revealDefaults.main = customRevealMessage;
+        }
 
         const icons = ICON_SOURCES;
 
@@ -1904,7 +1921,7 @@
         const defaultGenderOverlayBg = "rgba(255, 255, 255, 0.88)";
         function setGenderState() {
           if (isBoy) {
-            genderText.textContent = genderTranslations.boy;
+            genderText.textContent = customRevealMessage || genderTranslations.boy;
             genderText.style.color = "#ffffff";
             genderText.style.textShadow =
               "-2px -2px 0 #5c928c, 2px -2px 0 #5c928c, -2px 2px 0 #5c928c, 2px 2px 0 #5c928c";
@@ -1912,7 +1929,7 @@
             genderOverlay.style.background = "rgba(164, 201, 196, 0.92)";
             genderOverlay.setAttribute("data-gender", "boy");
           } else if (isGirl) {
-            genderText.textContent = genderTranslations.girl;
+            genderText.textContent = customRevealMessage || genderTranslations.girl;
             genderText.style.color = "#ffffff";
             genderText.style.textShadow =
               "-2px -2px 0 #ef8d6d, 2px -2px 0 #ef8d6d, -2px 2px 0 #ef8d6d, 2px 2px 0 #ef8d6d";

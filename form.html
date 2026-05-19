@@ -461,8 +461,18 @@
           </div>
         </fieldset>
         <div>
-          <label for="message" id="messageLabel">Reveal Message</label>
-          <textarea id="message" placeholder="Reveal Message"></textarea>
+          <label for="introMessage" id="introMessageLabel">Intro Message</label>
+          <textarea
+            id="introMessage"
+            placeholder="Spin to see what baby will be!"
+          ></textarea>
+        </div>
+        <div>
+          <label for="revealMessage" id="revealMessageLabel">Reveal Message</label>
+          <textarea
+            id="revealMessage"
+            placeholder="IT'S A GIRL!"
+          ></textarea>
         </div>
         <fieldset>
           <legend id="textColorLabel">Intro Text Color</legend>
@@ -593,7 +603,10 @@
         en: {
           title: 'Customize Your Reveal Link',
           gender: 'Boy or Girl?',
-          message: 'Reveal Message',
+          introMessage: 'Intro Message',
+          introMessagePlaceholder: 'Spin to see what baby will be!',
+          revealMessage: 'Reveal Message',
+          revealMessagePlaceholder: "IT'S A GIRL!",
           textColor: 'Intro Text Color',
           generate: 'Generate URL',
           copy: 'Copy to Clipboard',
@@ -623,7 +636,10 @@
         es: {
           title: 'Personaliza tu enlace',
           gender: '¿Niño o niña?',
-          message: 'Mensaje de revelación',
+          introMessage: 'Mensaje inicial',
+          introMessagePlaceholder: '¡Gira para ver qué será el bebé!',
+          revealMessage: 'Mensaje de revelación',
+          revealMessagePlaceholder: '¡ES UNA NIÑA!',
           textColor: 'Color del texto inicial',
           generate: 'Generar enlace',
           copy: 'Copiar',
@@ -653,7 +669,10 @@
         fr: {
           title: 'Personnalisez votre lien',
           gender: 'Garçon ou fille ?',
-          message: 'Message de révélation',
+          introMessage: 'Message d’introduction',
+          introMessagePlaceholder: 'Tournez pour découvrir bébé !',
+          revealMessage: 'Message de révélation',
+          revealMessagePlaceholder: "C'EST UNE FILLE !",
           textColor: 'Couleur du texte initial',
           generate: 'Générer le lien',
           copy: 'Copier',
@@ -683,7 +702,10 @@
         de: {
           title: 'Passen Sie Ihren Link an',
           gender: 'Junge oder Mädchen?',
-          message: 'Enthüllungsnachricht',
+          introMessage: 'Intro-Nachricht',
+          introMessagePlaceholder: 'Drehen, um zu sehen, was das Baby wird!',
+          revealMessage: 'Enthüllungsnachricht',
+          revealMessagePlaceholder: 'ES IST EIN MÄDCHEN!',
           textColor: 'Intro-Textfarbe',
           generate: 'Link erstellen',
           copy: 'Kopieren',
@@ -720,8 +742,10 @@
 
       const formTitle = document.getElementById('formTitle');
       const genderLabel = document.getElementById('genderLabel');
-      const messageLabel = document.getElementById('messageLabel');
-      const messageField = document.getElementById('message');
+      const introMessageLabel = document.getElementById('introMessageLabel');
+      const introMessageField = document.getElementById('introMessage');
+      const revealMessageLabel = document.getElementById('revealMessageLabel');
+      const revealMessageField = document.getElementById('revealMessage');
       const textColorLabel = document.getElementById('textColorLabel');
       const generateButton = document.getElementById('generateButton');
       const copyButton = document.getElementById('copyButton');
@@ -769,8 +793,10 @@
         document.title = t.title;
         formTitle.textContent = t.title;
         genderLabel.textContent = t.gender;
-        messageLabel.textContent = t.message;
-        messageField.placeholder = t.message;
+        introMessageLabel.textContent = t.introMessage;
+        introMessageField.placeholder = t.introMessagePlaceholder;
+        revealMessageLabel.textContent = t.revealMessage;
+        revealMessageField.placeholder = t.revealMessagePlaceholder;
         textColorLabel.textContent = t.textColor;
         generateButton.textContent = t.generate;
         copyButton.textContent = t.copy;
@@ -807,7 +833,8 @@
         const genderValue = (
           document.querySelector('input[name="gender"]:checked') || { value: '' }
         ).value;
-        const messageValue = messageField.value || '';
+        const introMessageValue = introMessageField.value || '';
+        const revealMessageValue = revealMessageField.value || '';
         const checkedIntroColor =
           document.querySelector('input[name="introColor"]:checked') || { value: 'honey' };
         const customColorValue = customIntroColor.value || '#d9a637';
@@ -817,7 +844,12 @@
         const innerParams = new URLSearchParams();
         innerParams.set('lang', currentLang);
         innerParams.set('reveal', genderValue);
-        innerParams.set('message', messageValue);
+        if (introMessageValue.trim()) {
+          innerParams.set('intro', introMessageValue);
+        }
+        if (revealMessageValue.trim()) {
+          innerParams.set('revealMessage', revealMessageValue);
+        }
         innerParams.set('introColor', introColorValue);
 
         const encoded = b64EncodeUnicode(innerParams.toString());
@@ -1020,9 +1052,11 @@
         });
       });
 
-      messageField.addEventListener('input', () => {
-        markNeedsGeneration();
-        updatePreview();
+      [introMessageField, revealMessageField].forEach((field) => {
+        field.addEventListener('input', () => {
+          markNeedsGeneration();
+          updatePreview();
+        });
       });
 
       generateButton.addEventListener('click', () => {
