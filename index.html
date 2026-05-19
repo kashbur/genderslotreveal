@@ -127,6 +127,36 @@
           hint-pulse 1200ms ease-in-out 400ms infinite alternate;
       }
 
+      .landing-loading {
+        position: absolute;
+        left: 50%;
+        bottom: 2.25%;
+        transform: translateX(-50%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 0.42rem 1.45rem;
+        border-radius: 999px;
+        background: rgba(255, 242, 217, 0.94);
+        border: 3px solid #e69c6a;
+        color: #986f17;
+        font-family: 'SparkyStones', sans-serif;
+        font-size: clamp(15px, 3vw, 21px);
+        line-height: 1.1;
+        text-align: center;
+        text-transform: uppercase;
+        box-shadow: 0 8px 18px rgba(89, 55, 15, 0.16);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease;
+        z-index: 22;
+      }
+
+      .landing-loading.show {
+        opacity: 1;
+      }
+
       @keyframes hint-fade-in {
         from {
           opacity: 0;
@@ -694,6 +724,9 @@
       >
         <div id="landingTextBox" class="hidden"></div>
         <div id="landingHint" class="landing-hint" aria-live="polite" hidden></div>
+        <div id="landingLoading" class="landing-loading" aria-live="polite" hidden>
+          Loading...
+        </div>
       </div>
       <div class="slot-machine-container">
         <div class="slot-machine blur-background" id="slotMachine"></div>
@@ -1395,6 +1428,18 @@
         return hintTranslations[key] || hintTranslations.en;
       }
 
+      const loadingTranslations = {
+        en: "Loading...",
+        es: "Cargando...",
+        fr: "Chargement...",
+        de: "Laden...",
+      };
+
+      function getLoadingText(lang) {
+        const key = (lang || "en").toLowerCase().split(/[-_]/)[0];
+        return loadingTranslations[key] || loadingTranslations.en;
+      }
+
       const LANGUAGE_ASSET_MAP = {
         en: {
           background: "img/Assets/background.png",
@@ -1478,6 +1523,7 @@
           FALLBACK_IMAGE_MAP.set(localizedSrc, englishSrc);
         }
       });
+      let essentialAssetPreloadPromise = null;
       let assetPreloadPromise = null;
       let assetsInitialized = false;
 
@@ -1719,26 +1765,38 @@
           populateInitialReels();
         }
         function startGameAssetPreload() {
-          if (!assetsInitialized) {
-            assetsInitialized = true;
-            applyLocalizedAssets();
-          }
-          if (!assetPreloadPromise) {
+          if (!essentialAssetPreloadPromise) {
             const essentialSources = [
               languageAssets.background,
               languageAssets.tapToSpin,
               languageAssets.instructions,
+              languageAssets.boyIcon,
+              languageAssets.girlIcon,
+              icons[0],
+              icons[1],
+              icons[2],
             ].filter(Boolean);
             const essentialSet = new Set(essentialSources);
             const secondarySources = ALL_IMAGE_SOURCES.filter(
               (src) => !essentialSet.has(src),
             );
+            essentialAssetPreloadPromise = preloadImages(
+              Array.from(essentialSet),
+              "high",
+            )
+              .catch(() => {})
+              .then(() => {
+                if (!assetsInitialized) {
+                  assetsInitialized = true;
+                  applyLocalizedAssets();
+                }
+              });
             assetPreloadPromise = Promise.all([
-              preloadImages(essentialSources, "high"),
+              essentialAssetPreloadPromise,
               preloadImages(secondarySources),
             ]).catch(() => {});
           }
-          return assetPreloadPromise;
+          return essentialAssetPreloadPromise;
         }
         const landingBackgrounds = {
           es: "img/Assets/Spanish/babyjackpot-spanish.png",
@@ -1747,8 +1805,10 @@
         };
         const landingScreen = document.getElementById("landing-screen");
         const landingHint = document.getElementById("landingHint");
+        const landingLoading = document.getElementById("landingLoading");
         let landingHintTimeout = null;
         let refitIntroText = null;
+        let isPreparingGame = false;
         if (landingScreen) {
           const landingImage =
             landingBackgrounds[normalizedLanguage] ||
@@ -1765,10 +1825,21 @@
               landingHint.classList.add("show");
             }, 1000);
           }
+          if (landingLoading) {
+            landingLoading.textContent = getLoadingText(normalizedLanguage);
+          }
           const landingBgImage = new Image();
           landingBgImage.addEventListener("load", () => {
             if (typeof refitIntroText === "function") {
               refitIntroText();
+            }
+            const preloadWhenReady = () => {
+              startGameAssetPreload();
+            };
+            if (typeof window.requestIdleCallback === "function") {
+              window.requestIdleCallback(preloadWhenReady, { timeout: 1200 });
+            } else {
+              window.setTimeout(preloadWhenReady, 300);
             }
           });
           landingBgImage.src = landingImage;
@@ -1776,7 +1847,7 @@
             if (event) {
               event.preventDefault();
             }
-            if (landingScreen.style.display === "none") {
+            if (landingScreen.style.display === "none" || isPreparingGame) {
               return;
             }
             const debugTextBox = document.getElementById("landingTextBox");
@@ -1791,8 +1862,23 @@
               landingHint.classList.remove("show");
               landingHint.hidden = true;
             }
-            landingScreen.style.display = "none";
-            startGameAssetPreload();
+            isPreparingGame = true;
+            landingScreen.setAttribute("aria-busy", "true");
+            if (landingLoading) {
+              landingLoading.hidden = false;
+              requestAnimationFrame(() => {
+                landingLoading.classList.add("show");
+              });
+            }
+            startGameAssetPreload().then(() => {
+              landingScreen.style.display = "none";
+              landingScreen.setAttribute("aria-busy", "false");
+              if (landingLoading) {
+                landingLoading.classList.remove("show");
+                landingLoading.hidden = true;
+              }
+              isPreparingGame = false;
+            });
           };
           landingScreen.addEventListener("click", dismissLanding);
           landingScreen.addEventListener(
