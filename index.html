@@ -82,6 +82,12 @@
         align-items: center;
         overflow: visible;
       }
+      .game-stage {
+        position: absolute;
+        inset: 0;
+        transform-origin: center center;
+        transition: transform 180ms ease;
+      }
       .slot-machine-container::before,
       .slot-machine-container::after {
         content: "";
@@ -242,10 +248,10 @@
 
       #landingTextBox {
         position: absolute;
-        left: 5%;
-        top: 21.7%;
-        width: 90%;
-        height: 62%;
+        left: 9%;
+        top: 21.53%;
+        width: 82.03%;
+        height: 58.52%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -693,11 +699,29 @@
         }
 
         .aspect-container {
-          width: min(46vw, calc(98vh * 9 / 16));
-          max-width: 560px;
+          width: min(64vw, calc(100vh * 9 / 16));
+          max-width: none;
           background: transparent;
           box-shadow: none;
+          overflow: visible;
           z-index: 1;
+        }
+
+        body.game-started .game-stage {
+          transform: scale(1.22);
+        }
+
+        .instructions-overlay {
+          position: fixed;
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          z-index: 50;
+        }
+
+        .instructions-container {
+          width: min(82vw, 82vh, 760px);
+          max-width: none;
         }
 
         .slot-machine-container::before,
@@ -857,26 +881,28 @@
         </div>
       </div>
       <div class="slot-machine-container">
-        <div class="party-bunting frame-bunting" aria-hidden="true"></div>
-        <div class="slot-machine blur-background" id="slotMachine"></div>
-        <div id="reel1" class="reel blur-background"></div>
-        <div id="reel2" class="reel blur-background"></div>
-        <div id="reel3" class="reel blur-background"></div>
-        <div
-          class="spin-button blur-background"
-          id="spinButton"
-          role="button"
-          tabindex="0"
-          aria-label="Spin to reveal"
-        >
-          <img
-            src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
-            alt="Spin"
-            decoding="async"
-            fetchpriority="high"
-            loading="eager"
-            style="visibility: hidden"
-          />
+        <div class="game-stage">
+          <div class="party-bunting frame-bunting" aria-hidden="true"></div>
+          <div class="slot-machine blur-background" id="slotMachine"></div>
+          <div id="reel1" class="reel blur-background"></div>
+          <div id="reel2" class="reel blur-background"></div>
+          <div id="reel3" class="reel blur-background"></div>
+          <div
+            class="spin-button blur-background"
+            id="spinButton"
+            role="button"
+            tabindex="0"
+            aria-label="Spin to reveal"
+          >
+            <img
+              src="data:image/gif;base64,R0lGODlhAQABAAAAACw="
+              alt="Spin"
+              decoding="async"
+              fetchpriority="high"
+              loading="eager"
+              style="visibility: hidden"
+            />
+          </div>
         </div>
         <div class="reveal-overlay intro-overlay" id="introOverlay">
           <div class="color-overlay"></div>
