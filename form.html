@@ -475,10 +475,14 @@
           ></textarea>
         </div>
         <fieldset>
-          <legend id="textColorLabel">Intro Text Color</legend>
+          <legend id="textColorLabel">Advanced Intro Color</legend>
           <div class="radio-group color-grid" role="radiogroup" aria-labelledby="textColorLabel">
             <label class="radio-option color-option active">
-              <input type="radio" name="introColor" value="honey" checked />
+              <input type="radio" name="introColor" value="pattern" checked />
+              <span data-color-option="pattern">Default Pattern</span>
+            </label>
+            <label class="radio-option color-option">
+              <input type="radio" name="introColor" value="honey" />
               <span class="color-swatch" style="background: #d9a637"></span>
               <span data-color-option="honey">Honey</span>
             </label>
@@ -607,12 +611,13 @@
           introMessagePlaceholder: 'Spin to see what baby will be!',
           revealMessage: 'Reveal Message',
           revealMessagePlaceholder: "IT'S A GIRL!",
-          textColor: 'Intro Text Color',
+          textColor: 'Advanced Intro Color',
           generate: 'Generate URL',
           copy: 'Copy to Clipboard',
           boy: 'Boy',
           girl: 'Girl',
           colors: {
+            pattern: 'Default Pattern',
             honey: 'Honey',
             cocoa: 'Cocoa',
             coral: 'Coral',
@@ -640,12 +645,13 @@
           introMessagePlaceholder: '¡Gira para ver qué será el bebé!',
           revealMessage: 'Mensaje de revelación',
           revealMessagePlaceholder: '¡ES UNA NIÑA!',
-          textColor: 'Color del texto inicial',
+          textColor: 'Color avanzado del texto inicial',
           generate: 'Generar enlace',
           copy: 'Copiar',
           boy: 'Niño',
           girl: 'Niña',
           colors: {
+            pattern: 'Patrón predeterminado',
             honey: 'Miel',
             cocoa: 'Cacao',
             coral: 'Coral',
@@ -673,12 +679,13 @@
           introMessagePlaceholder: 'Tournez pour découvrir bébé !',
           revealMessage: 'Message de révélation',
           revealMessagePlaceholder: "C'EST UNE FILLE !",
-          textColor: 'Couleur du texte initial',
+          textColor: 'Couleur avancée du texte initial',
           generate: 'Générer le lien',
           copy: 'Copier',
           boy: 'Garçon',
           girl: 'Fille',
           colors: {
+            pattern: 'Motif par défaut',
             honey: 'Miel',
             cocoa: 'Cacao',
             coral: 'Corail',
@@ -706,12 +713,13 @@
           introMessagePlaceholder: 'Drehen, um zu sehen, was das Baby wird!',
           revealMessage: 'Enthüllungsnachricht',
           revealMessagePlaceholder: 'ES IST EIN MÄDCHEN!',
-          textColor: 'Intro-Textfarbe',
+          textColor: 'Erweiterte Intro-Textfarbe',
           generate: 'Link erstellen',
           copy: 'Kopieren',
           boy: 'Junge',
           girl: 'Mädchen',
           colors: {
+            pattern: 'Standardmuster',
             honey: 'Honig',
             cocoa: 'Kakao',
             coral: 'Koralle',
@@ -836,7 +844,7 @@
         const introMessageValue = introMessageField.value || '';
         const revealMessageValue = revealMessageField.value || '';
         const checkedIntroColor =
-          document.querySelector('input[name="introColor"]:checked') || { value: 'honey' };
+          document.querySelector('input[name="introColor"]:checked') || { value: 'pattern' };
         const customColorValue = customIntroColor.value || '#d9a637';
         const introColorValue =
           checkedIntroColor.value === 'custom' ? customColorValue : checkedIntroColor.value;
@@ -850,7 +858,9 @@
         if (revealMessageValue.trim()) {
           innerParams.set('revealMessage', revealMessageValue);
         }
-        innerParams.set('introColor', introColorValue);
+        if (introColorValue !== 'pattern') {
+          innerParams.set('introColor', introColorValue);
+        }
 
         const encoded = b64EncodeUnicode(innerParams.toString());
         return `https://genderslotreveal.netlify.app/?d=${encodeURIComponent(encoded)}`;

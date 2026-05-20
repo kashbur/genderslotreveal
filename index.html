@@ -35,6 +35,9 @@
         --spin-button-aspect: 2019 / 657;
         --instructions-max-width: 580px;
         --intro-text-color: #d9a637;
+        --intro-mustard: #d9a637;
+        --intro-teal: #6faea3;
+        --intro-peach: #ef8d6d;
         --landscape-bg: #fcf1de;
         --game-paper: #fffdf7;
         --dot-mint: rgba(164, 201, 196, 0.58);
@@ -112,7 +115,7 @@
         background-image: url("img/Assets/banner.png");
         background-position: center top;
         background-repeat: no-repeat;
-        background-size: cover;
+        background-size: contain;
         pointer-events: none;
       }
       .frame-bunting {
@@ -239,13 +242,13 @@
 
       #landingTextBox {
         position: absolute;
-        left: 8%;
+        left: 5%;
         top: 21.7%;
-        width: 82.64%;
-        height: 58.6%;
+        width: 90%;
+        height: 62%;
         display: flex;
         flex-direction: column;
-        justify-content: flex-start;
+        justify-content: center;
         align-items: center;
         text-align: center;
         padding-top: 0;
@@ -260,9 +263,9 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: flex-start;
+        justify-content: center;
         text-align: center;
-        padding: 0 7% 7%;
+        padding: 0 7%;
         box-sizing: border-box;
         max-width: 100%;
         max-height: 100%;
@@ -281,12 +284,31 @@
         text-wrap: balance;
         text-align: center;
       }
+      #landingTextBox .intro-line {
+        display: block;
+        text-transform: uppercase;
+        text-shadow:
+          0 2px 0 rgba(255, 255, 255, 0.62),
+          0 4px 7px rgba(126, 84, 44, 0.18);
+      }
+      #landingTextBox .intro-line:nth-child(3n + 1) {
+        color: var(--intro-mustard);
+      }
+      #landingTextBox .intro-line:nth-child(3n + 2) {
+        color: var(--intro-teal);
+      }
+      #landingTextBox .intro-line:nth-child(3n) {
+        color: var(--intro-peach);
+      }
+      #landingTextBox .intro-text-content.has-custom-color .intro-line {
+        color: var(--intro-text-color);
+      }
       #customMessage {
         font-family: 'SparkyStones', sans-serif;
         font-size: clamp(20px, 6vw, 70px);
         text-align: center;
         line-height: 1.2;
-        color: var(--intro-text-color);
+        color: var(--intro-mustard);
       }
       #landingTextBox.hidden {
         display: none;
@@ -689,10 +711,10 @@
 
         .viewport-bunting {
           position: fixed;
-          top: -22px;
+          top: -10px;
           left: 50%;
           width: 100vw;
-          height: min(11vw, 112px);
+          height: min(10.2vw, 140px);
           transform: translateX(-50%);
           z-index: 0;
         }
@@ -936,12 +958,11 @@
         teal: "#2f776f",
         charcoal: "#2f2a24",
       };
-      const DEFAULT_INTRO_TEXT_COLOR = INTRO_TEXT_COLORS.honey;
 
       function resolveIntroTextColor(value) {
         const colorValue = (value || "").trim().toLowerCase();
         if (!colorValue) {
-          return DEFAULT_INTRO_TEXT_COLOR;
+          return "";
         }
         if (INTRO_TEXT_COLORS[colorValue]) {
           return INTRO_TEXT_COLORS[colorValue];
@@ -949,17 +970,19 @@
         if (/^#[0-9a-f]{6}$/i.test(colorValue)) {
           return colorValue;
         }
-        return DEFAULT_INTRO_TEXT_COLOR;
+        return "";
       }
 
       const introTextColor = resolveIntroTextColor(
         MERGED_SEARCH_PARAMS.get("introColor") ||
           MERGED_SEARCH_PARAMS.get("textColor"),
       );
-      document.documentElement.style.setProperty(
-        "--intro-text-color",
-        introTextColor,
-      );
+      if (introTextColor) {
+        document.documentElement.style.setProperty(
+          "--intro-text-color",
+          introTextColor,
+        );
+      }
 
       let introTextResizeHandler = null;
       let introTextResizeObserver = null;
@@ -996,7 +1019,7 @@
           return;
         }
 
-        const widthLimit = availableWidth * 0.88;
+        const widthLimit = availableWidth * 0.86;
         const heightLimit = availableHeight * 0.92;
         const minFontSize = 8;
         const maxFontSize = Math.min(
@@ -1060,6 +1083,43 @@
         textElement.style.overflowWrap = "break-word";
       }
 
+      function escapeIntroHtml(value) {
+        return value.replace(/[&<>]/g, (char) => {
+          if (char === "&") return "&amp;";
+          if (char === "<") return "&lt;";
+          return "&gt;";
+        });
+      }
+
+      function buildIntroLines(value) {
+        const normalized = value.replace(/\\n/g, "\n").trim();
+        if (/^spin to see what baby will be!?$/i.test(normalized)) {
+          return ["SPIN", "TO SEE", "WHAT", "BABY", "WILL BE!"];
+        }
+        const explicitLines = normalized
+          .split(/\r?\n/)
+          .map((line) => line.trim())
+          .filter(Boolean);
+        if (explicitLines.length > 1) {
+          return explicitLines.map((line) => line.toUpperCase());
+        }
+        const words = normalized.toUpperCase().split(/\s+/).filter(Boolean);
+        if (words.length <= 2) {
+          return [words.join(" ")];
+        }
+        if (words.length <= 4) {
+          return [words.slice(0, 2).join(" "), words.slice(2).join(" ")];
+        }
+        const lineCount = Math.min(4, Math.ceil(words.length / 2));
+        const lines = [];
+        for (let i = 0; i < lineCount; i++) {
+          const start = Math.round((i * words.length) / lineCount);
+          const end = Math.round(((i + 1) * words.length) / lineCount);
+          lines.push(words.slice(start, end).join(" "));
+        }
+        return lines.filter(Boolean);
+      }
+
       function applyIntroTextFromURL() {
         const landingTextBox = document.getElementById("landingTextBox");
         if (!landingTextBox) {
@@ -1093,13 +1153,13 @@
           landingTextBox.innerHTML = "";
           return null;
         }
-        const withNewlines = trimmed.replace(/\\n/g, "\n");
-        const sanitized = withNewlines.replace(/[<>]/g, (char) =>
-          char === "<" ? "&lt;" : "&gt;",
-        );
-        const html = sanitized.replace(/\r?\n/g, "<br/>");
+        const lines = buildIntroLines(trimmed);
+        const html = lines
+          .map((line) => `<span class="intro-line">${escapeIntroHtml(line)}</span>`)
+          .join("");
+        const colorClass = introTextColor ? " has-custom-color" : "";
         landingTextBox.innerHTML =
-          `<div class="intro-text"><span id="customMessage" class="intro-text-content">${html}</span></div>`;
+          `<div class="intro-text"><span id="customMessage" class="intro-text-content${colorClass}">${html}</span></div>`;
         landingTextBox.classList.remove("hidden");
 
         const reFit = () => {
