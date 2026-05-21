@@ -8,6 +8,9 @@
       name="description"
       content="A fun surprise reveal with optional gender and language selection."
     />
+    <meta property="og:title" content="Baby Jackpot — The Big Reveal" />
+    <meta property="og:description" content="Spin the slots to find out!" />
+    <meta property="og:type" content="website" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -402,103 +405,6 @@
       #landingTextBox.hidden {
         display: none;
       }
-      #landingTextBox.text-box-debug-active {
-        outline: 2px dashed rgba(152, 111, 23, 0.85);
-        outline-offset: 2px;
-        pointer-events: auto;
-      }
-      .text-box-debug-handle {
-        position: absolute;
-        width: 18px;
-        height: 18px;
-        border: 2px solid #ffffff;
-        border-radius: 50%;
-        background: #986f17;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-        pointer-events: auto;
-        z-index: 2;
-      }
-      .text-box-debug-handle[data-corner="nw"] {
-        left: -9px;
-        top: -9px;
-        cursor: nwse-resize;
-      }
-      .text-box-debug-handle[data-corner="ne"] {
-        right: -9px;
-        top: -9px;
-        cursor: nesw-resize;
-      }
-      .text-box-debug-handle[data-corner="sw"] {
-        left: -9px;
-        bottom: -9px;
-        cursor: nesw-resize;
-      }
-      .text-box-debug-handle[data-corner="se"] {
-        right: -9px;
-        bottom: -9px;
-        cursor: nwse-resize;
-      }
-      .text-box-debug-panel {
-        position: fixed;
-        right: 12px;
-        bottom: 12px;
-        width: min(320px, calc(100vw - 24px));
-        padding: 12px;
-        border-radius: 8px;
-        background: rgba(255, 255, 255, 0.94);
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
-        color: #2a2a2a;
-        font-family: Arial, sans-serif;
-        font-size: 12px;
-        z-index: 1000;
-      }
-      .text-box-debug-panel[hidden] {
-        display: none;
-      }
-      .text-box-debug-panel h2 {
-        margin: 0 0 8px;
-        font-size: 14px;
-        line-height: 1.2;
-      }
-      .text-box-debug-row {
-        display: grid;
-        grid-template-columns: 48px 1fr 50px;
-        gap: 8px;
-        align-items: center;
-        margin: 7px 0;
-      }
-      .text-box-debug-row input {
-        width: 100%;
-      }
-      .text-box-debug-value {
-        font-variant-numeric: tabular-nums;
-        text-align: right;
-      }
-      .text-box-debug-output {
-        margin-top: 10px;
-        padding: 8px;
-        border-radius: 6px;
-        background: rgba(0, 0, 0, 0.08);
-        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-        line-height: 1.35;
-        white-space: pre-wrap;
-      }
-      .text-box-debug-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        margin-top: 10px;
-      }
-      .text-box-debug-actions button {
-        border: 0;
-        border-radius: 6px;
-        padding: 6px 10px;
-        background: #986f17;
-        color: #fff;
-        font: inherit;
-        cursor: pointer;
-      }
-
       .slot-machine {
         position: absolute;
         width: 100%;
@@ -1057,6 +963,79 @@
           width: min(86vw, 980px);
         }
       }
+      .replay-button {
+        position: absolute;
+        bottom: 8%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 15;
+        border: 3px solid #e69c6a;
+        border-radius: 999px;
+        padding: 0.55rem 1.6rem;
+        background: rgba(255, 242, 217, 0.96);
+        color: #986f17;
+        font-family: 'SparkyStones', sans-serif;
+        font-size: clamp(14px, 3.5vw, 20px);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        box-shadow: 0 6px 18px rgba(89, 55, 15, 0.16);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 400ms ease, transform 120ms ease;
+        white-space: nowrap;
+      }
+      .replay-button.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .replay-button:hover {
+        transform: translateX(-50%) translateY(-2px);
+      }
+      @media (min-aspect-ratio: 4/3) {
+        .replay-button {
+          position: fixed;
+          bottom: 5%;
+        }
+      }
+      body.invalid-reveal-link {
+        background: #fcf1de;
+        display: grid;
+        place-items: center;
+        padding: clamp(1rem, 4vw, 2.5rem);
+      }
+
+      body.invalid-reveal-link > .party-bunting,
+      body.invalid-reveal-link > .aspect-container {
+        display: none;
+      }
+
+      .invalid-link-screen {
+        width: min(720px, 100%);
+        padding: clamp(2rem, 7vw, 4rem);
+        border-radius: 18px;
+        background: #fffaf0;
+        border: 1px solid rgba(220, 165, 42, 0.24);
+        box-shadow: 0 18px 48px rgba(126, 94, 79, 0.14);
+        color: #2f2a24;
+        text-align: center;
+      }
+
+      .invalid-link-screen h1 {
+        margin: 0 0 1rem;
+        font-family: var(--font-family), sans-serif;
+        font-size: clamp(2.3rem, 7vw, 4.4rem);
+        line-height: 0.95;
+        color: #d9a637;
+        text-shadow:
+          0 2px 0 rgba(255, 255, 255, 0.72),
+          0 5px 10px rgba(126, 84, 44, 0.14);
+      }
+
+      .invalid-link-screen p {
+        margin: 0;
+        font: 700 clamp(1rem, 2.4vw, 1.25rem) / 1.45 system-ui, sans-serif;
+      }
     </style>
   </head>
   <body>
@@ -1109,6 +1088,7 @@
         <div class="gender-overlay" id="genderOverlay">
           <div class="gender-text">IT'S A GIRL!</div>
         </div>
+        <button class="replay-button" id="replayButton" type="button">Watch Again</button>
         <div
           class="instructions-overlay"
           id="instructionsOverlay"
@@ -1169,6 +1149,17 @@
         }
         return params;
       })();
+
+      if (!decodedSearchParams) {
+        document.body.classList.add("invalid-reveal-link");
+        document.body.insertAdjacentHTML(
+          "beforeend",
+          `<main class="invalid-link-screen" aria-labelledby="invalidRevealTitle">
+            <h1 id="invalidRevealTitle">Reveal Link Needed</h1>
+            <p>This reveal opens from a custom link. Please use the link shared by the parents-to-be.</p>
+          </main>`
+        );
+      }
 
       const INTRO_TEXT_COLORS = {
         honey: "#d9a637",
@@ -1362,11 +1353,6 @@
         if (introParam == null) {
           introParam = "Spin to see what baby will be!";
         }
-        try {
-          introParam = decodeURIComponent(introParam);
-        } catch (error) {
-          // ignore decoding errors and use the original value
-        }
         const trimmed = introParam.trim();
         if (!trimmed) {
           landingTextBox.classList.add("hidden");
@@ -1425,267 +1411,7 @@
           MERGED_SEARCH_PARAMS.get("finalMessage") ||
           MERGED_SEARCH_PARAMS.get("resultMessage") ||
           "";
-        try {
-          return decodeURIComponent(value).trim();
-        } catch (error) {
-          return value.trim();
-        }
-      }
-
-      function setupTextBoxDebug() {
-        const landingTextBox = document.getElementById("landingTextBox");
-        if (!landingTextBox) {
-          return;
-        }
-        const settings = [
-          { key: "left", label: "Left", min: 0, max: 100 },
-          { key: "top", label: "Top", min: 0, max: 100 },
-          { key: "width", label: "Width", min: 10, max: 100 },
-          { key: "height", label: "Height", min: 10, max: 100 },
-        ];
-        const panel = document.createElement("div");
-        panel.className = "text-box-debug-panel";
-        panel.hidden = true;
-        panel.innerHTML = `
-          <h2>Text Box Debug</h2>
-          ${settings
-            .map(
-              (setting) => `
-                <label class="text-box-debug-row">
-                  <span>${setting.label}</span>
-                  <input
-                    type="range"
-                    data-text-box-setting="${setting.key}"
-                    min="${setting.min}"
-                    max="${setting.max}"
-                    step="0.1"
-                  />
-                  <span class="text-box-debug-value" data-text-box-value="${setting.key}"></span>
-                </label>
-              `,
-            )
-            .join("")}
-          <div class="text-box-debug-output" aria-live="polite"></div>
-          <div class="text-box-debug-actions">
-            <button type="button" data-text-box-reset>Reset</button>
-            <button type="button" data-text-box-close>Close</button>
-          </div>
-        `;
-        document.body.appendChild(panel);
-
-        const output = panel.querySelector(".text-box-debug-output");
-        const sliders = Array.from(
-          panel.querySelectorAll("[data-text-box-setting]"),
-        );
-        const initialValues = {
-          left: 8,
-          top: 21.7,
-          width: 82.64,
-          height: 58.6,
-        };
-        const handles = ["nw", "ne", "sw", "se"].map((corner) => {
-          const handle = document.createElement("div");
-          handle.className = "text-box-debug-handle";
-          handle.dataset.corner = corner;
-          handle.hidden = true;
-          landingTextBox.appendChild(handle);
-          return handle;
-        });
-
-        function setDebugActive(isActive) {
-          landingTextBox.classList.toggle("text-box-debug-active", isActive);
-          handles.forEach((handle) => {
-            handle.hidden = !isActive;
-          });
-        }
-
-        function getCurrentValue(key) {
-          const inlineValue = parseFloat(landingTextBox.style[key]);
-          if (!Number.isNaN(inlineValue)) {
-            return inlineValue;
-          }
-          const computedValue = parseFloat(getComputedStyle(landingTextBox)[key]);
-          const parentRect = landingTextBox.parentElement.getBoundingClientRect();
-          const basis = key === "left" || key === "width"
-            ? parentRect.width
-            : parentRect.height;
-          if (!Number.isNaN(computedValue) && basis > 0) {
-            return (computedValue / basis) * 100;
-          }
-          return initialValues[key];
-        }
-
-        function getValues() {
-          return settings.reduce((values, setting) => {
-            values[setting.key] = getCurrentValue(setting.key);
-            return values;
-          }, {});
-        }
-
-        function formatPercent(value) {
-          return `${Number(value).toFixed(2).replace(/\.?0+$/, "")}%`;
-        }
-
-        function refitDebugText() {
-          fitIntroTextToContainer(landingTextBox);
-          requestAnimationFrame(() => fitIntroTextToContainer(landingTextBox));
-        }
-
-        function renderControls() {
-          const values = getValues();
-          sliders.forEach((slider) => {
-            const key = slider.dataset.textBoxSetting;
-            const value = values[key];
-            slider.value = value;
-            const valueEl = panel.querySelector(`[data-text-box-value="${key}"]`);
-            if (valueEl) {
-              valueEl.textContent = formatPercent(value);
-            }
-          });
-          output.textContent = [
-            `left: ${formatPercent(values.left)};`,
-            `top: ${formatPercent(values.top)};`,
-            `width: ${formatPercent(values.width)};`,
-            `height: ${formatPercent(values.height)};`,
-          ].join("\n");
-        }
-
-        function applyValue(key, value) {
-          landingTextBox.style[key] = formatPercent(value);
-          const valueEl = panel.querySelector(`[data-text-box-value="${key}"]`);
-          if (valueEl) {
-            valueEl.textContent = formatPercent(value);
-          }
-          renderControls();
-          refitDebugText();
-        }
-
-        function applyValues(values) {
-          Object.entries(values).forEach(([key, value]) => {
-            landingTextBox.style[key] = formatPercent(value);
-          });
-          renderControls();
-          refitDebugText();
-        }
-
-        function stopDebugClickThrough(event) {
-          if (panel.hidden) {
-            return;
-          }
-          event.preventDefault();
-          event.stopPropagation();
-        }
-
-        landingTextBox.addEventListener("click", stopDebugClickThrough);
-        landingTextBox.addEventListener("touchstart", stopDebugClickThrough, {
-          passive: false,
-        });
-
-        sliders.forEach((slider) => {
-          slider.addEventListener("input", () => {
-            applyValue(slider.dataset.textBoxSetting, slider.value);
-          });
-        });
-
-        handles.forEach((handle) => {
-          handle.addEventListener("pointerdown", (event) => {
-            if (panel.hidden) {
-              return;
-            }
-            event.preventDefault();
-            event.stopPropagation();
-            handle.setPointerCapture(event.pointerId);
-            const corner = handle.dataset.corner;
-            const startX = event.clientX;
-            const startY = event.clientY;
-            const startValues = getValues();
-            const parentRect = landingTextBox.parentElement.getBoundingClientRect();
-            const minWidth = 10;
-            const minHeight = 10;
-
-            function onPointerMove(moveEvent) {
-              moveEvent.preventDefault();
-              moveEvent.stopPropagation();
-              const deltaX = ((moveEvent.clientX - startX) / parentRect.width) * 100;
-              const deltaY = ((moveEvent.clientY - startY) / parentRect.height) * 100;
-              const nextValues = { ...startValues };
-
-              if (corner.includes("w")) {
-                const maxLeft = startValues.left + startValues.width - minWidth;
-                nextValues.left = Math.min(
-                  Math.max(0, startValues.left + deltaX),
-                  maxLeft,
-                );
-                nextValues.width = startValues.width + startValues.left - nextValues.left;
-              } else {
-                nextValues.width = Math.min(
-                  Math.max(minWidth, startValues.width + deltaX),
-                  100 - startValues.left,
-                );
-              }
-
-              if (corner.includes("n")) {
-                const maxTop = startValues.top + startValues.height - minHeight;
-                nextValues.top = Math.min(
-                  Math.max(0, startValues.top + deltaY),
-                  maxTop,
-                );
-                nextValues.height = startValues.height + startValues.top - nextValues.top;
-              } else {
-                nextValues.height = Math.min(
-                  Math.max(minHeight, startValues.height + deltaY),
-                  100 - startValues.top,
-                );
-              }
-
-              applyValues(nextValues);
-            }
-
-            function onPointerUp(upEvent) {
-              upEvent.preventDefault();
-              upEvent.stopPropagation();
-              handle.releasePointerCapture(event.pointerId);
-              handle.removeEventListener("pointermove", onPointerMove);
-              handle.removeEventListener("pointerup", onPointerUp);
-              handle.removeEventListener("pointercancel", onPointerUp);
-            }
-
-            handle.addEventListener("pointermove", onPointerMove);
-            handle.addEventListener("pointerup", onPointerUp);
-            handle.addEventListener("pointercancel", onPointerUp);
-          });
-        });
-
-        panel.querySelector("[data-text-box-reset]").addEventListener("click", () => {
-          applyValues(initialValues);
-        });
-
-        panel.querySelector("[data-text-box-close]").addEventListener("click", () => {
-          panel.hidden = true;
-          setDebugActive(false);
-        });
-
-        document.addEventListener("keydown", (event) => {
-          const target = event.target;
-          const isTyping =
-            target instanceof HTMLElement &&
-            (target.isContentEditable ||
-              ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName));
-          if (isTyping || event.key.toLowerCase() !== "d") {
-            return;
-          }
-          event.preventDefault();
-          panel.hidden = !panel.hidden;
-          setDebugActive(!panel.hidden);
-          if (!panel.hidden) {
-            renderControls();
-            refitDebugText();
-          }
-        });
-
-        renderControls();
-        setDebugActive(false);
-        refitDebugText();
+        return value.trim();
       }
 
       function syncIconDimensionsWithCSS() {
@@ -2306,7 +2032,6 @@
           document.body.classList.add("game-started");
           startGameAssetPreload();
         }
-        setupTextBoxDebug();
         const genderOverlay = document.getElementById("genderOverlay");
         const genderText = genderOverlay.querySelector(".gender-text");
         const isBoy = params.reveal === "1" || params.reveal === "boy";
@@ -2604,7 +2329,7 @@
         }
 
         function fitRevealLine(el, type) {
-          if (!el) {
+          if (!el || typeof textFit !== "function") {
             return;
           }
           el.style.height = "auto";
@@ -2672,9 +2397,6 @@
               .filter(Boolean)
               .forEach(addLine);
             const hideDelay = 30000;
-
-
-
             revealOverlay.style.opacity = "1";
             revealOverlay.style.pointerEvents = "auto";
             refitAllLines();
@@ -2685,6 +2407,9 @@
             setTimeout(() => {
               revealOverlay.style.opacity = "0";
               revealOverlay.style.pointerEvents = "none";
+              if (replayButton) {
+                replayButton.classList.add("show");
+              }
             }, hideDelay);
           }
 
@@ -2715,6 +2440,11 @@
           }
         }
 
+        const replayButton = document.getElementById("replayButton");
+        if (replayButton) {
+          replayButton.addEventListener("click", () => window.location.reload());
+        }
+
         function showGenderReveal() {
           genderOverlay.classList.remove("active");
           void genderOverlay.offsetWidth;
@@ -2740,6 +2470,9 @@
             genderOverlay.style.opacity = "0";
             genderOverlay.style.pointerEvents = "none";
             genderOverlay.classList.remove("active");
+            if (replayButton) {
+              replayButton.classList.add("show");
+            }
           }, 8000);
         }
         // -------- Confetti logic (unchanged) ----------

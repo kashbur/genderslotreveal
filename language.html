@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Select Language · Gender Slot Reveal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet" />
     <style>
       :root {
         color-scheme: light;
@@ -22,13 +25,13 @@
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        background: radial-gradient(circle at top, #ffe7f1 0%, #f5f7ff 55%, #e7ecff);
+        background: #f8ecd0;
         padding: clamp(1.5rem, 4vw, 4rem);
       }
       h1 {
         font-size: clamp(1.75rem, 4vw, 2.75rem);
         font-weight: 600;
-        color: #2a2d3a;
+        color: #986f17;
         text-align: center;
         margin-bottom: clamp(1.5rem, 4vw, 3rem);
       }
@@ -39,25 +42,26 @@
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       }
       button.language-choice {
-        border: none;
+        border: 1px solid rgba(200, 145, 25, 0.22);
         border-radius: 18px;
         padding: clamp(1.75rem, 4vw, 2.75rem) clamp(1.5rem, 5vw, 3rem);
         font-size: clamp(1.35rem, 3vw, 1.75rem);
         font-weight: 600;
-        background: white;
-        color: #2a2d3a;
-        box-shadow: 0 18px 40px rgba(26, 33, 64, 0.14);
-        transition: transform 160ms ease, box-shadow 160ms ease;
+        background: #fffdf2;
+        color: #2f2a24;
+        box-shadow: 0 18px 40px rgba(89, 55, 15, 0.1);
+        transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
         cursor: pointer;
       }
       button.language-choice:hover,
       button.language-choice:focus-visible {
-        transform: translateY(-6px);
-        box-shadow: 0 26px 50px rgba(26, 33, 64, 0.2);
+        transform: translateY(-4px);
+        border-color: rgba(200, 145, 25, 0.5);
+        box-shadow: 0 24px 44px rgba(89, 55, 15, 0.14);
         outline: none;
       }
       button.language-choice:active {
-        transform: translateY(-2px);
+        transform: translateY(-1px);
       }
       @media (max-width: 520px) {
         body {

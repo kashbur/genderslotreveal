@@ -4,6 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Customize Your Reveal Link</title>
+    <script>
+      if (sessionStorage.getItem("babyJackpotCreatorUnlocked") !== "1") {
+        window.location.replace("./create/");
+      }
+    </script>
     <style>
       :root {
         color-scheme: light;
@@ -411,9 +416,11 @@
         .language-controls button {
           width: 100%;
         }
-        .radio-group,
-        .color-grid {
+        .radio-group {
           grid-template-columns: 1fr;
+        }
+        .color-grid {
+          grid-template-columns: repeat(2, 1fr);
         }
         .actions {
           flex-direction: column;
@@ -559,7 +566,7 @@
           id="previewFrame"
           class="preview-frame"
           title="Preview"
-          loading="lazy"
+          loading="eager"
         ></iframe>
       </section>
     </main>
@@ -612,6 +619,7 @@
           introMessagePlaceholder: 'Spin to see what baby will be!',
           revealMessage: 'Reveal Message',
           revealMessagePlaceholder: "IT'S A GIRL!",
+          revealMessagePlaceholderBoy: "IT'S A BOY!",
           textColor: 'Advanced Intro Color',
           generate: 'Generate URL',
           copy: 'Copy to Clipboard',
@@ -646,6 +654,7 @@
           introMessagePlaceholder: '¡Gira para ver qué será el bebé!',
           revealMessage: 'Mensaje de revelación',
           revealMessagePlaceholder: '¡ES UNA NIÑA!',
+          revealMessagePlaceholderBoy: '¡ES UN NIÑO!',
           textColor: 'Color avanzado del texto inicial',
           generate: 'Generar enlace',
           copy: 'Copiar',
@@ -680,6 +689,7 @@
           introMessagePlaceholder: 'Tournez pour découvrir bébé !',
           revealMessage: 'Message de révélation',
           revealMessagePlaceholder: "C'EST UNE FILLE !",
+          revealMessagePlaceholderBoy: "C'EST UN GARÇON !",
           textColor: 'Couleur avancée du texte initial',
           generate: 'Générer le lien',
           copy: 'Copier',
@@ -714,6 +724,7 @@
           introMessagePlaceholder: 'Drehen, um zu sehen, was das Baby wird!',
           revealMessage: 'Enthüllungsnachricht',
           revealMessagePlaceholder: 'ES IST EIN MÄDCHEN!',
+          revealMessagePlaceholderBoy: 'ES IST EIN JUNGE!',
           textColor: 'Erweiterte Intro-Textfarbe',
           generate: 'Link erstellen',
           copy: 'Kopieren',
@@ -779,6 +790,16 @@
       const languageDescription = document.getElementById('languageDescription');
       const languageConfirm = document.getElementById('languageConfirm');
 
+      function updateRevealPlaceholder() {
+        const t = translations[currentLang] || translations.en;
+        const isBoySelected = (
+          document.querySelector('input[name="gender"]:checked') || {}
+        ).value === '1';
+        revealMessageField.placeholder = isBoySelected
+          ? (t.revealMessagePlaceholderBoy || "IT'S A BOY!")
+          : (t.revealMessagePlaceholder || "IT'S A GIRL!");
+      }
+
       function setCopyAvailability(isEnabled) {
         copyButton.disabled = !isEnabled;
         copyButton.setAttribute('aria-disabled', String(!isEnabled));
@@ -805,7 +826,7 @@
         introMessageLabel.textContent = t.introMessage;
         introMessageField.placeholder = t.introMessagePlaceholder;
         revealMessageLabel.textContent = t.revealMessage;
-        revealMessageField.placeholder = t.revealMessagePlaceholder;
+        updateRevealPlaceholder();
         textColorLabel.textContent = t.textColor;
         generateButton.textContent = t.generate;
         copyButton.textContent = t.copy;
@@ -864,7 +885,7 @@
         }
 
         const encoded = b64EncodeUnicode(innerParams.toString());
-        return `https://genderslotreveal.netlify.app/?d=${encodeURIComponent(encoded)}`;
+        return `https://bigreveal.joyjotstudio.store/?d=${encodeURIComponent(encoded)}`;
       }
 
       function updatePreview({ updateResultInput = false } = {}) {
@@ -984,6 +1005,7 @@
         input.addEventListener('change', () => {
           if (input.checked) {
             setActiveRadio(label, genderOptions);
+            updateRevealPlaceholder();
             markNeedsGeneration();
             updatePreview();
           }

@@ -157,13 +157,24 @@
     </main>
 
     <script>
-      const CREATOR_PASSWORDS = ["BabyJackpot2026"];
+      const PASSWORD_HASHES = [
+        "9bdef60e87af7acef05ab3b39327eda4f101e0e83ad5b8a43691388570a10eb3",
+      ];
 
-      document.getElementById("passwordForm").addEventListener("submit", (event) => {
+      async function sha256Hex(value) {
+        const bytes = new TextEncoder().encode(value);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", bytes);
+        return [...new Uint8Array(hashBuffer)]
+          .map((byte) => byte.toString(16).padStart(2, "0"))
+          .join("");
+      }
+
+      document.getElementById("passwordForm").addEventListener("submit", async (event) => {
         event.preventDefault();
         const password = document.getElementById("password").value.trim();
-        if (CREATOR_PASSWORDS.includes(password)) {
-          window.location.href = "../form.html";
+        if (PASSWORD_HASHES.includes(await sha256Hex(password))) {
+          sessionStorage.setItem("babyJackpotCreatorUnlocked", "1");
+          window.location.href = "../language.html";
           return;
         }
         document.getElementById("error").textContent = "Incorrect password.";
