@@ -171,13 +171,19 @@
 
       document.getElementById("passwordForm").addEventListener("submit", async (event) => {
         event.preventDefault();
-        const password = document.getElementById("password").value.trim();
-        if (PASSWORD_HASHES.includes(await sha256Hex(password))) {
-          sessionStorage.setItem("babyJackpotCreatorUnlocked", "1");
-          window.location.href = "../language.html";
-          return;
+        const errorEl = document.getElementById("error");
+        errorEl.textContent = "";
+        try {
+          const password = document.getElementById("password").value.trim();
+          if (PASSWORD_HASHES.includes(await sha256Hex(password))) {
+            sessionStorage.setItem("babyJackpotCreatorUnlocked", "1");
+            window.location.href = "../language.html";
+            return;
+          }
+          errorEl.textContent = "Incorrect password.";
+        } catch (e) {
+          errorEl.textContent = "Something went wrong. Please try again.";
         }
-        document.getElementById("error").textContent = "Incorrect password.";
       });
     </script>
   </body>

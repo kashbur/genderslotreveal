@@ -813,6 +813,8 @@
       }
       .confetti {
         position: absolute;
+        top: 0;
+        left: 0;
         z-index: 101;
         will-change: transform, opacity;
         pointer-events: none;
@@ -2542,8 +2544,8 @@
             const left =
               (i / confettiCount) * viewportWidth + (Math.random() * 16 - 8);
             const top = -18 - Math.random() * 35;
-            const size = 6 + Math.random() * 6;
-            const scale = 0.7 + Math.random() * 0.6;
+            const size = 10 + Math.random() * 10;
+            const scale = 0.85 + Math.random() * 0.5;
             const color = colors[Math.floor(Math.random() * colors.length)];
             const rotation = Math.random() * 360;
             if (shapeType === 0) {
