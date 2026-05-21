@@ -863,6 +863,38 @@
         /* box-shadow: none; */
         /* border: none; */
       }
+      @media (min-aspect-ratio: 4 / 3) {
+        .instructions-overlay,
+        .reveal-overlay,
+        .gender-overlay {
+          position: fixed;
+          inset: 0;
+          width: 100vw;
+          height: 100vh;
+          border-radius: 0;
+          transform: none;
+        }
+
+        .instructions-overlay {
+          z-index: 70;
+        }
+
+        .reveal-overlay {
+          z-index: 60;
+        }
+
+        .gender-overlay {
+          z-index: 62;
+        }
+
+        .reveal-overlay .color-overlay {
+          border-radius: 0;
+        }
+
+        .reveal-lines {
+          width: min(86vw, 980px);
+        }
+      }
     </style>
   </head>
   <body>
