@@ -44,6 +44,10 @@
         --dot-mint: rgba(164, 201, 196, 0.58);
         --dot-peach: rgba(239, 141, 109, 0.5);
         --dot-gold: rgba(247, 199, 77, 0.46);
+        --dot-xs: clamp(5px, 1.15vmin, 7px);
+        --dot-sm: clamp(6px, 1.35vmin, 8px);
+        --dot-md: clamp(7px, 1.55vmin, 10px);
+        --dot-lg: clamp(8px, 1.8vmin, 12px);
       }
       html,
       body {
@@ -97,22 +101,100 @@
         pointer-events: none;
       }
       .slot-machine-container::before {
-        background:
-          radial-gradient(circle, var(--dot-mint) 0 8px, transparent 9px)
-            5% 6% / 132px 146px,
-          radial-gradient(circle, var(--dot-peach) 0 9px, transparent 10px)
-            38% 10% / 158px 172px,
-          radial-gradient(circle, var(--dot-gold) 0 8px, transparent 9px)
-            73% 7% / 146px 158px,
-          radial-gradient(circle, rgba(164, 201, 196, 0.42) 0 6px, transparent 7px)
-            22% 29% / 118px 132px,
-          radial-gradient(circle, rgba(247, 199, 77, 0.38) 0 7px, transparent 8px)
-            68% 36% / 136px 154px,
-          radial-gradient(circle, rgba(239, 141, 109, 0.42) 0 7px, transparent 8px)
-            18% 68% / 152px 166px,
-          radial-gradient(circle, rgba(164, 201, 196, 0.5) 0 9px, transparent 10px)
-            61% 84% / 146px 160px,
-          var(--game-paper);
+        background-color: var(--game-paper);
+        background-image:
+          radial-gradient(
+            circle at 6% 7%,
+            var(--dot-mint) 0 var(--dot-md),
+            transparent calc(var(--dot-md) + 1px)
+          ),
+          radial-gradient(
+            circle at 24% 10%,
+            var(--dot-peach) 0 var(--dot-sm),
+            transparent calc(var(--dot-sm) + 1px)
+          ),
+          radial-gradient(
+            circle at 49% 6%,
+            var(--dot-gold) 0 var(--dot-md),
+            transparent calc(var(--dot-md) + 1px)
+          ),
+          radial-gradient(
+            circle at 78% 9%,
+            rgba(164, 201, 196, 0.5) 0 var(--dot-lg),
+            transparent calc(var(--dot-lg) + 1px)
+          ),
+          radial-gradient(
+            circle at 93% 21%,
+            rgba(239, 141, 109, 0.42) 0 var(--dot-xs),
+            transparent calc(var(--dot-xs) + 1px)
+          ),
+          radial-gradient(
+            circle at 14% 27%,
+            rgba(247, 199, 77, 0.42) 0 var(--dot-sm),
+            transparent calc(var(--dot-sm) + 1px)
+          ),
+          radial-gradient(
+            circle at 34% 22%,
+            rgba(164, 201, 196, 0.42) 0 var(--dot-xs),
+            transparent calc(var(--dot-xs) + 1px)
+          ),
+          radial-gradient(
+            circle at 71% 28%,
+            var(--dot-peach) 0 var(--dot-md),
+            transparent calc(var(--dot-md) + 1px)
+          ),
+          radial-gradient(
+            circle at 9% 44%,
+            var(--dot-mint) 0 var(--dot-sm),
+            transparent calc(var(--dot-sm) + 1px)
+          ),
+          radial-gradient(
+            circle at 88% 45%,
+            rgba(247, 199, 77, 0.38) 0 var(--dot-sm),
+            transparent calc(var(--dot-sm) + 1px)
+          ),
+          radial-gradient(
+            circle at 17% 65%,
+            rgba(239, 141, 109, 0.42) 0 var(--dot-md),
+            transparent calc(var(--dot-md) + 1px)
+          ),
+          radial-gradient(
+            circle at 39% 72%,
+            rgba(164, 201, 196, 0.5) 0 var(--dot-xs),
+            transparent calc(var(--dot-xs) + 1px)
+          ),
+          radial-gradient(
+            circle at 67% 66%,
+            var(--dot-gold) 0 var(--dot-md),
+            transparent calc(var(--dot-md) + 1px)
+          ),
+          radial-gradient(
+            circle at 91% 64%,
+            var(--dot-mint) 0 var(--dot-sm),
+            transparent calc(var(--dot-sm) + 1px)
+          ),
+          radial-gradient(
+            circle at 8% 84%,
+            rgba(247, 199, 77, 0.46) 0 var(--dot-xs),
+            transparent calc(var(--dot-xs) + 1px)
+          ),
+          radial-gradient(
+            circle at 31% 91%,
+            rgba(239, 141, 109, 0.45) 0 var(--dot-sm),
+            transparent calc(var(--dot-sm) + 1px)
+          ),
+          radial-gradient(
+            circle at 59% 85%,
+            var(--dot-mint) 0 var(--dot-lg),
+            transparent calc(var(--dot-lg) + 1px)
+          ),
+          radial-gradient(
+            circle at 84% 91%,
+            var(--dot-gold) 0 var(--dot-sm),
+            transparent calc(var(--dot-sm) + 1px)
+          );
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
         z-index: 0;
       }
       .slot-machine-container::after {
@@ -683,16 +765,95 @@
         }
 
         body.game-started {
-          background:
-            radial-gradient(circle, var(--dot-mint) 0 10px, transparent 11px)
-              2vw 4vh / 260px 220px,
-            radial-gradient(circle, var(--dot-peach) 0 12px, transparent 13px)
-              9vw 8vh / 330px 260px,
-            radial-gradient(circle, var(--dot-gold) 0 11px, transparent 12px)
-              4vw 19vh / 300px 245px,
-            radial-gradient(circle, rgba(164, 201, 196, 0.38) 0 8px, transparent 9px)
-              12vw 27vh / 230px 210px,
-            var(--game-paper);
+          background-color: var(--game-paper);
+          background-image:
+            radial-gradient(
+              circle at 4% 9%,
+              var(--dot-mint) 0 var(--dot-lg),
+              transparent calc(var(--dot-lg) + 1px)
+            ),
+            radial-gradient(
+              circle at 16% 17%,
+              var(--dot-peach) 0 var(--dot-md),
+              transparent calc(var(--dot-md) + 1px)
+            ),
+            radial-gradient(
+              circle at 30% 7%,
+              var(--dot-gold) 0 var(--dot-sm),
+              transparent calc(var(--dot-sm) + 1px)
+            ),
+            radial-gradient(
+              circle at 45% 15%,
+              rgba(164, 201, 196, 0.42) 0 var(--dot-sm),
+              transparent calc(var(--dot-sm) + 1px)
+            ),
+            radial-gradient(
+              circle at 61% 8%,
+              rgba(239, 141, 109, 0.42) 0 var(--dot-md),
+              transparent calc(var(--dot-md) + 1px)
+            ),
+            radial-gradient(
+              circle at 78% 16%,
+              rgba(247, 199, 77, 0.42) 0 var(--dot-lg),
+              transparent calc(var(--dot-lg) + 1px)
+            ),
+            radial-gradient(
+              circle at 94% 9%,
+              var(--dot-mint) 0 var(--dot-sm),
+              transparent calc(var(--dot-sm) + 1px)
+            ),
+            radial-gradient(
+              circle at 6% 35%,
+              rgba(247, 199, 77, 0.38) 0 var(--dot-md),
+              transparent calc(var(--dot-md) + 1px)
+            ),
+            radial-gradient(
+              circle at 18% 49%,
+              rgba(164, 201, 196, 0.5) 0 var(--dot-xs),
+              transparent calc(var(--dot-xs) + 1px)
+            ),
+            radial-gradient(
+              circle at 84% 35%,
+              var(--dot-peach) 0 var(--dot-sm),
+              transparent calc(var(--dot-sm) + 1px)
+            ),
+            radial-gradient(
+              circle at 96% 47%,
+              rgba(164, 201, 196, 0.42) 0 var(--dot-md),
+              transparent calc(var(--dot-md) + 1px)
+            ),
+            radial-gradient(
+              circle at 10% 73%,
+              var(--dot-peach) 0 var(--dot-lg),
+              transparent calc(var(--dot-lg) + 1px)
+            ),
+            radial-gradient(
+              circle at 25% 86%,
+              var(--dot-gold) 0 var(--dot-sm),
+              transparent calc(var(--dot-sm) + 1px)
+            ),
+            radial-gradient(
+              circle at 47% 79%,
+              var(--dot-mint) 0 var(--dot-md),
+              transparent calc(var(--dot-md) + 1px)
+            ),
+            radial-gradient(
+              circle at 63% 91%,
+              rgba(239, 141, 109, 0.42) 0 var(--dot-xs),
+              transparent calc(var(--dot-xs) + 1px)
+            ),
+            radial-gradient(
+              circle at 77% 72%,
+              rgba(247, 199, 77, 0.46) 0 var(--dot-md),
+              transparent calc(var(--dot-md) + 1px)
+            ),
+            radial-gradient(
+              circle at 91% 84%,
+              rgba(164, 201, 196, 0.5) 0 var(--dot-sm),
+              transparent calc(var(--dot-sm) + 1px)
+            );
+          background-repeat: no-repeat;
+          background-size: 100% 100%;
         }
 
         body.game-started::before {
