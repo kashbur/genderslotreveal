@@ -21,7 +21,8 @@
     <style>
       @font-face {
         font-family: 'SparkyStones';
-        src: url('./sparkystones.ttf') format('truetype');
+        src: url('./sparkystones.woff2') format('woff2'),
+             url('./sparkystones.ttf') format('truetype');
         font-weight: normal;
         font-style: normal;
         font-display: swap;
@@ -118,7 +119,7 @@
         display: none;
       }
       .party-bunting {
-        background-image: url("img/Assets/banner.png");
+        background-image: url("img/Assets/banner.webp");
         background-position: center top;
         background-repeat: no-repeat;
         background-size: contain;
@@ -142,7 +143,7 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background-image: url("img/Assets/babyjackpot.png");
+        background-image: url("img/Assets/babyjackpot.webp");
         background-size: cover;
         background-position: center;
         z-index: 20;
@@ -1237,8 +1238,10 @@
             .catch(() => {});
         }
 
+        let _introResizeTimer = null;
         introTextResizeHandler = () => {
-          reFit();
+          clearTimeout(_introResizeTimer);
+          _introResizeTimer = setTimeout(reFit, 100);
         };
         window.addEventListener("resize", introTextResizeHandler);
         window.addEventListener("orientationchange", introTextResizeHandler);
@@ -1680,45 +1683,45 @@
 
       const LANGUAGE_ASSET_MAP = {
         en: {
-          background: "img/background-2.png",
-          tapToSpin: "img/Assets/taptospin.png",
-          instructions: "img/Assets/instructions.png",
-          boyIcon: "img/Assets/boy.png",
-          girlIcon: "img/Assets/girl.png",
+          background: "img/background-2.webp",
+          tapToSpin: "img/Assets/taptospin.webp",
+          instructions: "img/Assets/instructions.webp",
+          boyIcon: "img/Assets/boy.webp",
+          girlIcon: "img/Assets/girl.webp",
         },
         es: {
-          background: "img/Assets/Spanish/background-spanish.png",
-          tapToSpin: "img/Assets/Spanish/taptospin-spanish.png",
-          instructions: "img/Assets/Spanish/instructions-spanish.png",
-          boyIcon: "img/Assets/Spanish/boy-spanish.png",
-          girlIcon: "img/Assets/Spanish/girl-spanish.png",
+          background: "img/Assets/Spanish/background-spanish.webp",
+          tapToSpin: "img/Assets/Spanish/taptospin-spanish.webp",
+          instructions: "img/Assets/Spanish/instructions-spanish.webp",
+          boyIcon: "img/Assets/Spanish/boy-spanish.webp",
+          girlIcon: "img/Assets/Spanish/girl-spanish.webp",
         },
         fr: {
-          background: "img/Assets/French/background-french.png",
-          tapToSpin: "img/Assets/French/taptospin-french.png",
-          instructions: "img/Assets/French/instructions-french.png",
-          boyIcon: "img/Assets/French/boy-french.png",
-          girlIcon: "img/Assets/French/girl-french.png",
+          background: "img/Assets/French/background-french.webp",
+          tapToSpin: "img/Assets/French/taptospin-french.webp",
+          instructions: "img/Assets/French/instructions-french.webp",
+          boyIcon: "img/Assets/French/boy-french.webp",
+          girlIcon: "img/Assets/French/girl-french.webp",
         },
         de: {
-          background: "img/Assets/German/background-german.png",
-          tapToSpin: "img/Assets/German/taptospin-german.png",
-          instructions: "img/Assets/German/instructions-german.png",
-          boyIcon: "img/Assets/German/boy-german.png",
-          girlIcon: "img/Assets/German/girl-german.png",
+          background: "img/Assets/German/background-german.webp",
+          tapToSpin: "img/Assets/German/taptospin-german.webp",
+          instructions: "img/Assets/German/instructions-german.webp",
+          boyIcon: "img/Assets/German/boy-german.webp",
+          girlIcon: "img/Assets/German/girl-german.webp",
         },
       };
 
       const STATIC_ICON_SOURCES = [
-        "img/Assets/blue-balloon.png",
-        "img/Assets/bottle.png",
+        "img/Assets/blue-balloon.webp",
+        "img/Assets/bottle.webp",
         { key: "boyIcon" },
-        "img/Assets/confetti.png",
-        "img/Assets/elephant.png",
+        "img/Assets/confetti.webp",
+        "img/Assets/elephant.webp",
         { key: "girlIcon" },
-        "img/Assets/pink-balloon.png",
-        "img/Assets/rainbow.png",
-        "img/Assets/teddy-bear.png",
+        "img/Assets/pink-balloon.webp",
+        "img/Assets/rainbow.webp",
+        "img/Assets/teddy-bear.webp",
       ];
 
       function resolveLanguageAssets(languageCode) {
@@ -1736,7 +1739,7 @@
 
       const languageAssets = resolveLanguageAssets(normalizedLanguage);
       const englishAssets = LANGUAGE_ASSET_MAP.en;
-      const BANNER_IMAGE_SOURCE = "img/Assets/banner.png";
+      const BANNER_IMAGE_SOURCE = "img/Assets/banner.webp";
       const ICON_SOURCES = buildIconSources(languageAssets);
       const CRITICAL_IMAGE_SOURCES = [
         BANNER_IMAGE_SOURCE,
@@ -2044,9 +2047,9 @@
           return essentialAssetPreloadPromise;
         }
         const landingBackgrounds = {
-          es: "img/Assets/Spanish/babyjackpot-spanish.png",
-          fr: "img/Assets/French/babyjackpot-french.png",
-          de: "img/Assets/German/babyjackpot-german.png",
+          es: "img/Assets/Spanish/babyjackpot-spanish.webp",
+          fr: "img/Assets/French/babyjackpot-french.webp",
+          de: "img/Assets/German/babyjackpot-german.webp",
         };
         const landingScreen = document.getElementById("landing-screen");
         const landingHint = document.getElementById("landingHint");
@@ -2057,7 +2060,7 @@
         if (landingScreen) {
           const landingImage =
             landingBackgrounds[normalizedLanguage] ||
-            "img/Assets/babyjackpot.png";
+            "img/Assets/babyjackpot.webp";
           landingScreen.style.backgroundImage = `url("${landingImage}")`;
           refitIntroText = applyIntroTextFromURL();
           if (landingHint) {
@@ -2630,7 +2633,9 @@
           const confettiElements = [];
           const viewportWidth = container.offsetWidth,
             viewportHeight = container.offsetHeight;
-          const confettiCount = 64;
+          const isReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          if (isReducedMotion) return;
+          const confettiCount = window.innerWidth < 520 ? 32 : 64;
           for (let i = 0; i < confettiCount; i++) {
             const confetti = document.createElement("div");
             const shapeType = Math.floor(Math.random() * 3);
@@ -2647,8 +2652,6 @@
             const scale = 0.7 + Math.random() * 0.6;
             const color = colors[Math.floor(Math.random() * colors.length)];
             const rotation = Math.random() * 360;
-            confetti.style.left = `${left}px`;
-            confetti.style.top = `${top}px`;
             if (shapeType === 0) {
               confetti.style.width = `${size}px`;
               confetti.style.height = `${size}px`;
@@ -2660,8 +2663,7 @@
               confetti.style.height = `${size}px`;
             }
             confetti.style.backgroundColor = color;
-            confetti.style.transform = `rotate(${rotation}deg) scale(${scale})`;
-            confetti.style.boxShadow = "0 0 4px rgba(255,255,255,0.7)";
+            confetti.style.transform = `translate3d(${left}px, ${top}px, 0) rotate(${rotation}deg) scale(${scale})`;
             container.appendChild(confetti);
             confettiElements.push({
               element: confetti,
@@ -2673,6 +2675,7 @@
               floatFactor: 0.8 + Math.random() * 0.4,
               x: left,
               y: top,
+              scale: scale,
               rotation: rotation,
               gravity: 0.05 + Math.random() * 0.04,
               airResistance: 0.97 + Math.random() * 0.02,
@@ -2695,11 +2698,7 @@
                   Math.sin(wobblePhase) * confetti.horizontalWobble;
                 confetti.rotation += confetti.rotationSpeed * 0.5 * deltaTime;
                 const el = confetti.element;
-                el.style.top = `${confetti.y}px`;
-                el.style.left = `${confetti.x + wobble}px`;
-                const scale =
-                  el.style.transform.match(/scale\(([^)]+)\)/)?.[1] || 1;
-                el.style.transform = `rotate(${confetti.rotation}deg) scale(${scale})`;
+                el.style.transform = `translate3d(${confetti.x + wobble}px, ${confetti.y}px, 0) rotate(${confetti.rotation}deg) scale(${confetti.scale})`;
                 const shimmer = 0.8 + Math.sin(confetti.y * 0.006) * 0.18;
                 if (confetti.y > viewportHeight - 120) {
                   const fadeOut =
@@ -2725,7 +2724,11 @@
             cancelActiveConfetti();
           }, 8000);
         }
-        window.addEventListener("resize", refitAllLines);
+        let _refitTimer = null;
+        window.addEventListener("resize", () => {
+          clearTimeout(_refitTimer);
+          _refitTimer = setTimeout(refitAllLines, 100);
+        });
       });
     </script>
   </body>
