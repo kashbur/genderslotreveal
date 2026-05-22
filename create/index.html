@@ -177,7 +177,7 @@
           const password = document.getElementById("password").value.trim();
           if (PASSWORD_HASHES.includes(await sha256Hex(password))) {
             sessionStorage.setItem("babyJackpotCreatorUnlocked", "1");
-            window.location.href = "../language.html";
+            window.location.href = "../form.html";
             return;
           }
           errorEl.textContent = "Incorrect password.";
