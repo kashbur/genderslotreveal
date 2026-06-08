@@ -622,6 +622,7 @@
           revealMessagePlaceholderBoy: "IT'S A BOY!",
           textColor: 'Advanced Intro Color',
           generate: 'Generate URL',
+          generating: 'Generating...',
           copy: 'Copy to Clipboard',
           boy: 'Boy',
           girl: 'Girl',
@@ -657,6 +658,7 @@
           revealMessagePlaceholderBoy: '¡ES UN NIÑO!',
           textColor: 'Color avanzado del texto inicial',
           generate: 'Generar enlace',
+          generating: 'Generando...',
           copy: 'Copiar',
           boy: 'Niño',
           girl: 'Niña',
@@ -692,6 +694,7 @@
           revealMessagePlaceholderBoy: "C'EST UN GARÇON !",
           textColor: 'Couleur avancée du texte initial',
           generate: 'Générer le lien',
+          generating: 'Génération...',
           copy: 'Copier',
           boy: 'Garçon',
           girl: 'Fille',
@@ -727,6 +730,7 @@
           revealMessagePlaceholderBoy: 'ES IST EIN JUNGE!',
           textColor: 'Erweiterte Intro-Textfarbe',
           generate: 'Link erstellen',
+          generating: 'Wird erstellt...',
           copy: 'Kopieren',
           boy: 'Junge',
           girl: 'Mädchen',
@@ -894,6 +898,23 @@
           resultUrl.value = url;
         }
         previewFrame.src = url;
+      }
+
+      async function shortenUrl(url) {
+        const response = await fetch('/.netlify/functions/shorten-url', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url }),
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || !result.shortUrl) {
+          throw new Error(result.error || 'Short URL generation failed');
+        }
+
+        return result.shortUrl;
       }
 
       function setActiveRadio(targetLabel, options) {
@@ -1092,11 +1113,27 @@
         });
       });
 
-      generateButton.addEventListener('click', () => {
-        updatePreview({ updateResultInput: true });
-        setCopyAvailability(true);
-        resultUrl.focus();
-        resultUrl.select();
+      generateButton.addEventListener('click', async () => {
+        const locale = translations[currentLang] || translations.en;
+        const originalText = generateButton.textContent;
+        const longUrl = buildObfuscatedUrl();
+
+        previewFrame.src = longUrl;
+        generateButton.disabled = true;
+        generateButton.textContent = locale.generating || 'Generating...';
+
+        try {
+          resultUrl.value = await shortenUrl(longUrl);
+        } catch (error) {
+          console.error('TinyURL generation failed', error);
+          resultUrl.value = longUrl;
+        } finally {
+          generateButton.disabled = false;
+          generateButton.textContent = originalText;
+          setCopyAvailability(true);
+          resultUrl.focus();
+          resultUrl.select();
+        }
       });
 
       copyButton.addEventListener('click', async () => {
