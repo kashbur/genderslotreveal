@@ -2353,8 +2353,50 @@
           });
         }
 
+        function fitGenderText() {
+          const textEl = genderText;
+          if (!textEl || !textEl.textContent.trim()) return;
+          const overlay = genderOverlay;
+          const cs = window.getComputedStyle(overlay);
+          const availW = overlay.clientWidth - parseFloat(cs.paddingLeft || 0) - parseFloat(cs.paddingRight || 0);
+          const availH = overlay.clientHeight - parseFloat(cs.paddingTop || 0) - parseFloat(cs.paddingBottom || 0);
+          if (availW <= 0 || availH <= 0) return;
+
+          const clone = textEl.cloneNode(true);
+          Object.assign(clone.style, {
+            position: "absolute",
+            visibility: "hidden",
+            pointerEvents: "none",
+            left: "0",
+            top: "0",
+            width: availW + "px",
+            maxWidth: availW + "px",
+            height: "auto",
+            maxHeight: "none",
+            display: "block",
+            boxSizing: "border-box",
+            animation: "none",
+          });
+          overlay.appendChild(clone);
+
+          let lo = 12, hi = 160, best = 12;
+          const tol = 0.5;
+          while (lo <= hi) {
+            const mid = (lo + hi) / 2;
+            clone.style.fontSize = mid + "px";
+            if (clone.scrollWidth <= availW + tol && clone.scrollHeight <= availH + tol) {
+              best = mid;
+              lo = mid + tol;
+            } else {
+              hi = mid - tol;
+            }
+          }
+          clone.remove();
+          textEl.style.fontSize = Math.max(12, best - tol) + "px";
+        }
+
         if (document.fonts && document.fonts.ready) {
-          document.fonts.ready.then(refitAllLines);
+          document.fonts.ready.then(() => { refitAllLines(); fitGenderText(); });
         }
 
         function applyTextStyles(el, color, outlineColor, fontFamily) {
@@ -2453,6 +2495,7 @@
           genderOverlay.style.opacity = "1";
           genderOverlay.style.pointerEvents = "auto";
           setGenderState();
+          fitGenderText();
           genderOverlay.classList.add("active");
           if (isBoy) {
             genderOverlay.style.background = "rgba(203, 226, 207, 0.92)";
@@ -2623,7 +2666,11 @@
         let _refitTimer = null;
         window.addEventListener("resize", () => {
           clearTimeout(_refitTimer);
-          _refitTimer = setTimeout(refitAllLines, 100);
+          _refitTimer = setTimeout(() => { refitAllLines(); fitGenderText(); }, 100);
+        });
+        window.addEventListener("orientationchange", () => {
+          clearTimeout(_refitTimer);
+          _refitTimer = setTimeout(() => { refitAllLines(); fitGenderText(); }, 250);
         });
       });
     </script>
